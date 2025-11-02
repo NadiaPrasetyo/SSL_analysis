@@ -1,0 +1,4 @@
+source_organism,host_organisms,antigen_name,gene_name,Uniprot_ID,source
+ssl,Homo sapiens,SSL3,,Q2G0X7 ,literature
+ssl,Homo sapiens,SSL7,,Q2G2Y0 ,literature
+ssl,Homo sapiens,SSL11,,Q2G0X4,literature

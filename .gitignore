@@ -1,3 +1,6 @@
+# Project Specific files and folders to ignore
+notes.md
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
