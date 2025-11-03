@@ -161,6 +161,29 @@ def download_and_extract_zip(url: str, accession: str, output_dir: str, session=
 
     logging.error(f"Failed to download valid ZIP for {accession} after multiple attempts — skipping.")
 
+def translate_6_frames(fasta_path: str, output_path: str):
+    """
+    Translate nucleotide sequences in fasta_path into 6-frame protein sequences using seqkit.
+    Saves the translated sequences to output_path.
+    """
+    # check that seqkit is installed
+    import subprocess
+    try:
+        subprocess.run(["seqkit", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        raise RuntimeError("seqkit is not installed or not found in PATH. Please install seqkit to use this feature.")
+    # translate in all six frames, append frame info, convert init codon to M and trim trailing X/*
+    cmd = ["seqkit", "translate", "-f", "6", "-F", "-M", "--trim", fasta_path]
+
+    out_dir = os.path.dirname(output_path)
+    if out_dir:
+        ensure_dir(out_dir)
+
+    try:
+        with open(output_path, "w") as out_f:
+            subprocess.run(cmd, check=True, stdout=out_f, stderr=subprocess.PIPE, text=True)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"seqkit translate failed: {e.stderr.strip()}")
 
 # ---------------------------
 # Fetching genomes
@@ -302,6 +325,15 @@ def main():
         fetch_from_csv(csv_path, output_dir)
 
     shutil.rmtree(os.path.join(output_dir, "ncbi_dataset")) if os.path.exists(os.path.join(output_dir, "ncbi_dataset")) else None  # remove zip extraction dir if exists
+
+    # translate genomes to proteins in 6 frames
+    logging.info("Translating genomes to proteins in 6 frames...")
+    for file in tqdm(os.listdir(output_dir), desc="Translating"):
+        if file.endswith(".fasta") and not file.endswith("_proteins.fasta"):
+            fasta_path = os.path.join(output_dir, file)
+            protein_output_path = os.path.join(output_dir, f"{os.path.splitext(file)[0]}_6frame_proteins.fasta")
+            translate_6_frames(fasta_path, protein_output_path)
+
     logging.info("Done.")
 
 

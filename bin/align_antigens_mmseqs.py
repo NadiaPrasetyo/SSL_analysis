@@ -105,7 +105,7 @@ def run_mmseqs2_and_process(strain_fasta_path, antigen_fasta, results_dir, fetch
         str: The name of the strain (derived from the input FASTA filename).
     """
     strain_fasta = Path(strain_fasta_path)
-    strain_name = strain_fasta.stem.replace("_proteins", "")
+    strain_name = strain_fasta.stem.replace("_6frame_proteins", "")
     raw_result = results_dir / f"{strain_name}_alignment.tsv"
     best_result = results_dir / f"{strain_name}_best_hits.tsv"
     antigen_seqs_out = results_dir / f"{strain_name}_matched_antigens.fasta"
@@ -251,7 +251,7 @@ def main(pathogen_dir, pathogen_name, genome_dir, num_threads, output_dir, fetch
     results_dir = Path(base_dir/output_dir)
     results_dir.mkdir(parents=True, exist_ok=True)
     if mode == "protein":
-        strain_files = list(strain_dir.glob("*_proteins.fasta"))
+        strain_files = list(strain_dir.glob("*_6frame_proteins.fasta"))
     else:  # nucleotide
         strain_files = [f for f in strain_dir.glob("*.fasta") if not f.name.endswith("_proteins.fasta")]
         logging.info(f"Running in nucleotide mode. Found {len(strain_files)} files: {strain_files} .")
