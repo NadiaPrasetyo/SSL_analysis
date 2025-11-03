@@ -171,7 +171,7 @@ def translate_6_frames(fasta_path: str, output_path: str):
     Saves translated sequences to output_path.
     """
     try:
-        subprocess.run(["seqkit", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run(["which", "seqkit"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except (subprocess.CalledProcessError, FileNotFoundError):
         raise RuntimeError("seqkit is not installed or not found in PATH.")
 
