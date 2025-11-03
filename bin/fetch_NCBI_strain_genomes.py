@@ -190,46 +190,68 @@ def translate_6_frames(fasta_path: str, output_path: str):
 # ---------------------------
 def fetch_complete_genomes_for_taxon(taxon: str) -> list:
     """
-    Retrieve all complete genomes for a given taxon.
-    Handles pagination with retry/backoff for transient errors.
+    Retrieve all complete genomes for a given taxon using the NCBI Datasets v2 API.
+    Handles pagination with adaptive page size reduction and retry/backoff for transient errors.
     """
     assemblies = []
     next_page_token = None
     session = get_requests_session()
+    page_size = 1000  # Start large, reduce if timeouts occur
 
     while True:
         url = f"{API_BASE}/taxon/{requests.utils.quote(taxon)}/dataset_report"
         params = {
             "filters.assembly_level": "complete_genome",
             "filters.assembly_source": "refseq",
-            "page_size": 1000,
+            "page_size": page_size,
         }
         if next_page_token:
             params["page_token"] = next_page_token
 
         for attempt in range(5):
-            r = rate_limited_request(session, "GET", url, params=params, headers={"accept": "application/json"})
+            try:
+                r = rate_limited_request(session, "GET", url, params=params, headers={"accept": "application/json"})
+            except requests.exceptions.RequestException as e:
+                logging.warning(f"Connection error fetching page for {taxon}: {e}. Retrying...")
+                time.sleep(5 * (2 ** attempt))
+                continue
+
+            # Handle server or rate-limit errors
             if r.status_code in (429, 500, 502, 503, 504):
                 wait = 5 * (2 ** attempt)
                 logging.warning(f"API error {r.status_code} on {taxon}, retrying in {wait}s...")
                 time.sleep(wait)
+
+                # If timeout persists, reduce page size
+                if r.status_code == 504 and page_size > 100:
+                    old_size = page_size
+                    page_size = max(100, page_size // 2)
+                    logging.warning(f"Reducing page size from {old_size} to {page_size} due to repeated timeouts.")
                 continue
+
             elif not r.ok:
                 r.raise_for_status()
-            break
 
+            break  # successful response
+
+        # If still failing after retries, abort
         if not r.ok:
             raise RuntimeError(f"Failed to fetch genome list for {taxon}: {r.status_code}")
 
         data = r.json()
-        total = data.get("total_count", 0)
-        logging.info(f"Found {total} complete genomes for {taxon}")
 
+        # Log total only on first page
+        if not next_page_token:
+            total = data.get("total_count", 0)
+            logging.info(f"Found {total} complete genomes for {taxon}")
+
+        # Collect assemblies
         for record in data.get("reports", []):
             acc = record.get("accession")
             if acc:
                 assemblies.append({"accession": acc})
 
+        # Pagination
         next_page_token = data.get("next_page_token")
         if not next_page_token:
             break
