@@ -165,18 +165,34 @@ def fetch_complete_genomes_for_taxon(taxon: str) -> list:
     """Return a list of dicts with assembly info for a taxon at complete genome level."""
     assemblies = []
     next_page_token = None
+    page_size = 500  # smaller requests to avoid 504 timeouts
+
+    logging.info(f"Querying NCBI Datasets API for '{taxon}' complete genomes...")
 
     while True:
         url = f"{API_BASE}/taxon/{requests.utils.quote(taxon)}/dataset_report"
         params = {
             "filters.assembly_level": "complete_genome",
-            "page_size": 1000,
+            "page_size": page_size,
         }
         if next_page_token:
             params["page_token"] = next_page_token
 
-        r = safe_get(url, params=params, headers={"accept": "application/json"})
-        r.raise_for_status()
+        # retry loop for 5xx errors
+        for attempt in range(5):
+            try:
+                r = safe_get(url, params=params, headers={"accept": "application/json"})
+                if r.status_code >= 500:
+                    raise requests.exceptions.HTTPError(f"{r.status_code} Server Error")
+                r.raise_for_status()
+                break
+            except requests.exceptions.RequestException as e:
+                wait_time = 2 ** attempt
+                logging.warning(f"Error fetching page ({e}). Retrying in {wait_time}s...")
+                time.sleep(wait_time)
+        else:
+            raise RuntimeError(f"Failed after multiple retries for taxon: {taxon}")
+
         data = r.json()
         total = data.get("total_count", 0)
         logging.info(f"Found {total} complete genomes for {taxon}")
@@ -190,6 +206,10 @@ def fetch_complete_genomes_for_taxon(taxon: str) -> list:
         if not next_page_token:
             break
 
+        # pause slightly between page requests (stay within rate limit)
+        time.sleep(MIN_REQUEST_INTERVAL)
+
+    logging.info(f"Retrieved {len(assemblies)} total assemblies for {taxon}")
     return assemblies
 
 
