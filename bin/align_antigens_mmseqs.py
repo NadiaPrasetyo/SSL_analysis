@@ -264,7 +264,7 @@ def main(pathogen_dir, pathogen_name, genome_dir, num_threads, output_dir, fetch
 
     with ProcessPoolExecutor(max_workers=num_threads) as executor:
         futures = {
-            executor.submit(run_mmseqs2_and_process, f, antigen_fasta, results_dir, fetch_qseq, mode, pathogen_dir): f
+            executor.submit(run_mmseqs2_and_process, f, antigen_fasta, results_dir, fetch_qseq, mode, strain_dir): f
             for f in strain_fastas
         }
         for future in as_completed(futures):
