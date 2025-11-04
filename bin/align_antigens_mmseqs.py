@@ -58,6 +58,8 @@ def setup_logging(verbose, output_dir):
     """
     log_level = logging.DEBUG if verbose else logging.INFO
     log_file = Path(output_dir) / "mmseqs_alignment.log"
+    # create log file
+    log_file.touch(exist_ok=True)
     handlers = [logging.StreamHandler()]  # Log to console
     if verbose:
         handlers.append(logging.FileHandler(log_file))  # Log to file
