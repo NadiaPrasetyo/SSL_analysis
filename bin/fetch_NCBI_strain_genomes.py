@@ -175,7 +175,7 @@ def translate_6_frames(fasta_path: str, output_path: str):
     except (subprocess.CalledProcessError, FileNotFoundError):
         raise RuntimeError("seqkit is not installed or not found in PATH.")
 
-    cmd = ["seqkit", "translate", "-f", "6", "-F", "-M", "--trim", fasta_path]
+    cmd = ["seqkit", "translate", "-f", "6", "-F", "-M", fasta_path]
     ensure_dir(os.path.dirname(output_path))
 
     try:
