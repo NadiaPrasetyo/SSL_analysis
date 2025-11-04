@@ -93,55 +93,37 @@ def extract_antigens_to_fasta(csv_path, fasta_path, mode="protein"):
                 seq = row['nucleotide_sequence'].replace('\r', '').replace('\n', '')
             f_out.write(f">antigen_{idx}|{acc}|{name}\n{seq}\n")
 
-def run_mmseqs2_and_process(strain_fasta_path, antigen_fasta, results_dir, fetch_qseq=False, mode="protein"):
+def run_mmseqs2_and_process(strain_fasta_path, antigen_fasta, results_dir, fetch_qseq=False, mode="protein", dir_prefix=""):
     """
-    Runs MMseqs2 easy-search and processes alignment results.
-    Executes sequence alignment between the provided antigen FASTA file and a strain's translated genome FASTA file using MMseqs2.
-    The function saves the raw alignment results, extracts the best hits, and writes matched antigen sequences to output files.
+    Runs MMseqs2 alignment of antigens against a strain's genome or proteome,
+    processes the results to extract best hits, and saves outputs.
     Args:
-        strain_fasta_path (str or Path): Path to the strain's translated genome FASTA file.
-        antigen_fasta (str or Path): Path to the antigen FASTA file.
-        results_dir (str or Path): Directory where output files will be saved.
-        fetch_qseq (bool, optional): If True, includes query sequences in the MMseqs2 output. Defaults to False.
+        strain_fasta_path (str): Path to the strain's genome or proteome FASTA
+        antigen_fasta (str): Path to the antigen FASTA file.
+        results_dir (Path): Directory to save output files.
+        fetch_qseq (bool): Whether to include query sequences in the output.
+        mode (str): Alignment mode ("protein" or "nucleotide").
+        dir_prefix (str): Optional prefix for output filenames.
     Returns:
-        str: The name of the strain (derived from the input FASTA filename).
+        None
     """
     strain_fasta = Path(strain_fasta_path)
     strain_name = strain_fasta.stem.replace("_6frame_proteins", "")
-    raw_result = results_dir / f"{strain_name}_alignment.tsv"
-    best_result = results_dir / f"{strain_name}_best_hits.tsv"
-    antigen_seqs_out = results_dir / f"{strain_name}_matched_antigens.fasta"
+    
+    # Add pathogen directory name prefix to outputs
+    prefix = f"{dir_prefix}_" if dir_prefix else ""
+    raw_result = results_dir / f"{prefix}{strain_name}_alignment.tsv"
+    best_result = results_dir / f"{prefix}{strain_name}_best_hits.tsv"
+    antigen_seqs_out = results_dir / f"{prefix}{strain_name}_matched_antigens.fasta"
+    ...
+    extract_best_hits_with_sequences(strain_fasta_path, raw_result, best_result, antigen_seqs_out, fetch_qseq)
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        output_fields = [
-            "query", "target", "pident", "nident", "alnlen",
-            "evalue", "bits", "mismatch", "qcov", "tcov", "tstart", "tend", "taln"
-        ]
-        if fetch_qseq:
-            output_fields.append("qseq")
+    # Remove empty output files
+    for path in [raw_result, best_result, antigen_seqs_out]:
+        if not path.exists() or os.path.getsize(path) == 0:
+            logging.info(f"[⚠] Removing empty file: {path}")
+            path.unlink(missing_ok=True)
 
-        search_type = "2" if mode == "protein" else "3"  # 2 for translated, 3 for nucleotide
-        cmd = [
-            "mmseqs", "easy-search",
-            antigen_fasta, str(strain_fasta),
-            str(raw_result), tmpdir,
-            "--search-type", search_type,
-            "--format-mode", "4",
-            "--format-output", ",".join(output_fields)
-        ]
-
-        # Only add dbtype if nucleotide mode
-        if mode == "nucleotide":
-            cmd.extend(["--dbtype", "2"])
-
-        subprocess.run(cmd, check=True)
-
-        logging.info(f"[✓] {strain_name} with mode {mode} MMseqs2 search complete. Extracting best hits...")
-
-        extract_best_hits_with_sequences(strain_fasta_path,raw_result, best_result, antigen_seqs_out, fetch_qseq)
-
-    logging.info(f"[✓] {strain_name} aligned. Hits + sequences saved.")
-    return strain_name
 
 def extract_best_hits_with_sequences(strain_fasta_path, raw_tsv_path, output_tsv_path, fasta_out_path, fetch_qseq):
     """
@@ -282,7 +264,7 @@ def main(pathogen_dir, pathogen_name, genome_dir, num_threads, output_dir, fetch
 
     with ProcessPoolExecutor(max_workers=num_threads) as executor:
         futures = {
-            executor.submit(run_mmseqs2_and_process, f, antigen_fasta, results_dir, fetch_qseq, mode): f
+            executor.submit(run_mmseqs2_and_process, f, antigen_fasta, results_dir, fetch_qseq, mode, pathogen_dir): f
             for f in strain_fastas
         }
         for future in as_completed(futures):
