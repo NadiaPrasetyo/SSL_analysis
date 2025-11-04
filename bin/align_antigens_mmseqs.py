@@ -95,35 +95,70 @@ def extract_antigens_to_fasta(csv_path, fasta_path, mode="protein"):
 
 def run_mmseqs2_and_process(strain_fasta_path, antigen_fasta, results_dir, fetch_qseq=False, mode="protein", dir_prefix=""):
     """
-    Runs MMseqs2 alignment of antigens against a strain's genome or proteome,
-    processes the results to extract best hits, and saves outputs.
-    Args:
-        strain_fasta_path (str): Path to the strain's genome or proteome FASTA
-        antigen_fasta (str): Path to the antigen FASTA file.
-        results_dir (Path): Directory to save output files.
-        fetch_qseq (bool): Whether to include query sequences in the output.
-        mode (str): Alignment mode ("protein" or "nucleotide").
-        dir_prefix (str): Optional prefix for output filenames.
-    Returns:
-        None
+    Runs MMseqs2 easy-search and processes alignment results.
+    Extracts best hits only if the alignment file contains real results (not just a header).
     """
     strain_fasta = Path(strain_fasta_path)
     strain_name = strain_fasta.stem.replace("_6frame_proteins", "")
-    
-    # Add pathogen directory name prefix to outputs
     prefix = f"{dir_prefix}_" if dir_prefix else ""
+
     raw_result = results_dir / f"{prefix}{strain_name}_alignment.tsv"
     best_result = results_dir / f"{prefix}{strain_name}_best_hits.tsv"
     antigen_seqs_out = results_dir / f"{prefix}{strain_name}_matched_antigens.fasta"
-    ...
-    extract_best_hits_with_sequences(strain_fasta_path, raw_result, best_result, antigen_seqs_out, fetch_qseq)
 
-    # Remove empty output files
-    for path in [raw_result, best_result, antigen_seqs_out]:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        output_fields = [
+            "query", "target", "pident", "nident", "alnlen",
+            "evalue", "bits", "mismatch", "qcov", "tcov", "tstart", "tend", "taln"
+        ]
+        if fetch_qseq:
+            output_fields.append("qseq")
+
+        # 2 = protein search, 3 = nucleotide search
+        search_type = "2" if mode == "protein" else "3"
+        cmd = [
+            "mmseqs", "easy-search",
+            str(antigen_fasta), str(strain_fasta),
+            str(raw_result), tmpdir,
+            "--search-type", search_type,
+            "--format-mode", "4",
+            "--format-output", ",".join(output_fields)
+        ]
+
+        if mode == "nucleotide":
+            cmd.extend(["--dbtype", "2"])
+
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            logging.error(f"[✗] MMseqs2 failed for {strain_name}: {e}")
+            return strain_name
+
+        # ✅ Check for empty or header-only TSV
+        has_hits = False
+        if raw_result.exists():
+            with open(raw_result) as f:
+                lines = [ln.strip() for ln in f if ln.strip()]
+                if len(lines) > 1:  # more than just a header
+                    has_hits = True
+
+        if not has_hits:
+            logging.warning(f"[⚠] No hits found for {strain_name}. Skipping extraction.")
+            raw_result.unlink(missing_ok=True)
+            return strain_name
+
+        logging.info(f"[✓] {strain_name} MMseqs2 search complete. Extracting best hits...")
+
+        extract_best_hits_with_sequences(strain_fasta_path, raw_result, best_result, antigen_seqs_out, fetch_qseq)
+
+    # Optional: remove empty post-processing outputs
+    for path in [best_result, antigen_seqs_out]:
         if not path.exists() or os.path.getsize(path) == 0:
             logging.info(f"[⚠] Removing empty file: {path}")
             path.unlink(missing_ok=True)
 
+    logging.info(f"[✓] {strain_name} aligned. Hits + sequences saved.")
+    return strain_name
 
 def extract_best_hits_with_sequences(strain_fasta_path, raw_tsv_path, output_tsv_path, fasta_out_path, fetch_qseq):
     """
