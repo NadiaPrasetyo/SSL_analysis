@@ -37,8 +37,6 @@ def setup_logging(verbose: bool, output_dir: Path):
     )
     if verbose:
         logging.info("Logging initialized. Log file: %s", log_file)
-    return log_file
-
 
 def run_jackhmmer(query_file: Path, seq_db: Path, output_dir: Path, verbose: bool = False) -> Path:
     """Run jackhmmer for a single query file."""
