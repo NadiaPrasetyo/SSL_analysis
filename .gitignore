@@ -1,5 +1,6 @@
 # Project Specific files and folders to ignore
 notes.md
+data/ssl/genomes_6frame_proteins.fasta
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
