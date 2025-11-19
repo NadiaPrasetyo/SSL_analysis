@@ -1,0 +1,40 @@
+#                                                                 --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
+# target name          accession  query name           accession    E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
+#  ------------------- ---------- -------------------- ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
+NC_002745.2_frame=2    -          Q2G0X7|SSL3          -                  0 1613.6 371.2  3.4e-177  584.2  29.7  16.5  11   4   3  14  14   9   9 Staphylococcus aureus subsp. aureus N315, complete sequence
+NC_007795.1_frame=1    -          Q2G0X7|SSL3          -                  0 1580.8 309.2  2.1e-143  473.1  18.3  15.6  10   5   5  15  15  11  11 Staphylococcus aureus subsp. aureus NCTC 8325 chromosome, complete genome
+NZ_CP132371.1_frame=3  -          Q2G0X7|SSL3          -                  0 1559.7 169.3  3.8e-177  584.1  29.2  20.3  17   4   3  20  20   8   8 Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+NZ_CP011877.1_frame=-2 -          Q2G0X7|SSL3          -                  0 1438.8 183.0  6.4e-144  474.8  16.6  20.9  17   5   5  22  22  11  11 Staphylococcus aureus strain 12S01032 chromosome, complete genome
+NZ_LR134090.1_frame=1  -          Q2G0X7|SSL3          -                  0 1427.1 171.0    8e-176  579.7  30.5  31.2  25   5   5  32  32   9   9 Staphylococcus aureus strain NCTC9555 chromosome 1, complete sequence
+NC_002953.3_frame=3    -          Q2G0X7|SSL3          -                  0 1422.6 409.0  2.8e-139  459.5  18.3  17.7  15   4   4  19  19  11  11 Staphylococcus aureus subsp. aureus MSSA476, complete sequence
+NZ_CP113052.1_frame=2  -          Q2G0X7|SSL3          -                  0 1420.1 300.7    4e-148  488.6  19.5  15.6  10   5   5  15  15  11  11 Staphylococcus aureus strain Fizz chromosome, complete genome
+NZ_LR134090.1_frame=2  -          Q2G0X7|SSL3          -                  0 1326.2 190.4  3.1e-140  462.7  21.1  38.9  25   7  15  45  45  12  11 Staphylococcus aureus strain NCTC9555 chromosome 1, complete sequence
+NZ_CP029678.1_frame=1  -          Q2G0X7|SSL3          -                  0 1321.6 427.0  8.6e-144  474.4  18.0  20.1  15   5   5  20  20  11  11 Staphylococcus aureus strain AR_0216 chromosome, complete genome
+NZ_CP136528.1_frame=1  -          Q2G0X7|SSL3          -                  0 1312.2 177.4  8.1e-144  474.4  18.0  19.9  15   5   5  20  20  12  11 Staphylococcus aureus strain BAA-1556_Catania chromosome, complete genome
+NC_002952.2_frame=1    -          Q2G0X7|SSL3          -                  0 1289.1 285.5  9.6e-133  438.0  15.2  13.9  10   4   4  14  14   9   9 Staphylococcus aureus subsp. aureus MRSA252, complete sequence
+NC_017338.2_frame=2    -          Q2G0X7|SSL3          -                  0 1232.5 147.5  1.3e-132  437.6  19.6  16.8  14   3   3  17  17   8   8 Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+NC_017763.1_frame=3    -          Q2G0X7|SSL3          -                  0 1122.0 137.5  9.9e-155  510.3  22.7  19.1  17   3   3  20  20   9   8 Staphylococcus aureus subsp. aureus HO 5096 0412, complete sequence
+NC_002745.2_frame=3    -          Q2G0X7|SSL3          -                  0 1084.8 294.5   1.8e-71  236.4  16.2  16.5  12   5   5  17  17  12  10 Staphylococcus aureus subsp. aureus N315, complete sequence
+NZ_CP132371.1_frame=1  -          Q2G0X7|SSL3          -                  0 1068.4 177.1   1.8e-71  236.5  16.2  19.3  14   5   5  19  19  12  11 Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+NC_007795.1_frame=3    -          Q2G0X7|SSL3          -                  0 1020.3 108.9  2.6e-179  591.2  29.8  15.6  14   2   2  16  16   8   6 Staphylococcus aureus subsp. aureus NCTC 8325 chromosome, complete genome
+NZ_CP113052.1_frame=1  -          Q2G0X7|SSL3          -           1.1e-303 1000.3 109.2  2.6e-173  571.5  30.2  16.3  14   2   2  16  16   7   6 Staphylococcus aureus strain Fizz chromosome, complete genome
+NZ_CP136528.1_frame=3  -          Q2G0X7|SSL3          -           1.1e-303 1000.3 109.2  2.6e-173  571.5  30.2  19.3  17   2   2  19  19   6   6 Staphylococcus aureus strain BAA-1556_Catania chromosome, complete genome
+NZ_CP029678.1_frame=3  -          Q2G0X7|SSL3          -           1.4e-303 1000.0 109.2  2.7e-173  571.4  30.2  11.8  10   2   2  12  12   7   6 Staphylococcus aureus strain AR_0216 chromosome, complete genome
+NC_002953.3_frame=2    -          Q2G0X7|SSL3          -           3.5e-301  992.1 114.4  1.4e-176  582.2  30.9  18.0  16   2   2  18  18   8   7 Staphylococcus aureus subsp. aureus MSSA476, complete sequence
+NC_017338.2_frame=3    -          Q2G0X7|SSL3          -           1.8e-264  871.3 157.3   2.7e-66  219.4  15.3  23.5  20   4   4  24  24  11  10 Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+NC_002952.2_frame=3    -          Q2G0X7|SSL3          -           2.4e-264  870.9  90.5  2.6e-152  502.4  22.4  13.4  11   2   2  13  13   5   5 Staphylococcus aureus subsp. aureus MRSA252, complete sequence
+NZ_CP011877.1_frame=-1 -          Q2G0X7|SSL3          -           3.6e-225  742.0  65.4  5.9e-154  507.8  22.3  12.4  12   1   1  13  13   6   4 Staphylococcus aureus strain 12S01032 chromosome, complete genome
+NC_002953.3_frame=1    -          Q2G0X7|SSL3          -           2.1e-202  667.2 113.6   1.6e-66  220.2  13.9  15.7  12   3   3  15  15   9   7 Staphylococcus aureus subsp. aureus MSSA476, complete sequence
+NC_017338.2_frame=1    -          Q2G0X7|SSL3          -           1.8e-197  650.9  68.4  1.8e-121  400.9  14.4  10.8   9   2   1  10  10   6   4 Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+NZ_CP136528.1_frame=2  -          Q2G0X7|SSL3          -           3.7e-169  557.8 149.4   1.2e-65  217.3  21.4   9.0   6   2   2   8   8   6   5 Staphylococcus aureus strain BAA-1556_Catania chromosome, complete genome
+NZ_CP113052.1_frame=3  -          Q2G0X7|SSL3          -           1.1e-162  536.5  91.9   1.2e-65  217.3  21.4  16.3  14   2   2  16  16   6   5 Staphylococcus aureus strain Fizz chromosome, complete genome
+#
+# Program:         jackhmmer
+# Version:         3.1b2 (February 2015)
+# Pipeline mode:   SEARCH
+# Query file:      data/ssl/SSL3.fasta
+# Target file:     data/ssl/genomes_6frame_proteins.fasta
+# Option settings: jackhmmer -N 5 -o data/ssl/jackhmmer_results/SSL3.jackhmmer.out -A data/ssl/jackhmmer_results/SSL3.jackhmmer.sto --tblout data/ssl/jackhmmer_results/SSL3.jackhmmer.tblout --domtblout data/ssl/jackhmmer_results/SSL3.jackhmmer.domtblout --noali --cpu 4 data/ssl/SSL3.fasta data/ssl/genomes_6frame_proteins.fasta 
+# Current dir:     /projects/health_sciences/bms/biochemistry/gardner_group/nadia/SSL_analysis
+# Date:            Fri Nov  7 10:37:33 2025
+# [ok]
