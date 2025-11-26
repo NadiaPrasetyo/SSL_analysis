@@ -1,23 +1,38 @@
 #                                                                 --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
 # target name          accession  query name           accession    E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
 #  ------------------- ---------- -------------------- ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
-NC_007795.1_frame=1    -          Q2G2Y0|SSL7          -                  0 1585.4 125.9   8.8e-87  285.5  12.1   7.9   7   0   0   7   7   7   7 Staphylococcus aureus subsp. aureus NCTC 8325 chromosome, complete genome
-NZ_CP011877.1_frame=-2 -          Q2G2Y0|SSL7          -                  0 1563.4 130.3   3.8e-86  283.4   8.9   8.4   8   0   0   8   8   8   7 Staphylococcus aureus strain 12S01032 chromosome, complete genome
-NZ_CP113052.1_frame=2  -          Q2G2Y0|SSL7          -                  0 1415.8 110.3   8.5e-87  285.5  12.1   7.6   7   0   0   7   7   7   7 Staphylococcus aureus strain Fizz chromosome, complete genome
-NZ_CP132371.1_frame=1  -          Q2G2Y0|SSL7          -                  0 1415.0 121.1   9.2e-89  292.0  15.8   8.0   8   0   0   8   8   8   6 Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
-NZ_CP029678.1_frame=1  -          Q2G2Y0|SSL7          -                  0 1400.3 126.5     9e-87  285.4  12.1   8.1   8   0   0   8   8   8   7 Staphylococcus aureus strain AR_0216 chromosome, complete genome
-NC_002745.2_frame=3    -          Q2G2Y0|SSL7          -                  0 1331.6 133.6   9.7e-89  291.9  15.8   9.1  10   0   0  10  10  10   5 Staphylococcus aureus subsp. aureus N315, complete sequence
-NC_002953.3_frame=3    -          Q2G2Y0|SSL7          -                  0 1328.5 160.0   5.4e-85  279.6  12.6   9.5   9   0   0   9   9   9   8 Staphylococcus aureus subsp. aureus MSSA476, complete sequence
-NC_002745.2_frame=2    -          Q2G2Y0|SSL7          -                  0 1293.4 148.9   6.8e-85  279.3  13.1   9.2   9   0   0   9   9   9   8 Staphylococcus aureus subsp. aureus N315, complete sequence
-NC_017338.2_frame=2    -          Q2G2Y0|SSL7          -                  0 1198.7 141.4   3.6e-80  263.9  11.8   8.1   8   0   0   8   8   8   6 Staphylococcus aureus subsp. aureus JKD6159, complete sequence
-NZ_CP035450.1_frame=2  -          Q2G2Y0|SSL7          -            1.9e-22   75.0   4.1   4.8e-22   73.7   4.1   1.6   1   0   0   1   1   1   1 Streptococcus pyogenes strain emm93.4 chromosome, complete genome
+NZ_LR134284.1_frame=2  -          Q2G2Y0|SSL7          -           1.1e-241  792.7  78.4   7.7e-79  259.9   9.0   5.3   5   0   0   5   5   4   4 Streptococcus pyogenes strain NCTC8232 chromosome 1, complete sequence
+NZ_LS483357.1_frame=1  -          Q2G2Y0|SSL7          -           3.1e-208  683.3  52.6   9.7e-76  249.8   7.0   3.3   3   0   0   3   3   3   3 Streptococcus pyogenes strain NCTC8326 chromosome 1, complete sequence
+NZ_CP155738.1_frame=3  -          Q2G2Y0|SSL7          -           3.8e-129  424.5  53.3   2.4e-72  238.7  18.1   3.2   3   0   0   3   3   2   2 Streptococcus pyogenes strain 1510/08 chromosome, complete genome
+NZ_CP118481.1_frame=2  -          Q2G2Y0|SSL7          -           9.9e-129  423.2  31.1   7.4e-79  260.0   9.7   2.5   2   0   0   2   2   2   2 Streptococcus pyogenes strain 20185322 chromosome, complete genome
+NZ_CP118481.1_frame=1  -          Q2G2Y0|SSL7          -             1e-123  406.8  26.8   1.7e-62  206.4  11.2   2.4   2   0   0   2   2   2   2 Streptococcus pyogenes strain 20185322 chromosome, complete genome
+NZ_CP070994.1_frame=-3 -          Q2G2Y0|SSL7          -           8.6e-122  400.5  39.6   1.7e-61  203.2  21.0   2.3   2   0   0   2   2   2   2 Streptococcus pyogenes strain M11318 chromosome, complete genome
+NZ_CP134538.1_frame=-2 -          Q2G2Y0|SSL7          -           3.7e-115  378.8  22.9     2e-62  206.2   8.3   2.4   2   0   0   2   2   2   2 Streptococcus equi subsp. equi strain XJ5012 chromosome, complete genome
+NZ_AP023388.1_frame=1  -          Q2G2Y0|SSL7          -            2.6e-97  320.4  27.0     7e-69  227.3  11.3   2.9   3   0   0   3   3   2   2 Streptococcus pyogenes strain NIH35 chromosome, complete genome
+NZ_AP023389.1_frame=3  -          Q2G2Y0|SSL7          -            1.1e-96  318.3  26.6   1.9e-62  206.3  10.8   2.4   2   0   0   2   2   2   2 Streptococcus pyogenes strain KUN-0012590 chromosome, complete genome
+NZ_CP051138.1_frame=1  -          Q2G2Y0|SSL7          -            9.5e-96  315.2  27.5   3.4e-62  205.5  11.4   2.4   2   0   0   2   2   2   2 Streptococcus pyogenes strain 4063-05 chromosome, complete genome
+NZ_CP070994.1_frame=3  -          Q2G2Y0|SSL7          -            4.2e-79  260.8   9.7   7.1e-79  260.0   9.7   1.4   1   0   0   1   1   1   1 Streptococcus pyogenes strain M11318 chromosome, complete genome
+NZ_CP167001.1_frame=3  -          Q2G2Y0|SSL7          -            4.4e-79  260.7   9.7   7.2e-79  260.0   9.7   1.3   1   0   0   1   1   1   1 Streptococcus pyogenes strain Isolate 31 chromosome, complete genome
+NZ_CP051138.1_frame=3  -          Q2G2Y0|SSL7          -            4.7e-76  250.8   7.0   9.7e-76  249.8   7.0   1.6   1   0   0   1   1   1   1 Streptococcus pyogenes strain 4063-05 chromosome, complete genome
+NZ_AP023389.1_frame=-2 -          Q2G2Y0|SSL7          -            4.2e-73  241.1  18.2   8.3e-73  240.2  18.2   1.5   1   0   0   1   1   1   1 Streptococcus pyogenes strain KUN-0012590 chromosome, complete genome
+NZ_CP051138.1_frame=2  -          Q2G2Y0|SSL7          -            4.5e-73  241.1  18.2   8.6e-73  240.1  18.2   1.5   1   0   0   1   1   1   1 Streptococcus pyogenes strain 4063-05 chromosome, complete genome
+NZ_AP023388.1_frame=-1 -          Q2G2Y0|SSL7          -            4.6e-73  241.0  18.2   8.3e-73  240.2  18.2   1.4   1   0   0   1   1   1   1 Streptococcus pyogenes strain NIH35 chromosome, complete genome
+NZ_CP070994.1_frame=2  -          Q2G2Y0|SSL7          -            3.9e-69  228.2  11.3   6.9e-69  227.4  11.3   1.4   1   0   0   1   1   1   1 Streptococcus pyogenes strain M11318 chromosome, complete genome
+NZ_CP167001.1_frame=1  -          Q2G2Y0|SSL7          -            4.1e-69  228.1  11.3     7e-69  227.3  11.3   1.3   1   0   0   1   1   1   1 Streptococcus pyogenes strain Isolate 31 chromosome, complete genome
+NZ_AP023389.1_frame=2  -          Q2G2Y0|SSL7          -            5.2e-69  227.8  11.0   1.1e-68  226.7  11.0   1.5   1   0   0   1   1   1   1 Streptococcus pyogenes strain KUN-0012590 chromosome, complete genome
+NZ_CP035450.1_frame=2  -          Q2G2Y0|SSL7          -            8.7e-69  227.0  11.7   1.5e-68  226.2  11.7   1.4   1   0   0   1   1   1   1 Streptococcus pyogenes strain emm93.4 chromosome, complete genome
+NZ_CP118481.1_frame=3  -          Q2G2Y0|SSL7          -            8.8e-69  227.0  11.7   1.7e-68  226.1  11.7   1.4   1   0   0   1   1   1   1 Streptococcus pyogenes strain 20185322 chromosome, complete genome
+NZ_CP119597.1_frame=-3 -          Q2G2Y0|SSL7          -            2.1e-68  225.8  13.0   3.8e-68  224.9  13.0   1.4   1   0   0   1   1   1   1 Streptococcus pyogenes strain 1039 chromosome, complete genome
+NZ_CP155740.1_frame=3  -          Q2G2Y0|SSL7          -            1.2e-62  207.0  10.1   2.3e-62  206.0  10.1   1.4   1   0   0   1   1   1   1 Streptococcus pyogenes strain 1851/03 chromosome, complete genome
+NZ_CP167001.1_frame=-1 -          Q2G2Y0|SSL7          -              9e-62  204.1  21.0   1.7e-61  203.1  21.0   1.4   1   0   0   1   1   1   1 Streptococcus pyogenes strain Isolate 31 chromosome, complete genome
+NZ_CP167001.1_frame=-2 -          Q2G2Y0|SSL7          -            1.2e-61  203.7  10.7   2.2e-61  202.8  10.7   1.4   1   0   0   1   1   1   1 Streptococcus pyogenes strain Isolate 31 chromosome, complete genome
 #
 # Program:         jackhmmer
 # Version:         3.1b2 (February 2015)
 # Pipeline mode:   SEARCH
 # Query file:      data/ssl/SSL7.fasta
 # Target file:     data/ssl/genomes_6frame_proteins.fasta
-# Option settings: jackhmmer -N 5 -o data/ssl/jackhmmer_results/SSL7.jackhmmer.out -A data/ssl/jackhmmer_results/SSL7.jackhmmer.sto --tblout data/ssl/jackhmmer_results/SSL7.jackhmmer.tblout --domtblout data/ssl/jackhmmer_results/SSL7.jackhmmer.domtblout --noali --cpu 4 data/ssl/SSL7.fasta data/ssl/genomes_6frame_proteins.fasta 
+# Option settings: jackhmmer -N 10 -o jackhmmer_results/SSL7.jackhmmer.out -A jackhmmer_results/SSL7.jackhmmer.sto --tblout jackhmmer_results/SSL7.jackhmmer.tblout --domtblout jackhmmer_results/SSL7.jackhmmer.domtblout --noali --cpu 4 data/ssl/SSL7.fasta data/ssl/genomes_6frame_proteins.fasta 
 # Current dir:     /projects/health_sciences/bms/biochemistry/gardner_group/nadia/SSL_analysis
-# Date:            Fri Nov  7 10:36:37 2025
+# Date:            Thu Nov 20 11:36:47 2025
 # [ok]
