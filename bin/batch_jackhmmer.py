@@ -45,17 +45,19 @@ def run_jackhmmer(query_file: Path, seq_db: Path, output_dir: Path, verbose: boo
     tblout_file = output_dir / f"{query_name}.jackhmmer.tblout"
     alignment_file = output_dir / f"{query_name}.jackhmmer.sto"
     domain_tblout_file = output_dir / f"{query_name}.jackhmmer.domtblout"
+    checkpoint_ali = output_dir / f"{query_name}"
 
     cmd = [
         "jackhmmer",
-        "-N", "10",  # max 5 iterations (default, but explicit)
+        "-N", "5",  # max 5 iterations (default, but explicit)
         "--cpu", "4",  # adjust as needed
         "--tblout", str(tblout_file),
         "--domtblout", str(domain_tblout_file),
         "-o", str(result_file),
         "--noali",
         "-A", str(alignment_file),
-        "--chkali", str(output_dir / f"{query_name}_checkpoint"),
+        "--chkali", checkpoint_ali,
+        "-T", "100",
         str(query_file),
         str(seq_db)
     ]
