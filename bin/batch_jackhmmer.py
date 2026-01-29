@@ -24,8 +24,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 def setup_logging(verbose: bool, output_dir: Path):
     """Configure logging to console and file."""
     log_level = logging.DEBUG if verbose else logging.INFO
-    if verbose:
-        log_file = output_dir / "jackhmmer_batch.log"
+    log_file = output_dir / "jackhmmer_batch.log"  
 
     logging.basicConfig(
         level=log_level,
@@ -57,7 +56,7 @@ def run_jackhmmer(query_file: Path, seq_db: Path, output_dir: Path, verbose: boo
         "--noali",
         "-A", str(alignment_file),
         "--chkali", checkpoint_ali,
-        "-T", "100",
+        "-incT", "100",
         str(query_file),
         str(seq_db)
     ]
