@@ -56,8 +56,7 @@ def run_jackhmmer(query_file: Path, seq_db: Path, output_dir: Path, verbose: boo
         "--noali",
         "-A", str(alignment_file),
         "--chkali", checkpoint_ali,
-        "--incT", "300",
-        "--incdomT", "100",
+        "--incT", "200",
         str(query_file),
         str(seq_db)
     ]
