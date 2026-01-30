@@ -1,0 +1,412 @@
+# STOCKHOLM 1.0
+#=GF ID Q2G0X4|SSL11-i2
+
+#=GS NC_007795.1_frame=1/129432-129655    DE [subseq from] Staphylococcus aureus subsp. aureus NCTC 8325 chromosome, complete genome
+#=GS NC_007795.1_frame=1/129754-129980    DE [subseq from] Staphylococcus aureus subsp. aureus NCTC 8325 chromosome, complete genome
+#=GS NC_007795.1_frame=1/130561-130597    DE [subseq from] Staphylococcus aureus subsp. aureus NCTC 8325 chromosome, complete genome
+#=GS NC_007795.1_frame=1/130663-130867    DE [subseq from] Staphylococcus aureus subsp. aureus NCTC 8325 chromosome, complete genome
+#=GS NC_007795.1_frame=1/130991-131223    DE [subseq from] Staphylococcus aureus subsp. aureus NCTC 8325 chromosome, complete genome
+#=GS NC_007795.1_frame=1/132452-132682    DE [subseq from] Staphylococcus aureus subsp. aureus NCTC 8325 chromosome, complete genome
+#=GS NC_007795.1_frame=1/134170-134394    DE [subseq from] Staphylococcus aureus subsp. aureus NCTC 8325 chromosome, complete genome
+#=GS NZ_CP011877.1_frame=-2/757121-757345 DE [subseq from] Staphylococcus aureus strain 12S01032 chromosome, complete genome
+#=GS NZ_CP011877.1_frame=-2/758231-758270 DE [subseq from] Staphylococcus aureus strain 12S01032 chromosome, complete genome
+#=GS NZ_CP011877.1_frame=-2/758339-758544 DE [subseq from] Staphylococcus aureus strain 12S01032 chromosome, complete genome
+#=GS NZ_CP011877.1_frame=-2/758669-758901 DE [subseq from] Staphylococcus aureus strain 12S01032 chromosome, complete genome
+#=GS NZ_CP011877.1_frame=-2/759398-759628 DE [subseq from] Staphylococcus aureus strain 12S01032 chromosome, complete genome
+#=GS NZ_CP011877.1_frame=-2/759753-759978 DE [subseq from] Staphylococcus aureus strain 12S01032 chromosome, complete genome
+#=GS NZ_CP011877.1_frame=-2/761111-761336 DE [subseq from] Staphylococcus aureus strain 12S01032 chromosome, complete genome
+#=GS NZ_CP113052.1_frame=2/460383-460606  DE [subseq from] Staphylococcus aureus strain Fizz chromosome, complete genome
+#=GS NZ_CP113052.1_frame=2/460705-460931  DE [subseq from] Staphylococcus aureus strain Fizz chromosome, complete genome
+#=GS NZ_CP113052.1_frame=2/461508-461543  DE [subseq from] Staphylococcus aureus strain Fizz chromosome, complete genome
+#=GS NZ_CP113052.1_frame=2/461627-461831  DE [subseq from] Staphylococcus aureus strain Fizz chromosome, complete genome
+#=GS NZ_CP113052.1_frame=2/461955-462187  DE [subseq from] Staphylococcus aureus strain Fizz chromosome, complete genome
+#=GS NZ_CP113052.1_frame=2/463416-463646  DE [subseq from] Staphylococcus aureus strain Fizz chromosome, complete genome
+#=GS NZ_CP113052.1_frame=2/465134-465241  DE [subseq from] Staphylococcus aureus strain Fizz chromosome, complete genome
+#=GS NZ_CP029678.1_frame=1/148323-148546  DE [subseq from] Staphylococcus aureus strain AR_0216 chromosome, complete genome
+#=GS NZ_CP029678.1_frame=1/148645-148871  DE [subseq from] Staphylococcus aureus strain AR_0216 chromosome, complete genome
+#=GS NZ_CP029678.1_frame=1/149448-149483  DE [subseq from] Staphylococcus aureus strain AR_0216 chromosome, complete genome
+#=GS NZ_CP029678.1_frame=1/149550-149754  DE [subseq from] Staphylococcus aureus strain AR_0216 chromosome, complete genome
+#=GS NZ_CP029678.1_frame=1/149878-150110  DE [subseq from] Staphylococcus aureus strain AR_0216 chromosome, complete genome
+#=GS NZ_CP029678.1_frame=1/151339-151569  DE [subseq from] Staphylococcus aureus strain AR_0216 chromosome, complete genome
+#=GS NZ_CP029678.1_frame=1/153057-153164  DE [subseq from] Staphylococcus aureus strain AR_0216 chromosome, complete genome
+#=GS NZ_CP132371.1_frame=1/881092-881181  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NZ_CP132371.1_frame=1/889130-889353  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NZ_CP132371.1_frame=1/889452-889678  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NZ_CP132371.1_frame=1/891056-891283  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NZ_CP132371.1_frame=1/891759-891989  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NZ_CP132371.1_frame=1/893477-893703  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NC_002953.3_frame=3/20076-20311      DE [subseq from] Staphylococcus aureus subsp. aureus MSSA476, complete sequence
+#=GS NC_002953.3_frame=3/142630-142853    DE [subseq from] Staphylococcus aureus subsp. aureus MSSA476, complete sequence
+#=GS NC_002953.3_frame=3/142952-143178    DE [subseq from] Staphylococcus aureus subsp. aureus MSSA476, complete sequence
+#=GS NC_002953.3_frame=3/143759-143794    DE [subseq from] Staphylococcus aureus subsp. aureus MSSA476, complete sequence
+#=GS NC_002953.3_frame=3/143866-144072    DE [subseq from] Staphylococcus aureus subsp. aureus MSSA476, complete sequence
+#=GS NC_002953.3_frame=3/144196-144428    DE [subseq from] Staphylococcus aureus subsp. aureus MSSA476, complete sequence
+#=GS NC_002953.3_frame=3/147395-147624    DE [subseq from] Staphylococcus aureus subsp. aureus MSSA476, complete sequence
+#=GS NC_002953.3_frame=3/688741-688884    DE [subseq from] Staphylococcus aureus subsp. aureus MSSA476, complete sequence
+#=GS NC_002745.2_frame=3/147034-147257    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002745.2_frame=3/147356-147582    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002745.2_frame=3/148960-149187    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002745.2_frame=3/149663-149893    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002745.2_frame=3/151381-151607    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002745.2_frame=2/147685-147729    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002745.2_frame=2/147842-148039    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002745.2_frame=2/148163-148198    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002745.2_frame=2/148243-148453    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002745.2_frame=2/148577-148809    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002745.2_frame=2/149305-149535    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002745.2_frame=2/150018-150243    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002745.2_frame=2/685751-685890    DE [subseq from] Staphylococcus aureus subsp. aureus N315, complete sequence
+#=GS NC_002952.2_frame=1/150854-151077    DE [subseq from] Staphylococcus aureus subsp. aureus MRSA252, complete sequence
+#=GS NC_002952.2_frame=1/151175-151403    DE [subseq from] Staphylococcus aureus subsp. aureus MRSA252, complete sequence
+#=GS NC_002952.2_frame=1/151964-152001    DE [subseq from] Staphylococcus aureus subsp. aureus MRSA252, complete sequence
+#=GS NC_002952.2_frame=1/152060-152266    DE [subseq from] Staphylococcus aureus subsp. aureus MRSA252, complete sequence
+#=GS NC_002952.2_frame=1/152391-152623    DE [subseq from] Staphylococcus aureus subsp. aureus MRSA252, complete sequence
+#=GS NC_002952.2_frame=1/153120-153350    DE [subseq from] Staphylococcus aureus subsp. aureus MRSA252, complete sequence
+#=GS NZ_CP132371.1_frame=3/889780-889824  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NZ_CP132371.1_frame=3/889937-890134  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NZ_CP132371.1_frame=3/890258-890293  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NZ_CP132371.1_frame=3/890338-890548  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NZ_CP132371.1_frame=3/890672-890904  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NZ_CP132371.1_frame=3/891400-891630  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NZ_CP132371.1_frame=3/892113-892338  DE [subseq from] Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+#=GS NC_017338.2_frame=2/141984-142208    DE [subseq from] Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+#=GS NC_017338.2_frame=2/142295-142521    DE [subseq from] Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+#=GS NC_017338.2_frame=2/143024-143060    DE [subseq from] Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+#=GS NC_017338.2_frame=2/143129-143332    DE [subseq from] Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+#=GS NC_017338.2_frame=2/144945-145134    DE [subseq from] Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+#=GS NC_017338.2_frame=2/145256-145481    DE [subseq from] Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+#=GS NC_017338.2_frame=3/25764-25859      DE [subseq from] Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+#=GS NC_017338.2_frame=3/143456-143688    DE [subseq from] Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+#=GS NC_017338.2_frame=3/144208-144435    DE [subseq from] Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+#=GS NC_017338.2_frame=3/144550-144780    DE [subseq from] Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+#=GS NC_017338.2_frame=3/144908-144951    DE [subseq from] Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+#=GS NC_017338.2_frame=3/146658-146887    DE [subseq from] Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+
+Q2G0X4|SSL11                                 MKLKNIAKASLALGILTTGMITTTAQPVKAST--L---E-V---R-SQ---ATQ----DLSEYYNRPFFEYTNQSG----Y--K--E--E--GK-----VTF---TPNYQLIDVTLTGNEKQNFGE--DI--SNVDIFVVR-----EN-SDRSG-NTASIGGITKTNGSNYID--KVKDVNLIITKNIDSVTSTSTSSTY
+NC_007795.1_frame=1/129432-129655            MKFKAIAKASLALGMLATGVITSNVQSVQAKA------E-V---K-QQ---SES----ELKHYYNKPILERKNVTG----F--KYTD--E--GKH---YLEV---TVGQQHSRITLLGSDKDKFKD-GEN--SNIDVFILR-----EG-DSRQA-TNYSIGGVTKSNSVQYID--YINTPILEIKKDNED----VLKDFY
+#=GR NC_007795.1_frame=1/129432-129655    PP 9*****************************96......9.9...9.9*...***....*****************9....8..7224..4..556...6999...9********************.778..9********.....**.*****.******************..*********766665....35789*
+NC_007795.1_frame=1/129754-129980            MKMKNIAKISLLLGILATGVNTTTEKPVHAEK--K---PIV---I-SE---NSK----KLKAYYNQPSIEYKNVTG----Y--I--SFIQ--PS-----IKFMNIIDGNSVNNIALIGKDKQHYHT--GV-HRNLNIFYVN-----ED-KRFEG-AKYSIGGITSANDK-AVD--LIAEARVIKEDHTGE--YDYDFFPF
+#=GR NC_007795.1_frame=1/129754-129980    PP 9*******************************..9...747...9.**...***....******************....9..8..6446..66.....666443799******************..87.589*******.....**.*****.************85.79*..****99999887777..6789****
+NC_007795.1_frame=1/130561-130597            MKITTIAKTSLALGLLTTGVITTTTQAANATT--L---S-S---T-K---------------------------------------------------------------------------------------------------------------------------------------------------------
+#=GR NC_007795.1_frame=1/130561-130597    PP 9*****************************99..8...7.6...4.4.........................................................................................................................................................
+NC_007795.1_frame=1/130663-130867            -------------------------TPQSPTT--K---Q-VPTEI-NP---KFK----DLRAYYTKPSLEFKNEIG----IILK--K--W--TT-----IRFMNVVPDYFIYKIALVGKDDKKYGE--GV-HRNVDVFVVL-----EE-NNYNL-EKYSVGGITKSNSK-KVD--HK--AGVRITKEDNKGTISHDVSEF
+#=GR NC_007795.1_frame=1/130663-130867    PP .........................3444555..5...5.41114.55...89*....*****************9....6447..8..8..99.....888444699******************..87.589*******.....**.*****.************97.588..84..7899999**************
+NC_007795.1_frame=1/130991-131223            MKMTAIAKASLALGILATGTITSLHQTVNASE--H---K-A---K-YE---NVTKDIFDLRDYYSGASKELKNVTG----Y--R--Y--SKGGKH---YLIF---DKNRKFTRVQIFGKDIERFKA-RKN--PGLDIFVVK-----EA-ENRNG-TVFSYGGVTKKNQDAYYD--YINAPRFQIKRDEGDGIA-TYGRVH
+#=GR NC_007795.1_frame=1/130991-131223    PP 9*******************************..9...9.8...8.77...65335559*****************....9..7..5..322445...6999...9*******************9.678..9********.....**.*****.******************..*********999999776.578899
+NC_007795.1_frame=1/132452-132682            MKLTTIAKATLALGILTTGVFTAESQTGHAKV--ELDET-Q---R-KY---YIN----MLHQYYSEESFEPTNISVKSEDY--Y--G--S--NV-----LNF---KQRNKAFKVFLLGDDKNKYKE--KT--HGLDVFAVP-----EL-IDIKG-GIYSVGGITKKNVRSVFG--FVSNPSLQV-KKVDAKNGFSINELF
+#=GR NC_007795.1_frame=1/132452-132682    PP 9*****************************97..53325.6...7.88...99*....*****************833445..5..6..7..99.....***...*********************..**..*********.....**.*****.******************..*********.677888999******
+NC_007795.1_frame=1/134170-134394            MKLKNIAKASLALGILTTGMITTTAQPVKAST--L---E-V---R-SQ---ATQ----DLSEYYNRPFFEYTNQSG----Y--K--E--E--GK-----VTF---TPNYQLIDVTLTGNEKQNFGE--DI--SNVDIFVVR-----EN-SDRSG-NTASIGGITKTNGSNYID--KVKDVNLIITKNIDSVTSTSTSSTY
+#=GR NC_007795.1_frame=1/134170-134394    PP 9*******************************..*...*.*...*.**...***....******************....*..*..*..*..**.....***...*********************..**..*********.....**.*****.******************..*************************
+NZ_CP011877.1_frame=-2/757121-757345         MKFKAIAKASLALGMLATGVITSNIQSVQAKT------E-V---K-QQ---SES----ELKHYYNKPVLERKNVTG----Y--K--Y--T--EKGK-DYIDV---IVDNQYSQISLVGSDKDKFKD-GDN--SNIDVFILR-----EG-DSRQA-TNYSIGGVTKSNSVQYID--YINTPILEIKKGNED----VLKDLY
+#=GR NZ_CP011877.1_frame=-2/757121-757345 PP 9*****************************97......8.9...9.99...***....******************....9..8..5..4..3333.67999...*********************.788..*********.....**.*****.******************..*********887776....45789*
+NZ_CP011877.1_frame=-2/758231-758270         MRMTQIAKASLALGLLTTGASIVTTQSAKAEV--T---P-S--LK-SE---Q----------------------------------------------------------------------------------------------------------------------------------------------------
+#=GR NZ_CP011877.1_frame=-2/758231-758270 PP 99****************************97..6...4.3..13.33...3....................................................................................................................................................
+NZ_CP011877.1_frame=-2/758339-758544         ------------------------PQPQSPTT--K---Q-A---Q-KEINPKYK----DLRTYYTKPSLEFEKQFG----FMLK--P--W--TT-----VRFMNVIPDWFIYKIALVGKDDKKYKD-GPY--DNIDVFIVL-----ED-NKYQL-KKYSVGGITKTNSK-KVD--H--KAELSITKKDEEGKISRDVSEY
+#=GR NZ_CP011877.1_frame=-2/758339-758544 PP ........................45555555..5...5.5...4.4433489*....*****************9....7335..6..7..88.....777444799******************.678..*********.....**.*****.************97.588..8..5789******************
+NZ_CP011877.1_frame=-2/758669-758901         MKMTAIAKASLALSILATGVITSTAQTVNASE--H---E-S---K-YE---NVTKDIFDLRDYYSRASKELKNVTG----Y--R--Y--SKGGKH---YLIF---DKHQKFTRIQIFGKDIEKLKA-RKN--PGLDIFVVK-----EA-ENRNG-TVYSYGGVTKKNKGAYYD--YLSAPRFVIKKEVGAGV-SVHVKRY
+#=GR NZ_CP011877.1_frame=-2/758669-758901 PP 9*******************************..9...9.9...8.77...65335559*****************....9..7..5..322445...6999...9*******************9.678..9********.....**.*****.******************..**************988.567889*
+NZ_CP011877.1_frame=-2/759398-759628         MKLTAIAKATLALGILTTGVMTAESQTVNAKV--KLDET-Q---R-KY---YIN----MLKDYYSQESYESTNISVKSEDY--Y--G--S--NV-----LNF---NQRNKNFKVFLIGDDRNKYKE--LT--HGRDVFAVP-----EL-IDTKG-GIYTVGGITKKNVRSVFG--YVSHPGLQV-KKVDPKDGFSIKELF
+#=GR NZ_CP011877.1_frame=-2/759398-759628 PP 9*****************************98..75424.5...7.77...89*....*****************833445..5..6..7..99.....***...*********************..**..*********.....**.*****.******************..*********.677888999******
+NZ_CP011877.1_frame=-2/759753-759978         MKLTALAKVTLAIGILTTGTLTTEAHSGHAKQ--IH-KS-V---N-KH---DKE----ALHRYYSGNFKEMKNINA----L--K--H-GK--NN-----LRF---KYRGMKTQVLLPGDEYRKYQQ-RRH--TGLDVFFVQ-----ER-RDKHD-ISYTVGGVTKTNKTSGF----VSTPRLNVTKEKGE-DAFVRGYPY
+#=GR NZ_CP011877.1_frame=-2/759753-759978 PP 9*****************************99..62.26.7...9.9*...***....******************....9..9..7.47..89.....***...*********************.667..89*******.....**.*****.************98755....77899999988887.667899***
+NZ_CP011877.1_frame=-2/761111-761336         MKLKNIAKASLALGILTTGMITTTAQPVKAST--L---E-V---R-SQ---ATQ----DLKGYYSGTGFNFQNVSG----Y--R--E--N--DK-----MNL---FSGSQLNVISLLGSDKERFKN-SDY--SGLDVFVVR-----EG-SGRQA-DNNSIGGITKTNKNNYKD--FVNNVGLEITKPTGHNTATRQVETY
+#=GR NZ_CP011877.1_frame=-2/761111-761336 PP 9*******************************..*...*.*...*.**...***....******************....*..*..*..*..**.....***...********************9.889..*********.....**.*****.******************..*************************
+NZ_CP113052.1_frame=2/460383-460606          MKFKAIAKASLALGMLATGVITSNVQSVQAKA------E-V---K-QQ---SES----ELKHYYNKPILERKNVTG----F--KYTD--E--GKH---YLEV---TVGQQHSRITLLGSDKDKFKD-GEN--SNIDVFILR-----EG-DSRQA-TNYSIGGVTKSNSVQYID--YINTPILEIKKDNED----VLKDFY
+#=GR NZ_CP113052.1_frame=2/460383-460606  PP 9*****************************96......9.9...9.9*...***....*****************9....8..7224..4..556...6999...9********************.778..9********.....**.*****.******************..*********766665....35789*
+NZ_CP113052.1_frame=2/460705-460931          MKMKNIAKISLLLGILATGVNTTTEKPVHAEK--K---PIV---I-SE---NSK----KLKAYYNQPSIEYKNVTG----Y--I--SFIQ--PS-----IKFMNIIDGNSVNNIALIGKDKQHYHT--GV-HRNLNIFYVN-----ED-KRFEG-AKYSIGGITSANDK-AVD--LIAEARVIKEDHTGE--YDYDFFPF
+#=GR NZ_CP113052.1_frame=2/460705-460931  PP 9*******************************..9...747...9.**...***....******************....9..8..6446..66.....666443799******************..87.589*******.....**.*****.************85.79*..****99999887777..6789****
+NZ_CP113052.1_frame=2/461508-461543          MKITTIAKTSLALGLLTTGVITTTTQAANATT--P---S-S---T-----------------------------------------------------------------------------------------------------------------------------------------------------------
+#=GR NZ_CP113052.1_frame=2/461508-461543  PP 9*****************************98..7...6.5...4...........................................................................................................................................................
+NZ_CP113052.1_frame=2/461627-461831          -------------------------TPQSPTT--K---Q-VPTEI-NP---KFK----DLRAYYTKPSLEFKNEIG----IILK--K--W--TT-----IRFMNVVPDYFIYKIALVGKDDKKYGE--GV-HRNVDVFVVL-----EE-NNYNL-EKYSVGGITKSNSK-KVD--HK--AGVRITKEDNKGTISHDVSEF
+#=GR NZ_CP113052.1_frame=2/461627-461831  PP .........................3444555..5...5.41114.55...89*....*****************9....6447..8..8..99.....888444699******************..87.589*******.....**.*****.************97.588..84..7899999**************
+NZ_CP113052.1_frame=2/461955-462187          MKMTAIAKASLALGILATGTITSLHQTVNASE--H---K-A---K-YE---NVTKDIFDLRDYYSGASKELKNVTG----Y--R--Y--SKGGKH---YLIF---DKNRKFTRVQIFGKDIERFKA-RKN--PGLDIFVVK-----EA-ENRNG-TVFSYGGVTKKNQDAYYD--YINAPRFQIKRDEGDGIA-TYGRVH
+#=GR NZ_CP113052.1_frame=2/461955-462187  PP 9*******************************..9...9.8...8.77...65335559*****************....9..7..5..322445...6999...9*******************9.678..9********.....**.*****.******************..*********999999776.578899
+NZ_CP113052.1_frame=2/463416-463646          MKLTTIAKATLALGILTTGVFTAESQTGHAKV--ELDET-Q---R-KY---YIN----MLHQYYSEESFEPTNISVKSEDY--Y--G--S--NV-----LNF---KQRNKAFKVFLLGDDKNKYKE--KT--HGLDVFAVP-----EL-IDIKG-GIYSVGGITKKNVRSVFG--FVSNPSLQV-KKVDAKNGFSINELF
+#=GR NZ_CP113052.1_frame=2/463416-463646  PP 9*****************************97..53325.6...7.88...99*....*****************833445..5..6..7..99.....***...*********************..**..*********.....**.*****.******************..*********.677888999******
+NZ_CP113052.1_frame=2/465134-465241          MKLKNIAKASLALGILTTGMITTTAQPVKAST--L---E-V---R-SQ---ATQ----DLSEYYNRPFFEYTNQSG----Y--K--E--E--GK-----VTF---TPNYQLIDVTLTGNEKQNFGE--DI--SNVDIFVVR-----EN-SDRSG-N--------------------------------------------
+#=GR NZ_CP113052.1_frame=2/465134-465241  PP 9*******************************..*...*.*...*.**...***....******************....*..*..*..*..**.....***...*********************..**..*********.....**.*9987.5............................................
+NZ_CP029678.1_frame=1/148323-148546          MKFKAIAKASLALGMLATGVITSNVQSVQAKA------E-V---K-QQ---SES----ELKHYYNKPILERKNVTG----F--KYTD--E--GKH---YLEV---TVGQQHSRITLLGSDKDKFKD-GEN--SNIDVFILR-----EG-DSRQA-TNYSIGGVTKSNSVQYID--YINTPILEIKKDNED----VLKDFY
+#=GR NZ_CP029678.1_frame=1/148323-148546  PP 9*****************************96......9.9...9.9*...***....*****************9....8..7224..4..556...6999...9********************.778..9********.....**.*****.******************..*********766665....35789*
+NZ_CP029678.1_frame=1/148645-148871          MKMKNIAKISLLLGILATGVNTTTEKPVHAEK--K---PIV---I-SE---NSK----KLKAYYNQPSIEYKNVTG----Y--I--SFIQ--PS-----IKFMNIIDGNSVNNIALIGKDKQHYHT--GV-HRNLNIFYVN-----ED-KRFEG-AKYSIGGITSANDK-AVD--LIAEARVIKEDHTGE--YDYDFFPF
+#=GR NZ_CP029678.1_frame=1/148645-148871  PP 9*******************************..9...747...9.**...***....******************....9..8..6446..66.....666443799******************..87.589*******.....**.*****.************85.79*..****99999887777..6789****
+NZ_CP029678.1_frame=1/149448-149483          MKITTIAKTSLALGLLTTGVITTTTQAANATT--P---S-S---T-----------------------------------------------------------------------------------------------------------------------------------------------------------
+#=GR NZ_CP029678.1_frame=1/149448-149483  PP 9*****************************98..7...6.5...4...........................................................................................................................................................
+NZ_CP029678.1_frame=1/149550-149754          -------------------------TPQSPTT--K---Q-VPTEI-NP---KFK----DLRAYYTKPSLEFKNEIG----IILK--K--W--TT-----IRFMNVVPDYFIYKIALVGKDDKKYGE--GV-HRNVDVFVVL-----EE-NNYNL-EKYSVGGITKSNSK-KVD--HK--AGVRITKEDNKGTISHDVSEF
+#=GR NZ_CP029678.1_frame=1/149550-149754  PP .........................3444555..5...5.41114.55...89*....*****************9....6447..8..8..99.....888444699******************..87.589*******.....**.*****.************97.588..84..7899999**************
+NZ_CP029678.1_frame=1/149878-150110          MKMTAIAKASLALGILATGTITSLHQTVNASE--H---K-A---K-YE---NVTKDIFDLRDYYSGASKELKNVTG----Y--R--Y--SKGGKH---YLIF---DKNRKFTRVQIFGKDIERFKA-RKN--PGLDIFVVK-----EA-ENRNG-TVFSYGGVTKKNQDAYYD--YINAPRFQIKRDEGDGIA-TYGRVH
+#=GR NZ_CP029678.1_frame=1/149878-150110  PP 9*******************************..9...9.8...8.77...65335559*****************....9..7..5..322445...6999...9*******************9.678..9********.....**.*****.******************..*********999999776.578899
+NZ_CP029678.1_frame=1/151339-151569          MKLTTIAKATLALGILTTGVFTAESQTGHAKV--ELDET-Q---R-KY---YIN----MLHQYYSEESFEPTNISVKSEDY--Y--G--S--NV-----LNF---KQRNKAFKVFLLGDDKNKYKE--KT--HGLDVFAVP-----EL-IDIKG-GIYSVGGITKKNVRSVFG--FVSNPSLQV-KKVDAKNGFSINELF
+#=GR NZ_CP029678.1_frame=1/151339-151569  PP 9*****************************97..53325.6...7.88...99*....*****************833445..5..6..7..99.....***...*********************..**..*********.....**.*****.******************..*********.677888999******
+NZ_CP029678.1_frame=1/153057-153164          MKLKNIAKASLALGILTTGMITTTAQPVKAST--L---E-V---R-SQ---ATQ----DLSEYYNRPFFEYTNQSG----Y--K--E--E--GK-----VTF---TPNYQLIDVTLTGNEKQNFGE--DI--SNVDIFVVR-----EN-SDRSG-N--------------------------------------------
+#=GR NZ_CP029678.1_frame=1/153057-153164  PP 9*******************************..*...*.*...*.**...***....******************....*..*..*..*..**.....***...*********************..**..*********.....**.*9987.5............................................
+NZ_CP132371.1_frame=1/881092-881181          ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------GTYTVADRVY-TPKRNI
+#=GR NZ_CP132371.1_frame=1/881092-881181  PP .......................................................................................................................................................................................3444444443.457899
+NZ_CP132371.1_frame=1/889130-889353          MKFKAIAKASLALGMLATGVITSNVQSVQAKT------E-V---K-QQ---SES----ELKHYYNKPVLERKNVTG----Y--K--Y--T--EKGK-DYIDV---IVDNQYSQISLVGSDKDKFKD-GDN--SNIDVFILR-----EG-DSRQA-TNYSIGGVTKTNSQPFID--YIHTPILEIKKGKEE----PQSSLY
+#=GR NZ_CP132371.1_frame=1/889130-889353  PP 9*****************************97......8.9...9.99...***....******************....9..8..5..4..3333.67999...*********************.788..*********.....**.*****.******************..*********877766....5789**
+NZ_CP132371.1_frame=1/889452-889678          MKMKNIAKISLLLGILATGVNTTTEKPVHAEK--K---PIV---I-SE---NSK----KLKAYYTQPSIEYKNVTG----Y--I--SFIQ--PS-----IKFMNIIDGNSVNNLALIGKDKQHYHT--GV-HRNLNIFYVN-----ED-KRFEG-AKYSIGGITSANDK-AVD--LIAEARVIKADHIGE--YDYDFFPF
+#=GR NZ_CP132371.1_frame=1/889452-889678  PP 9*******************************..9...747...9.**...***....******************....9..8..6446..66.....666443799******************..87.589*******.....**.*****.************85.7**..*******99999998..6689****
+NZ_CP132371.1_frame=1/891056-891283          MKLKTLAKATLALGLLTTGVITSEGQAVHAKE--K---Q-E---R-VQHLYDIK----DLYRYYSSESFEFSNISGKVENY--N--G--S--NV-----VRF---NQEKQNHQLFLLGKDKDKYKK--GL--EGQNVFVVK-----EL-IDPNG-RLSTVGGVTKKNNKS-S----ETNTHLFVNKVYGG-NLDASIDSF
+#=GR NZ_CP132371.1_frame=1/891056-891283  PP 9*******************************..*...9.9...8.7634467*....*****************844445..6..6..7..89.....***...*********************..**..*********.....**.*****.************975.3....34789999877766.6678899**
+NZ_CP132371.1_frame=1/891759-891989          MKLTALAKATLALGILTTGVFTAESKAVHAKV--ELDET-Q---R-KY---YIN----MLHQYYSEESFESTNISVKSEDY--Y--G--S--NV-----LNF---NQRNKTFKVFLLGDDKNKYKE--KT--HGLDVFAVP-----EL-IDIKG-GIYSVGGITKKNVRSVFG--FVSNPSLQV-KKVDAKHGFSINELF
+#=GR NZ_CP132371.1_frame=1/891759-891989  PP 9*****************************97..53325.6...7.88...99*....*****************833445..5..6..7..99.....***...*********************..**..*********.....**.*****.******************..*********.677888999******
+NZ_CP132371.1_frame=1/893477-893703          MKLKNIAKASLALGILTTGMITTTAQPVKAST--L---E-V---R-SQ---ATQ----DLSEYYKGRGFELTNVTG----Y--K--Y--G--NK-----VTF---IDNSQQIDVTLTGNEKLTVKDDDEV--SNVDVFVVR-----EG-SDKSA-ITTSIGGITKTNGTQHKD--TVQNVNLSVSKSTGQHTTSVTSEYY
+#=GR NZ_CP132371.1_frame=1/893477-893703  PP 9*******************************..*...*.*...*.**...***....******************....*..*..*..*..**.....***...*******************986568..9********.....**.*****.******************..*************************
+NC_002953.3_frame=3/20076-20311              ---KMINKIKILFSFLALLLS--FTSYAKAED--L---H-D---K-SE---LTD---LALANAYGQYNHPFIKENIKSDEI--S--G--E--KD-----LIF--RNQGDSGNDLRVKFATADLAQK-FKN--KNVDIYGASFYYKCEK-ISENI-SECLYGGTTLNSEKLAQE--RVIGANVWVDG-I-----QKETELI
+#=GR NC_002953.3_frame=3/20076-20311      PP ...667777777777764443..344455555..5...5.5...5.54...332...245444444443333333200114..4..4..4..55.....666..3455555555554444443333.355..7888876652222366.66678.9*********99988888..88888888833.3.....3356899
+NC_002953.3_frame=3/142630-142853            MKFKAIAKASLALGMLATGVITSNVQSVQAKT------E-V---K-QQ---SEA----DLKLYYNGPSFEYKKVTG----Y--GFIE-----GKD--RFIDF---IYNGQYNKISLVGSDKDKYNE--EV-NPDIDVFVVR-----EG-NGRQA-DNHSIGGITKTNRGVYYD--YIHTPILEIKKGKEE----PQSSLY
+#=GR NC_002953.3_frame=3/142630-142853    PP 9*****************************97......8.9...9.99...***....*****************9....8..4323.....222..369**...*********************..98.569*******.....**.*****.******************..*********877766....5789**
+NC_002953.3_frame=3/142952-143178            MKMKSIVKISLLLGILATGVNTTTEKPVHAEK--K---PIV---I-SE---NSK----KLKAYYTQPSIEYKNVTG----Y--I--SFIQ--PS-----IKFMNIIDGNSVNNIALIGKDKQHYHT--GV-HRNLNIFYVN-----ED-KRFEG-AKYSIGGITSANDK-AVD--LIAEARVIKADHIGE--YDYDFFPF
+#=GR NC_002953.3_frame=3/142952-143178    PP 9*******************************..9...747...9.**...***....******************....9..8..6446..66.....666443799******************..87.589*******.....**.*****.************85.7**..*******99999998..6689****
+NC_002953.3_frame=3/143759-143794            MKITTIAKTSLALGLLTTGVITTTTQAANATT--P---P-S---T-----------------------------------------------------------------------------------------------------------------------------------------------------------
+#=GR NC_002953.3_frame=3/143759-143794    PP 9*****************************98..6...4.4...3...........................................................................................................................................................
+NC_002953.3_frame=3/143866-144072            ---------------------TSPPQSPTTKQ--V--PT-E---I-NP---KFK----DLRAYYTKPSLEFKNEIG----IILK--K--W--TT-----IRFMNVVPDYFIYKIALVGKDDKKYGE--GV-HRNVDVFVVL-----EE-NNYNL-EKYSVGGITKSNSK-KVD--HK--AGVRITKEDNKGTISHDVSEF
+#=GR NC_002953.3_frame=3/143866-144072    PP .....................45555544444..4..23.4...5.66...99*....*****************9....6447..8..8..99.....888444699******************..87.589*******.....**.*****.************97.588..84..7899999**************
+NC_002953.3_frame=3/144196-144428            MKMAAIAKASLALGILATGTITSLHQTVNASE--H---E-A---K-YE---NVTKDIFDLRDYYSGASKELKNVTG----Y--R--Y--SKGGKH---YLIF---DKHQKFTRIQIFGKDIERFKA-RKN--PGLDIFVVK-----EA-ENRNG-TVFSYGGVTKKNQDAYYD--YINAPRFQIKRDEGDGIA-TYGRVH
+#=GR NC_002953.3_frame=3/144196-144428    PP 9*******************************..*...9.9...8.88...65335559*****************....9..7..5..322445...6999...9*******************9.678..9********.....**.*****.******************..*********999999776.578899
+NC_002953.3_frame=3/147395-147624            MKLKNIAKASLALGILTTGMITTTAQPVKAIE--QSRLS-V---T-SK---DTQ----ELKKYYSGTGYNFQNVSG----Y--R--E--G--NK-----MNI---IDGPQLNVVTLLGTDKERFKDDEDY--EGLDVFVVR-----EG-SGKHA-DNISIGGITKTNKNQYKD--PVQNVNLLTSKSNGQNTASVTSEYY
+#=GR NC_002953.3_frame=3/147395-147624    PP 9*****************************76..52236.7...9.99...***....******************....*..*..*..*..**.....***...*******************985568..9********.....**.*****.******************..*************************
+NC_002953.3_frame=3/688741-688884            ---------------------------------------------------GID----NLRNFYTKKD--FINLKD----V--K--D--N--DTP--IANQL---QFSNESYDLISESKDFNKFSN-FKG--KKLDVFGIS-----YN-GQCNT--KYIYGGITATNE--YLD--KPRNIPINIWINGNHKTI--STNKV
+#=GR NC_002953.3_frame=3/688741-688884    PP ...................................................568....9*****9975..566666....6..6..6..6..553..21333...4456667777778999***99.888..*********.....**.*9976..9*********96..8**..*********999999886..56789
+NC_002745.2_frame=3/147034-147257            MKFKAIAKASLALGMLATGVITSNVQSVQAKT------E-V---K-QQ---SES----ELKHYYNKPVLERKNVTG----Y--K--Y--T--EKGK-DYIDV---IVDNQYSQISLVGSDKDKFKD-GDN--SNIDVFILR-----EG-DSRQA-TNYSIGGVTKTNSQPFID--YIHTPILEIKKGKEE----PQSSLY
+#=GR NC_002745.2_frame=3/147034-147257    PP 9*****************************97......8.9...9.99...***....******************....9..8..5..4..3333.67999...*********************.788..*********.....**.*****.******************..*********877766....5789**
+NC_002745.2_frame=3/147356-147582            MKMKNIAKISLLLGILATGVNTTTEKPVHAEK--K---PIV---I-SE---NSK----KLKAYYTQPSIEYKNVTG----Y--I--SFIQ--PS-----IKFMNIIDGNSVNNLALIGKDKQHYHT--GV-HRNLNIFYVN-----ED-KRFEG-AKYSIGGITSANDK-AVD--LIAEARVIKADHIGE--YDYDFFPF
+#=GR NC_002745.2_frame=3/147356-147582    PP 9*******************************..9...747...9.**...***....******************....9..8..6446..66.....666443799******************..87.589*******.....**.*****.************85.7**..*******99999998..6689****
+NC_002745.2_frame=3/148960-149187            MKLKTLAKATLALGLLTTGVITSEGQAVHAKE--K---Q-E---R-VQHLYDIK----DLYRYYSSESFEFSNISGKVENY--N--G--S--NV-----VRF---NQEKQNHQLFLLGKDKDKYKK--GL--EGQNVFVVK-----EL-IDPNG-RLSTVGGVTKKNNKS-S----ETNTHLFVNKVYGG-NLDASIDSF
+#=GR NC_002745.2_frame=3/148960-149187    PP 9*******************************..*...9.9...8.7634467*....*****************844445..6..6..7..89.....***...*********************..**..*********.....**.*****.************975.3....34789999877766.6678899**
+NC_002745.2_frame=3/149663-149893            MKLTALAKATLALGILTTGVFTAESKAVHAKV--ELDET-Q---R-KY---YIN----MLHQYYSEESFESTNISVKSEDY--Y--G--S--NV-----LNF---NQRNKTFKVFLLGDDKNKYKE--KT--HGLDVFAVP-----EL-IDIKG-GIYSVGGITKKNVRSVFG--FVSNPSLQV-KKVDAKHGFSINELF
+#=GR NC_002745.2_frame=3/149663-149893    PP 9*****************************97..53325.6...7.88...99*....*****************833445..5..6..7..99.....***...*********************..**..*********.....**.*****.******************..*********.677888999******
+NC_002745.2_frame=3/151381-151607            MKLKNIAKASLALGILTTGMITTTAQPVKAST--L---E-V---R-SQ---ATQ----DLSEYYKGRGFELTNVTG----Y--K--Y--G--NK-----VTF---IDNSQQIDVTLTGNEKLTVKDDDEV--SNVDVFVVR-----EG-SDKSA-ITTSIGGITKTNGTQHKD--TVQNVNLSVSKSTGQHTTSVTSEYY
+#=GR NC_002745.2_frame=3/151381-151607    PP 9*******************************..*...*.*...*.**...***....******************....*..*..*..*..**.....***...*******************986568..9********.....**.*****.******************..*************************
+NC_002745.2_frame=2/147685-147729            MNMKTIAKTSLALGLLTTGAITVTTQSVKAEK--I---Q-S--TK-VD---KVP----TLK-------------------------------------------------------------------------------------------------------------------------------------------
+#=GR NC_002745.2_frame=2/147685-147729    PP 99******************************..9...8.6..14.44...555....665...........................................................................................................................................
+NC_002745.2_frame=2/147842-148039            ------------------------------KQ--A--QT-D---M-TP---KYE----DLRAYYTKPSFEFEKQFG----FLLK--P--W--TT-----VRFMNVIPNRFIYKIALVGKDEKKYKD-GPY--DNIDVFIVL-----ED-NKYQL-KKYSVGGITKTNSK-KVD--H--KAELSVTKKDNQGMISRDVSEY
+#=GR NC_002745.2_frame=2/147842-148039    PP ..............................22..2..03.3...4.56...89*....*****************9....6447..7..8..88.....777544799******************.678..*********.....**.*****.************97.588..8..57899*****************
+NC_002745.2_frame=2/148163-148198            MKITTIAKTSLALGLLTTGVITTTTQEANATT--P---S-S---T-----------------------------------------------------------------------------------------------------------------------------------------------------------
+#=GR NC_002745.2_frame=2/148163-148198    PP 9*****************************98..7...6.5...4...........................................................................................................................................................
+NC_002745.2_frame=2/148243-148453            --------------------STKVETPQSPTT--K---Q-V---P-TEINPKFK----DLRAYYTKPSLEFKNEIG----IILK--K--W--TT-----IRFMNIVPDYFIYKIALVGKDDKKYDE--GV-HRNVDVFVVL-----EE-KNKYGVERYSVGGITKSNSK-KVD--HK--AGVRITKEDNKGTISHDVSEF
+#=GR NC_002745.2_frame=2/148243-148453    PP ....................444555666666..6...6.5...4.3333389*....*****************9....6447..8..8..99.....888544699******************..87.589******9.....98.7765449***********97.588..84..7899999**************
+NC_002745.2_frame=2/148577-148809            MKMAAIAKASLALGILATGTITSLHQTVNASE--H---E-A---K-YE---NVTKDIFDLRDYYSGASKELKNVTG----Y--R--Y--SKGGKH---YLIF---DKNRKFTRVQIFGKDIERFKA-RKN--PGLDIFVVK-----EA-ENRNG-TVFSYGGVTKKNQDAYYD--YINAPRFQIKRDEGDGIA-TYGRVH
+#=GR NC_002745.2_frame=2/148577-148809    PP 9*******************************..*...9.9...8.88...65335559*****************....9..7..5..322445...6999...9*******************9.678..9********.....**.*****.******************..*********999999776.578899
+NC_002745.2_frame=2/149305-149535            MKFTAIAKAIFVLGILTTSVMITENQSVNAKG--K---Y-EKMNR-LY---DTN----KLHQYYSGPSYELTNVSGQSQGY--Y--D--S--NV-----LLF---NQQNQKFQVFLLGKDENKYKE--KT--HGLDVFAVP-----EL-VDLDG-RIFSVSGVTKKNVKSIFE--SLRTPNLLV-KKIDDKDGFSIDEFF
+#=GR NC_002745.2_frame=2/149305-149535    PP 9*****************************98..7...4.41225.67...99*....*****************744447..7..8..9..99.....***...*********************..**..*********.....**.*****.******************..*********.667777999******
+NC_002745.2_frame=2/150018-150243            MKFTALAKATLALGILTTGTLTTEVHSGHAKQNQK---S-V---N-KH---DKE----ALYRYYTGKTMEMKNISA----L--K--H-GK--NN-----LRF---KFRGIKIQVLLPGNDKSKFQQ-RSY--EGLDVFFVQ-----EK-RDKHD-IFYTVGGVIQNNKTSGVV----SAPILNISKEKGE-DAFVKGYPY
+#=GR NC_002745.2_frame=2/150018-150243    PP 9**************************99887214...6.7...9.99...***....******************....9..9..7.47..89.....***...********************9.678..*********.....**.*****.************988775....5678888766666.56889****
+NC_002745.2_frame=2/685751-685890            ----------------------------------------------------------NLRNFYTK--YEYVNLKN----V--K--D--K--NS----PESH---RLEYSYKNDTLYAEFDNEYIT-SDLKGKNVDVFGIS-----YK-YGSNS--RTIYGGVTKAENN-KLDSPRIIPINLIINGKHQTV----TTKSV
+#=GR NC_002745.2_frame=2/685751-685890    PP ..........................................................79999986..8999****....*..9..9..9..98....5777...99************6666655.4765579*******.....**.*9987..699******9986.577235556667775555553....45678
+NC_002952.2_frame=1/150854-151077            MKFKAIAKASLALGMLATGVITSNIQSVQAKT------E-V---K-QQ---SEA----DLKLYYNGPSFEYKKVTG----Y--GFIE-----GKD--RFIDF---IYNGQYNKISLVGSDKDKYNE--EV-NPDIDVFVVR-----EG-NGRQA-DNHSIGGVTKTNRGVYYD--YIHSPILEIKKGNEE----PQNSLY
+#=GR NC_002952.2_frame=1/150854-151077    PP 9*****************************97......8.9...9.99...***....*****************9....8..4323.....222..369**...*********************..98.569*******.....**.*****.******************..*********887777....5789**
+NC_002952.2_frame=1/151175-151403            MKMKSIAKVSLVLGILATGVNTVTEQPVHAEN--K---H-V---QVSQ---NSK----NLKAYYTQPSVEYKNVTG----Y--I--S--SIQPKPGTKFLNM---IEGNTVNNLALVGKDKEHYHT--GV-HRNLDIFYVN-----ED-KRFEG-AKYSIGGITKASD-KVVD--QVAEARVIKEDHTGE--YDYDFFPF
+#=GR NC_002952.2_frame=1/151175-151403    PP 9*******************************..*...9.7...5378...99*....******************....9..7..6..4332244457899...9********************..87.589*******.....**.*****.**********987.69**..****99999887777..6789****
+NC_002952.2_frame=1/151964-152001            MKMTQIAKTSLALSLLTTGASIVTTQSANAEV--A---S-A---L-KT--------------------------------------------------------------------------------------------------------------------------------------------------------
+#=GR NC_002952.2_frame=1/151964-152001    PP 9*****************************98..7...6.5...3.22........................................................................................................................................................
+NC_002952.2_frame=1/152060-152266            -----------------------TKQPQSPTT--K---Q-A---Q-KEINPKYK----DLRTYYTKPSLEFEKQFG----FMLK--P--W--TT-----VRFMNVIPDWFIYKIALVGKDDKKYKD-GPY--DNIDVFIVL-----ED-NKYQL-KKYSVGGITKTNSK-KVD--H--KAELSITKKDEKGKISHDDSEY
+#=GR NC_002952.2_frame=1/152060-152266    PP .......................566666666..6...6.5...5.5444489*....*****************9....7335..6..7..88.....777444799******************.678..*********.....**.*****.************97.588..8..5789******************
+NC_002952.2_frame=1/152391-152623            MKMTAIAKASLALSILATGVITSTAQTVNASE--H---E-S---K-YE---NVTKDIFDLRDYYSRASKELKNVTG----Y--R--Y--SKGGKH---YLIF---DKNRKFTRIQIFGKDIERIKK-RKN--PGLDIFVVK-----EA-ENRNG-TVYSYGGVTKKNQGAYYD--YLSAPRFVIKKEVGAGV-SVHVKRY
+#=GR NC_002952.2_frame=1/152391-152623    PP 9*******************************..9...9.9...8.77...65335559*****************....9..7..5..322445...6999...9*******************9.678..9********.....**.*****.******************..**************988.567889*
+NC_002952.2_frame=1/153120-153350            MKLTAIAKATLALGILTTGVMTAESQTVNAKV--KLDET-Q---R-KY---YIN----MLKDYYSQESYESTNISVKSEDY--Y--G--S--NV-----LNF---NQRNKNFKVFLIGDDRNKYKE--LT--HGRDVFAVP-----EL-IDTKG-GIYSVGGITKKNVRSVFG--YVSHPGLQV-KKVDPKDGFSIKELF
+#=GR NC_002952.2_frame=1/153120-153350    PP 9*****************************98..75424.5...7.77...89*....*****************833445..5..6..7..99.....***...*********************..**..*********.....**.*****.******************..*********.677888999******
+NZ_CP132371.1_frame=3/889780-889824          MNMKTIAKTSLALGLLTTGAITVTTQSVKAEK--I---Q-S--TK-VD---KVP----TLK-------------------------------------------------------------------------------------------------------------------------------------------
+#=GR NZ_CP132371.1_frame=3/889780-889824  PP 99******************************..9...8.6..14.44...555....655...........................................................................................................................................
+NZ_CP132371.1_frame=3/889937-890134          ------------------------------KQ--A--QT-D---M-TP---KYE----DLRAYYTKPSFEFEKQFG----FLLK--P--W--TT-----VRFMNVIPNRFIYKIALVGKDEKKYKD-GPY--DNIDVFIVL-----ED-NKYQL-KKYSVGGITKTNSK-KVD--H--KAELSVTKKDNQGMISRDVSEY
+#=GR NZ_CP132371.1_frame=3/889937-890134  PP ..............................22..2..03.3...4.56...89*....*****************9....6447..7..8..88.....777544799******************.678..*********.....**.*****.************97.588..8..57899*****************
+NZ_CP132371.1_frame=3/890258-890293          MKITTIAKTSLALGLLTTGVITTTTQEANATT--P---S-S---T-----------------------------------------------------------------------------------------------------------------------------------------------------------
+#=GR NZ_CP132371.1_frame=3/890258-890293  PP 9*****************************98..7...6.5...4...........................................................................................................................................................
+NZ_CP132371.1_frame=3/890338-890548          --------------------STKVETPQSPTT--K---Q-V---P-TEINPKFK----DLRAYYTKPSLEFKNEIG----IILK--K--W--TT-----IRFMNIVPDYFIYKIALVGKDDKKYDE--GV-HRNVDVFVVL-----EE-KNKYGVERYSVGGITKSNSK-KVD--HK--AGVRITKEDNKGTISHDVSEF
+#=GR NZ_CP132371.1_frame=3/890338-890548  PP ....................444555666666..6...6.5...4.3333389*....*****************9....6447..8..8..99.....888544699******************..87.589******9.....98.7765449***********97.588..84..7899999**************
+NZ_CP132371.1_frame=3/890672-890904          MKMAAIAKASLALGILATGTITSLHQTVNASE--H---E-A---K-YE---NVTKDIFDLRDYYSGASKELKNVTG----Y--R--Y--SKGGKH---YLIF---DKNRKFTRVQIFGKDIERFKA-RKN--PGLDIFVVK-----EA-ENRNG-TVFSYGGVTKKNQDAYYD--YINAPRFQIKRDEGDGIA-TYGRVH
+#=GR NZ_CP132371.1_frame=3/890672-890904  PP 9*******************************..*...9.9...8.88...65335559*****************....9..7..5..322445...6999...9*******************9.678..9********.....**.*****.******************..*********999999776.578899
+NZ_CP132371.1_frame=3/891400-891630          MKFTAIAKAIFVLGILTTSVMITENQSVNAKG--K---Y-EKMNR-LY---DTN----KLHQYYSGPSYELTNVSGQSQGY--Y--D--S--NV-----LLF---NQQNQKFQVFLLGKDENKYKE--KT--HGLDVFAVP-----EL-VDLDG-RIFSVSGVTKKNVKSIFE--SLRTPNLLV-KKIDDKDGFSIDEFF
+#=GR NZ_CP132371.1_frame=3/891400-891630  PP 9*****************************98..7...4.41225.67...99*....*****************744447..7..8..9..99.....***...*********************..**..*********.....**.*****.******************..*********.667777999******
+NZ_CP132371.1_frame=3/892113-892338          MKFTALAKATLALGILTTGTLTTEVHSGHAKQNQK---S-V---N-KH---DKE----ALYRYYTGKTMEMKNISA----L--K--H-GK--NN-----LRF---KFRGIKIQVLLPGNDKSKFQQ-RSY--EGLDVFFVQ-----EK-RDKHD-IFYTVGGVIQNNKTSGVV----SAPILNISKEKGE-DAFVKGYPY
+#=GR NZ_CP132371.1_frame=3/892113-892338  PP 9**************************99887214...6.7...9.99...***....******************....9..9..7.47..89.....***...********************9.678..*********.....**.*****.************988775....5678888766666.56889****
+NC_017338.2_frame=2/141984-142208            MKFKTIAKASLALGMLATGVITSNTQSVQAKT------E-V---K-QQ---SES----ELKHYYSGPSFEHKKVTG----F--KYTE--D--GKH---YLEV---TVGQQHSRITLLESDKDKFKE-GEN--SNIDVFVVR-----EG-AGRQA-TNYSIGGVTKTNSVQYID--YINTPILEIKKGNEDA----QTIYY
+#=GR NC_017338.2_frame=2/141984-142208    PP 9*****************************97......8.9...9.99...***....*****************9....8..6324..4..556...6999...9********************.778..9********.....**.*****.******************..*********8877764....4668*
+NC_017338.2_frame=2/142295-142521            MKMKSIAKVSLVLGILATGVNTTTEQPVHAEK--K---PIV---I-SE---NSK----KLKSYYTQPSTEYKNTTG----Y--I--S--SIQPD-----IKFMNIIQNNTVNNLALVGKDKQHYHA--GV-HRNLNIFYVA-----ED-KNFNG-GKYSIGGITKASD-KAVD--QIAEARVIKEDHTGE--YDYDFFPF
+#=GR NC_017338.2_frame=2/142295-142521    PP 9*******************************..9...747...9.**...***....******************....*..8..7..52244.....5554338********************..87.589*******.....**.*****.**********987.58**..****99999887777..6789****
+NC_017338.2_frame=2/143024-143060            MKMTTIAKTSLALGLLTTGVITTTTQAANATT--P---S-S---T-K---------------------------------------------------------------------------------------------------------------------------------------------------------
+#=GR NC_017338.2_frame=2/143024-143060    PP 9*****************************98..7...6.5...4.4.........................................................................................................................................................
+NC_017338.2_frame=2/143129-143332            -------------------------QSPNTKQ--V--PT-E---I-NP---KYK----DLRAYYTKPSLEFKNEIG----IILK--K--W--TT-----IRFMNIVPDYFIYKIALVGKDDKKYGE--GV-HRHVDAFIVL-----EEKNKYEV-EIYSVGGITKSNSK-KVD--HK--AGIRITKEDNKGTISHDVSEY
+#=GR NC_017338.2_frame=2/143129-143332    PP .........................3333333..3..13.4...5.66...99*....*****************9....6447..8..8..99.....888544699******************..87.579*****98.....87256689.************97.588..84..7899999**************
+NC_017338.2_frame=2/144945-145134            ---------------------------------------------------TTQ----ILYQYYSEESFEPTNISVKSEDY--Y--G--S--NV-----LNF---NQRNKTFKVFLIGDYKNKYKE--KA--HGLDVFAVP-----EL-IDTKG-RIYSVGGITKKNVRSVFG--FVSNPSLQV-KKVDAKNGFSINELF
+#=GR NC_017338.2_frame=2/144945-145134    PP ...................................................568....8****************833445..5..6..7..99.....***...*********************..**..*********.....**.*****.******************..*********.677888999******
+NC_017338.2_frame=2/145256-145481            MKLTAIAKATLALGILTTGTLITEVHSGHAKQNQK---S-V---N-KH---DKE----ALHRYYTGNFKEMKNINA----L--K--H-GK--NN-----LRF---KYRGMKTQVLLPGNEYRKYQQ-RRY--TGLDVFFVQ-----ER-RDKHD-ISYTVGGVTKTNKTSG----FVSEPRLNVTKENGK-DAFVKGYPY
+#=GR NC_017338.2_frame=2/145256-145481    PP 9**************************99887214...6.7...9.99...***....******************....9..9..7.47..89.....***...********************9.778..*********.....**.*****.************9865....5789*****998887.66899****
+NC_017338.2_frame=3/25764-25859              --------------------------------------------------------------------------------------------------------------------------------------------------NQ-GAGSK-KTCMYGGITLNEN-NTNN--RIQPIVVKV-YENDSVT---LSFDI
+#=GR NC_017338.2_frame=3/25764-25859      PP ..................................................................................................................................................23.33346.99*******9776.6788..999888888.5556655...46789
+NC_017338.2_frame=3/143456-143688            MKMTAIVKASLALGILATGTITSTHQTVNASE--H---E-S---K-YE---NVTKDIFDLRDYYSGASKELKNVIG----Y--H--Y--SKGGRH---YLVI---DKNRKFTRVQIFGKDIERFKA-RKN--PGLDIFVVK-----EA-ENRNG-TVYSYGGVTKKNKGAYYD--YLNAPRFQIKKDEGDGIA-TYDRIH
+#=GR NC_017338.2_frame=3/143456-143688    PP 9*******************************..9...9.9...8.77...65335559*****************....9..7..5..412334...4666...899*****************9.678..9********.....**.*****.******************..*********999888776.567899
+NC_017338.2_frame=3/144208-144435            MKLKTLAKATLALGLLTTGVITTEGQAVHAKD--K---Q-E---R-VQHLYDIK----DLHRYYSAPSFEYSNINGKVENY--N--G--S--NV-----VRF---EQKDQNHQLFLLGKDKEEYKE--GL--KGQNVFVVQ-----EL-IDPNG-RLSTVGGVTKKNNKS-S----ETNTHLFVNKVYGG-NLDASIDSF
+#=GR NC_017338.2_frame=3/144208-144435    PP 9*******************************..*...9.8...7.7634467*....*****************844445..6..6..7..89.....***...*********************..**..*********.....**.*****.************975.3....34789999877766.6678899**
+NC_017338.2_frame=3/144550-144780            MKLTAIAKATLVLGILTTSVITAESQTVHAKG--K---Y-EKMNR-LY---DTN----KLHQYYSGHSYELTNVSGQSQSY--Y--D--S--NV-----LLF---NQQNQKFQVFLLGKDENKYKE--KT--HGLDVFAVP-----EL-VDLDG-RIFSVSGITKKNVKSIFE--SLRTPNLLV-KKIDDKDGFSIDEFF
+#=GR NC_017338.2_frame=3/144550-144780    PP 9*****************************98..7...4.41225.67...99*....*****************855445..6..7..8..99.....***...*********************..**..*********.....**.*****.******************..*********.667777999******
+NC_017338.2_frame=3/144908-144951            MKLTTIAKVTLALGILTTGVFTTESQTVHAKV--ELDET-Q---R-KY---YIN--------------------------------------------------------------------------------------------------------------------------------------------------
+#=GR NC_017338.2_frame=3/144908-144951    PP 9*****************************97..52212.2...3.33...333..................................................................................................................................................
+NC_017338.2_frame=3/146658-146887            MKLKNIAKASLALGILTTGMITTTAQPVKAIE--QSRLS-V---T-SK---DTQ----ELKSYYSGTGFNFQNVSG----Y--R--E--E--NK-----MNV---IVGQQLNVISLLGSDKERFDDGKDY--NNLDVFVVR-----EG-SGKQA-DNISIGGITKTNENKYKD--TVKHVNMFIYRNTSHNTTTVKSTFH
+#=GR NC_017338.2_frame=3/146658-146887    PP 9*****************************76..52236.7...9.99...***....******************....*..*..*..*..**.....***...*******************986568..9********.....**.*****.******************..*************************
+#=GC PP_cons                                 9************************9999998..7...7.7...7.77...889....*****************9....8..7..7..7..77.....999...9*******************9..88..9********.....**.*****.************999899..999999**988888888888899**
+#=GC RF                                      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..x...x.x...x.xx...xxx....xxxxxxxxxxxxxxxxxx....x..x..x..x..xx.....xxx...xxxxxxxxxxxxxxxxxxxxx..xx..xxxxxxxxx.....xx.xxxxx.xxxxxxxxxxxxxxxxxx..xxxxxxxxxxxxxxxxxxxxxxxxx
+
+Q2G0X4|SSL11                                 TINKEEISLKELDFKLRKHLIDKHNLYK---T--E-PKDSKIRITMKDGGFYTFELNK-KLQTHRMGDVI-------DGRNIEKIEVNL
+NC_007795.1_frame=1/129432-129655            YISKEDISLKELDYRLRERAIKQHGLYS---N--G-LKQGQITITMNDGTTHTIDLSQ-KLEKERMGESI-------DGTKINKILVE-
+#=GR NC_007795.1_frame=1/129432-129655    PP ****************************...*..*.**********************.***********.......********998.
+NC_007795.1_frame=1/129754-129980            KIDKEAMSLKEIDFKLRKYLIDNYGLYG------E-MSTGKITVKKKYYGKYTFELDK-KLQEDRMSDVI-------NVTDIDRIEIK-
+#=GR NC_007795.1_frame=1/129754-129980    PP ****************************......5.679*******************.***********.......*********97.
+NC_007795.1_frame=1/130561-130597            -----------------------------------------------------------------------------------------
+#=GR NC_007795.1_frame=1/130561-130597    PP .........................................................................................
+NC_007795.1_frame=1/130663-130867            KITKEQISLKELDFKLRKQLIEKNNLYG---N--V-G-SGKIVIKMKNGGKYTFELHK-KLQENRMADVI-------DGTNIDNIEVNI
+#=GR NC_007795.1_frame=1/130663-130867    PP ****************************...7..7.5.8*******************.***********.......**********97
+NC_007795.1_frame=1/130991-131223            YIYKEEISLKELDFKLRQYLIQNFDLYK---K--F-PKDSKIKVIMKDGGYYTFELNK-KLQTNRMSDVI-------DGRNIEKIEANI
+#=GR NC_007795.1_frame=1/130991-131223    PP ****************************...*..*.**********************.***********.......*********996
+NC_007795.1_frame=1/132452-132682            FIQKEEVSLKELDFKIRKLLIEKYRLYK---G--T-SDKGRIVINMKDEKKHEIDLSE-KLSFERMFDVM-------DSKQIKNIEVNL
+#=GR NC_007795.1_frame=1/132452-132682    PP ****************************...*..*.**********************.***********.......**********97
+NC_007795.1_frame=1/134170-134394            TINKEEISLKELDFKLRKHLIDKHNLYK---T--E-PKDSKIRITMKDGGFYTFELNK-KLQTHRMGDVI-------DGRNIEKIEVNL
+#=GR NC_007795.1_frame=1/134170-134394    PP ****************************...*..*.**********************.***********.......**********97
+NZ_CP011877.1_frame=-2/757121-757345         YISKEDISLKELDYRLRERAIKQHGLYS---N--G-LKQGQITITMKDGKSHTIDLSQ-KLEKERMGDSI-------DGTKIDRILVEI
+#=GR NZ_CP011877.1_frame=-2/757121-757345 PP ****************************...*..*.**********************.***********.......*********986
+NZ_CP011877.1_frame=-2/758231-758270         -----------------------------------------------------------------------------------------
+#=GR NZ_CP011877.1_frame=-2/758231-758270 PP .........................................................................................
+NZ_CP011877.1_frame=-2/758339-758544         KITKEEISLKELDFKLRKQLIEQHNLYG---N--I-G-SGTIVIKTKNGGKYTFELHK-KLQEHRMADVI-------DGTSIDRIEVNL
+#=GR NZ_CP011877.1_frame=-2/758339-758544 PP ****************************...8..7.6.7*******************.***********.......**********97
+NZ_CP011877.1_frame=-2/758669-758901         YIYKEEISLKELDFKLRQYLIQDFDLYK---K--F-PKASKIKVTMKDGGYYTFELNK-KLQTNRMSDVI-------DGRNIEKIEANI
+#=GR NZ_CP011877.1_frame=-2/758669-758901 PP ****************************...*..*.**********************.***********.......*********996
+NZ_CP011877.1_frame=-2/759398-759628         FIQKEEVSLKELDFKIRKMLVEKYRLYK---G--T-ADKGRIVINMKDEKKHEIDLSE-KLSFDRMFDML-------DSKQIKNIEVNL
+#=GR NZ_CP011877.1_frame=-2/759398-759628 PP ****************************...*..*.**********************.***********.......**********97
+NZ_CP011877.1_frame=-2/759753-759978         DIKKEEISLKELDFKLRKHLIEKYGLYK---T--I-SKHGSVKINMKDGSFYNLNLRC-KLAFKYMGEVI-------DSKKIKDIEVNL
+#=GR NZ_CP011877.1_frame=-2/759753-759978 PP ****************************...*..*.**********************.***********.......**********97
+NZ_CP011877.1_frame=-2/761111-761336         SINKEEISLKELDFKLRKHLIDKHDLYK---T--E-PKDSKIRVTMKNGDFYTFELNK-KLQTHRMGDVI-------DGRNIEKIEVNL
+#=GR NZ_CP011877.1_frame=-2/761111-761336 PP ****************************...*..*.**********************.***********.......**********97
+NZ_CP113052.1_frame=2/460383-460606          YISKEDISLKELDYRLRERAIKQHGLYS---N--G-LKQGQITITMNDGTTHTIDLSQ-KLEKERMGESI-------DGTKINKILVE-
+#=GR NZ_CP113052.1_frame=2/460383-460606  PP ****************************...*..*.**********************.***********.......********998.
+NZ_CP113052.1_frame=2/460705-460931          KIDKEAMSLKEIDFKLRKYLIDNYGLYG------E-MSTGKITVKKKYYGKYTFELDK-KLQEDRMSDVI-------NVTDIDRIEIK-
+#=GR NZ_CP113052.1_frame=2/460705-460931  PP ****************************......5.679*******************.***********.......*********97.
+NZ_CP113052.1_frame=2/461508-461543          -----------------------------------------------------------------------------------------
+#=GR NZ_CP113052.1_frame=2/461508-461543  PP .........................................................................................
+NZ_CP113052.1_frame=2/461627-461831          KITKEQISLKELDFKLRKQLIEKNNLYG---N--V-G-SGKIVIKMKNGGKYTFELHK-KLQENRMADVI-------DGTNIDNIEVNI
+#=GR NZ_CP113052.1_frame=2/461627-461831  PP ****************************...7..7.5.8*******************.***********.......**********97
+NZ_CP113052.1_frame=2/461955-462187          YIYKEEISLKELDFKLRQYLIQNFDLYK---K--F-PKDSKIKVIMKDGGYYTFELNK-KLQTNRMSDVI-------DGRNIEKIEANI
+#=GR NZ_CP113052.1_frame=2/461955-462187  PP ****************************...*..*.**********************.***********.......*********996
+NZ_CP113052.1_frame=2/463416-463646          FIQKEEVSLKELDFKIRKLLIEKYRLYK---G--T-SDKGRIVINMKDEKKHEIDLSE-KLSFERMFDVM-------DSKQIKNIEVNL
+#=GR NZ_CP113052.1_frame=2/463416-463646  PP ****************************...*..*.**********************.***********.......**********97
+NZ_CP113052.1_frame=2/465134-465241          -----------------------------------------------------------------------------------------
+#=GR NZ_CP113052.1_frame=2/465134-465241  PP .........................................................................................
+NZ_CP029678.1_frame=1/148323-148546          YISKEDISLKELDYRLRERAIKQHGLYS---N--G-LKQGQITITMNDGTTHTIDLSQ-KLEKERMGESI-------DGTKINKILVE-
+#=GR NZ_CP029678.1_frame=1/148323-148546  PP ****************************...*..*.**********************.***********.......********998.
+NZ_CP029678.1_frame=1/148645-148871          KIDKEAMSLKEIDFKLRKYLIDNYGLYG------E-MSTGKITVKKKYYGKYTFELDK-KLQEDRMSDVI-------NVTDIDRIEIK-
+#=GR NZ_CP029678.1_frame=1/148645-148871  PP ****************************......5.679*******************.***********.......*********97.
+NZ_CP029678.1_frame=1/149448-149483          -----------------------------------------------------------------------------------------
+#=GR NZ_CP029678.1_frame=1/149448-149483  PP .........................................................................................
+NZ_CP029678.1_frame=1/149550-149754          KITKEQISLKELDFKLRKQLIEKNNLYG---N--V-G-SGKIVIKMKNGGKYTFELHK-KLQENRMADVI-------DGTNIDNIEVNI
+#=GR NZ_CP029678.1_frame=1/149550-149754  PP ****************************...7..7.5.8*******************.***********.......**********97
+NZ_CP029678.1_frame=1/149878-150110          YIYKEEISLKELDFKLRQYLIQNFDLYK---K--F-PKDSKIKVIMKDGGYYTFELNK-KLQTNRMSDVI-------DGRNIEKIEANI
+#=GR NZ_CP029678.1_frame=1/149878-150110  PP ****************************...*..*.**********************.***********.......*********996
+NZ_CP029678.1_frame=1/151339-151569          FIQKEEVSLKELDFKIRKLLIEKYRLYK---G--T-SDKGRIVINMKDEKKHEIDLSE-KLSFERMFDVM-------DSKQIKNIEVNL
+#=GR NZ_CP029678.1_frame=1/151339-151569  PP ****************************...*..*.**********************.***********.......**********97
+NZ_CP029678.1_frame=1/153057-153164          -----------------------------------------------------------------------------------------
+#=GR NZ_CP029678.1_frame=1/153057-153164  PP .........................................................................................
+NZ_CP132371.1_frame=1/881092-881181          TLNKEVVTLKELDHIIRFAHI-SYGLYM---G--EHLPKGNIVINTKDGGKYTLESHK-ELQKDRENVKI-------NTADIKNVTFK-
+#=GR NZ_CP132371.1_frame=1/881092-881181  PP *********************.9*****...9..75789*******************.***********.......*******9866.
+NZ_CP132371.1_frame=1/889130-889353          QIYKEDISLKELDYRLRERAIKQHGLYS---N--G-LKQGQITITMKDGKSHTIDLSQ-KLEKERMGDSI-------DGRQIQKILVE-
+#=GR NZ_CP132371.1_frame=1/889130-889353  PP ****************************...*..*.**********************.***********.......********998.
+NZ_CP132371.1_frame=1/889452-889678          KIDKEAMSLKEIDFKLRKYLIDNYGLYG------E-MSTGKITVKKKYYGKYTFELDK-KLQEDRMSDVI-------NVTDIDRIEIK-
+#=GR NZ_CP132371.1_frame=1/889452-889678  PP ****************************......5.679*******************.***********.......*********97.
+NZ_CP132371.1_frame=1/891056-891283          LINKEEVSLKELDFKIRKQLVEKYGLYK---G--T-TKYGKITINLKDEKKEVIDLGD-KLQFERMGDVL-------NSKDIQNIAVTI
+#=GR NZ_CP132371.1_frame=1/891056-891283  PP ****************************...*..*.**********************.***********.......*********985
+NZ_CP132371.1_frame=1/891759-891989          FIQKEEVSLKELDFKIRKMLVEKYRLYK---G--A-SDKGRIVINMKDEKKYVIDLSE-KLSFDRMFDVM-------DSKQIKNIEVNL
+#=GR NZ_CP132371.1_frame=1/891759-891989  PP ****************************...*..*.**********************.***********.......**********97
+NZ_CP132371.1_frame=1/893477-893703          SIYKEEISLKELDFKLRKHLIDKHDLYK---T--E-PKDSKIRITMKNGGYYTFELNK-KLQPHRMGDTI-------DSRNIEKIEVNL
+#=GR NZ_CP132371.1_frame=1/893477-893703  PP ****************************...*..*.**********************.***********.......**********97
+NC_002953.3_frame=3/20076-20311              RTNKKNVTLQELDIKIRKILSDKYKIYY---KDSE-ISKGLIEFDMKTPRDYSFDIYDLKGENDYEIDKIYEDNKTLKSDDISHIDVNL
+#=GR NC_002953.3_frame=3/20076-20311      PP ***************************8...8445.889***************98642444444444332211111677777777775
+NC_002953.3_frame=3/142630-142853            QIYKEDISLKELDFKLRKQLISQSGLYS---N--G-LKQGQITITMNDGTTHTIDLSQ-KLEKERMGESI-------DGRQIQKILVE-
+#=GR NC_002953.3_frame=3/142630-142853    PP ****************************...*..*.**********************.***********.......********998.
+NC_002953.3_frame=3/142952-143178            KIDKEAMSLKEIDFKLRKYLIDNYGLYG------E-MSTGKITVKKKYYGKYTFELDK-KLQEDRMSDVI-------NVTDIDRIEIK-
+#=GR NC_002953.3_frame=3/142952-143178    PP ****************************......5.679*******************.***********.......*********97.
+NC_002953.3_frame=3/143759-143794            -----------------------------------------------------------------------------------------
+#=GR NC_002953.3_frame=3/143759-143794    PP .........................................................................................
+NC_002953.3_frame=3/143866-144072            KITKEQISLKELDFKLRKQLIEKNNLYG---N--V-G-SGKIVIKMKNGGKYTFELHK-KLQENRMADVI-------DGTNIDNIEVNI
+#=GR NC_002953.3_frame=3/143866-144072    PP ****************************...7..7.5.8*******************.***********.......**********97
+NC_002953.3_frame=3/144196-144428            YIYKEEISLKELDFKLRQYLIQNFDLYK---K--F-PKDSKIKVIMKDGGYYTFELNK-KLQTNRMSDVI-------DGRNIEKIEANI
+#=GR NC_002953.3_frame=3/144196-144428    PP ****************************...*..*.**********************.***********.......*********996
+NC_002953.3_frame=3/147395-147624            SINKEEISLKELDFKLRKQLIDKHDLYK---T--E-PKDSKIKVSMKNGGYYTFELNK-KLQPHRMGDTI-------DSRNIKKIEVNL
+#=GR NC_002953.3_frame=3/147395-147624    PP ****************************...*..*.**********************.***********.......**********97
+NC_002953.3_frame=3/688741-688884            STNKKFVTAQEIDIKLRRYLQEEYNIYG---H--NGTKKG-------------------------------------------------
+#=GR NC_002953.3_frame=3/688741-688884    PP ***************************9...8..635555.................................................
+NC_002745.2_frame=3/147034-147257            QIYKEDISLKELDYRLRERAIKQHGLYS---N--G-LKQGQITITMKDGKSHTIDLSQ-KLEKERMGDSI-------DGRQIQKILVE-
+#=GR NC_002745.2_frame=3/147034-147257    PP ****************************...*..*.**********************.***********.......********998.
+NC_002745.2_frame=3/147356-147582            KIDKEAMSLKEIDFKLRKYLIDNYGLYG------E-MSTGKITVKKKYYGKYTFELDK-KLQEDRMSDVI-------NVTDIDRIEIK-
+#=GR NC_002745.2_frame=3/147356-147582    PP ****************************......5.679*******************.***********.......*********97.
+NC_002745.2_frame=3/148960-149187            LINKEEVSLKELDFKIRKQLVEKYGLYK---G--T-TKYGKITINLKDEKKEVIDLGD-KLQFERMGDVL-------NSKDIQNIAVTI
+#=GR NC_002745.2_frame=3/148960-149187    PP ****************************...*..*.**********************.***********.......*********985
+NC_002745.2_frame=3/149663-149893            FIQKEEVSLKELDFKIRKMLVEKYRLYK---G--A-SDKGRIVINMKDEKKYVIDLSE-KLSFDRMFDVM-------DSKQIKNIEVNL
+#=GR NC_002745.2_frame=3/149663-149893    PP ****************************...*..*.**********************.***********.......**********97
+NC_002745.2_frame=3/151381-151607            SIYKEEISLKELDFKLRKHLIDKHDLYK---T--E-PKDSKIRITMKNGGYYTFELNK-KLQPHRMGDTI-------DSRNIEKIEVNL
+#=GR NC_002745.2_frame=3/151381-151607    PP ****************************...*..*.**********************.***********.......**********97
+NC_002745.2_frame=2/147685-147729            -----------------------------------------------------------------------------------------
+#=GR NC_002745.2_frame=2/147685-147729    PP .........................................................................................
+NC_002745.2_frame=2/147842-148039            MITKEEISLKELDFKLRKQLIEKHNLYG---N--M--GSGTIVIKMKNGGKYTFELHK-KLQEHRMADVI-------EGTNIDKIEVNI
+#=GR NC_002745.2_frame=2/147842-148039    PP ****************************...6..6..58*******************.***********.......**********97
+NC_002745.2_frame=2/148163-148198            -----------------------------------------------------------------------------------------
+#=GR NC_002745.2_frame=2/148163-148198    PP .........................................................................................
+NC_002745.2_frame=2/148243-148453            KITKEQISLKELDFKLRKQLIENHNLYG---N--V-G-SGKIVINMKNGGKYTFELHK-KLQENRMADVI-------DGTNIDNIEVNI
+#=GR NC_002745.2_frame=2/148243-148453    PP ****************************...7..7.5.8*******************.***********.......**********97
+NC_002745.2_frame=2/148577-148809            YIYKEEISLKELDFKLRQYLIQNFDLYK---K--F-PKDSKIKVIMKDGGYYTFELNK-KLQTNRMSDVI-------DGRNIEKIEANI
+#=GR NC_002745.2_frame=2/148577-148809    PP ****************************...*..*.**********************.***********.......*********996
+NC_002745.2_frame=2/149305-149535            FIQKEEVSLKELDFKIRKLLIKKYKLYE---G--S-ADKGRIVINMKDENKYEIDLSD-KLDFERMADVI-------NSEQIKNIEVNL
+#=GR NC_002745.2_frame=2/149305-149535    PP ****************************...*..*.**********************.***********.......**********97
+NC_002745.2_frame=2/150018-150243            YIKKEKITLKELDYKLRKHLIEKYGLYK---T--I-SKDGRVKISLKDGSFYNLDLRS-KLKFKYMGEVI-------ESKQIKDIEVNL
+#=GR NC_002745.2_frame=2/150018-150243    PP ****************************...*..*.**********************.***********.......**********97
+NC_002745.2_frame=2/685751-685890            STDKKMVTAQEIDVKLRKYLQDEFNIYG---H--N--DTG-------------------------------------------------
+#=GR NC_002745.2_frame=2/685751-685890    PP 9**************************9...7..6..334.................................................
+NC_002952.2_frame=1/150854-151077            QIYKENISLKELDYRLRERAIKQHGLYS---N--G-LKQGQITITMKDGKSHTIDLSQ-KLEKERMGDSI-------DGRQIQKILVE-
+#=GR NC_002952.2_frame=1/150854-151077    PP ****************************...*..*.**********************.***********.......********998.
+NC_002952.2_frame=1/151175-151403            KIDKEAMTLKEVDFKIRKHLIDHYGLYG------E-MSSGTVTVQMKYYGKYTIELDK-KLQEDRMADIV-------KVIDIDRIEVK-
+#=GR NC_002952.2_frame=1/151175-151403    PP ****************************......5.678*******************.***********.......**********8.
+NC_002952.2_frame=1/151964-152001            -----------------------------------------------------------------------------------------
+#=GR NC_002952.2_frame=1/151964-152001    PP .........................................................................................
+NC_002952.2_frame=1/152060-152266            KITKEEISLKELDFKLRKQLIEQHNLYG---N--I-G-SGTIVIKTKNGGKYTFELHK-KLQEHRMADVI-------DGTSIERIEVNL
+#=GR NC_002952.2_frame=1/152060-152266    PP ****************************...8..7.6.7*******************.***********.......**********97
+NC_002952.2_frame=1/152391-152623            YIYKEEISLKELDFKLRQYLIQDFDLYK---K--F-PKASKIKVTMKDGGYYTFELNK-KLQTNRMSDVI-------DGRNIEKIEANI
+#=GR NC_002952.2_frame=1/152391-152623    PP ****************************...*..*.**********************.***********.......*********996
+NC_002952.2_frame=1/153120-153350            FIQKEEVSLKELDFKIRKMLVEKYRLYK---G--A-SDKGRIVINMKDEKKHEIDLSE-KLSFDRMFDVL-------DSKQIKNIEVNL
+#=GR NC_002952.2_frame=1/153120-153350    PP ****************************...*..*.**********************.***********.......**********97
+NZ_CP132371.1_frame=3/889780-889824          -----------------------------------------------------------------------------------------
+#=GR NZ_CP132371.1_frame=3/889780-889824  PP .........................................................................................
+NZ_CP132371.1_frame=3/889937-890134          MITKEEISLKELDFKLRKQLIEKHNLYG---N--M--GSGTIVIKMKNGGKYTFELHK-KLQEHRMADVI-------EGTNIDKIEVNI
+#=GR NZ_CP132371.1_frame=3/889937-890134  PP ****************************...6..6..58*******************.***********.......**********97
+NZ_CP132371.1_frame=3/890258-890293          -----------------------------------------------------------------------------------------
+#=GR NZ_CP132371.1_frame=3/890258-890293  PP .........................................................................................
+NZ_CP132371.1_frame=3/890338-890548          KITKEQISLKELDFKLRKQLIENHNLYG---N--V-G-SGKIVINMKNGGKYTFELHK-KLQENRMADVI-------DGTNIDNIEVNI
+#=GR NZ_CP132371.1_frame=3/890338-890548  PP ****************************...7..7.5.8*******************.***********.......**********97
+NZ_CP132371.1_frame=3/890672-890904          YIYKEEISLKELDFKLRQYLIQNFDLYK---K--F-PKDSKIKVIMKDGGYYTFELNK-KLQTNRMSDVI-------DGRNIEKIEANI
+#=GR NZ_CP132371.1_frame=3/890672-890904  PP ****************************...*..*.**********************.***********.......*********996
+NZ_CP132371.1_frame=3/891400-891630          FIQKEEVSLKELDFKIRKLLIKKYKLYE---G--S-ADKGRIVINMKDENKYEIDLSD-KLDFERMADVI-------NSEQIKNIEVNL
+#=GR NZ_CP132371.1_frame=3/891400-891630  PP ****************************...*..*.**********************.***********.......**********97
+NZ_CP132371.1_frame=3/892113-892338          YIKKEKITLKELDYKLRKHLIEKYGLYK---T--I-SKDGRVKISLKDGSFYNLDLRS-KLKFKYMGEVI-------ESKQIKDIEVNL
+#=GR NZ_CP132371.1_frame=3/892113-892338  PP ****************************...*..*.**********************.***********.......**********97
+NC_017338.2_frame=2/141984-142208            QIYKEDISLKELDFKLRKQLISQSGLYS---N--G-LKQGQITITMKDGTTHTIDLSK-KLEKERMGESI-------DGTNIEKILVEI
+#=GR NC_017338.2_frame=2/141984-142208    PP ****************************...*..*.**********************.***********.......*********986
+NC_017338.2_frame=2/142295-142521            KVDKEDMSLKEIDFKVRKYLIENYGLYG------E-MSSGSIIVQTKNYGRYTFELDK-KLQEDRMSDII-------DATSIERIEVK-
+#=GR NC_017338.2_frame=2/142295-142521    PP ****************************......5.678*******************.***********.......**********8.
+NC_017338.2_frame=2/143024-143060            -----------------------------------------------------------------------------------------
+#=GR NC_017338.2_frame=2/143024-143060    PP .........................................................................................
+NC_017338.2_frame=2/143129-143332            KITKEEISLKELDFKLRKQLIEKHNLYG---N--V-G-SGKIVIKMKNGGKYTFELHK-KLQEHRMADVI-------DGTNIDSIEVNI
+#=GR NC_017338.2_frame=2/143129-143332    PP ****************************...7..7.5.8*******************.***********.......**********97
+NC_017338.2_frame=2/144945-145134            FIQKEEVSLKELDFKIRKLLIEKYRLYK---G--T-ADKGRIVINMKDEKKYEIDLSE-KLSFDRMFDVM-------DSKQIKNIEVNL
+#=GR NC_017338.2_frame=2/144945-145134    PP ****************************...*..*.**********************.***********.......**********97
+NC_017338.2_frame=2/145256-145481            HINKEEISLKELDFKLRKHLIEKYGLYK---T--I-SKEGRVKISLKDGSFYNLDLRY-KLDFKYMGEVI-------DSKQIKDIEVNL
+#=GR NC_017338.2_frame=2/145256-145481    PP ****************************...*..*.**********************.***********.......**********97
+NC_017338.2_frame=3/25764-25859              NIDKETVTIQELDYKVRNKLISKINLYHLGGT--S-YETGYIKFIENANRYYWY-----------------------------------
+#=GR NC_017338.2_frame=3/25764-25859      PP ***************************72224..5.888988887777777655...................................
+NC_017338.2_frame=3/143456-143688            YIYKEEVSLKELDFKLRQYLIQNFGLYK---K--F-PKDSKIKVTMKDGGYYTFELNK-KLQTNRMSDVI-------DGRNIEKIEVDI
+#=GR NC_017338.2_frame=3/143456-143688    PP 9***************************...*..*.**********************.***********.......**********86
+NC_017338.2_frame=3/144208-144435            LINKEEVSLKELDFKIRKQLVEKYGLYK---G--T-TKYGKITINLKDEKKEVIDLGD-KLQFERMGDVL-------NSKDIQNIAVTI
+#=GR NC_017338.2_frame=3/144208-144435    PP ****************************...*..*.**********************.***********.......*********985
+NC_017338.2_frame=3/144550-144780            FIQKEELSLKELDFKIRKLLIKKYKLYE---G--A-ADKGRIVINMKDENKYEIDLSD-KLDFERMADVI-------NSEQIKNIEVNL
+#=GR NC_017338.2_frame=3/144550-144780    PP ****************************...*..*.**********************.***********.......**********97
+NC_017338.2_frame=3/144908-144951            -----------------------------------------------------------------------------------------
+#=GR NC_017338.2_frame=3/144908-144951    PP .........................................................................................
+NC_017338.2_frame=3/146658-146887            NIYKEEISLKELDFKLRKQLIDNHDLYK---T--E-PKDSKITVTMNNGGYYTFELNK-KLQEHRMGDVI-------DGTKIKEINVEL
+#=GR NC_017338.2_frame=3/146658-146887    PP ****************************...*..*.**********************.***********.......**********97
+#=GC PP_cons                                 ****************************...9..9.999*******************.***********.......*********987
+#=GC RF                                      xxxxxxxxxxxxxxxxxxxxxxxxxxxx...x..x.xxxxxxxxxxxxxxxxxxxxxx.xxxxxxxxxxx.......xxxxxxxxxxxx
+//

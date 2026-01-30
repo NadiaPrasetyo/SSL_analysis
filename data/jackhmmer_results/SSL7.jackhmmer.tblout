@@ -1,0 +1,23 @@
+#                                                                 --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
+# target name          accession  query name           accession    E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
+#  ------------------- ---------- -------------------- ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
+NC_007795.1_frame=1    -          Q2G2Y0|SSL7          -                  0 1592.1 125.6   4.4e-87  286.7  12.1   7.8   7   0   0   7   7   7   7 Staphylococcus aureus subsp. aureus NCTC 8325 chromosome, complete genome
+NZ_CP011877.1_frame=-2 -          Q2G2Y0|SSL7          -                  0 1569.8 129.9   2.2e-85  281.2   8.8   8.4   8   0   0   8   8   8   7 Staphylococcus aureus strain 12S01032 chromosome, complete genome
+NZ_CP113052.1_frame=2  -          Q2G2Y0|SSL7          -                  0 1421.4 109.9   4.3e-87  286.7  12.1   7.7   7   0   0   7   7   7   7 Staphylococcus aureus strain Fizz chromosome, complete genome
+NZ_CP132371.1_frame=1  -          Q2G2Y0|SSL7          -                  0 1421.2 119.0   4.8e-89  293.1  15.8   7.8   8   0   0   8   8   8   6 Staphylococcus aureus strain UNC_SA38 chromosome, complete genome
+NZ_CP029678.1_frame=1  -          Q2G2Y0|SSL7          -                  0 1405.7 126.5   4.5e-87  286.6  12.1   8.2   8   0   0   8   8   8   7 Staphylococcus aureus strain AR_0216 chromosome, complete genome
+NC_002745.2_frame=3    -          Q2G2Y0|SSL7          -                  0 1335.5 132.7     5e-89  293.0  15.8   8.8  10   0   0  10  10  10   5 Staphylococcus aureus subsp. aureus N315, complete sequence
+NC_002953.3_frame=3    -          Q2G2Y0|SSL7          -                  0 1324.3 156.3   1.6e-84  278.3  12.6   9.2   9   0   0   9   9   9   8 Staphylococcus aureus subsp. aureus MSSA476, complete sequence
+NC_002745.2_frame=2    -          Q2G2Y0|SSL7          -                  0 1295.7 149.9   1.7e-85  281.5  13.1   9.3   9   0   0   9   9   9   8 Staphylococcus aureus subsp. aureus N315, complete sequence
+NC_017338.2_frame=2    -          Q2G2Y0|SSL7          -                  0 1204.6 141.0   2.9e-80  264.4  15.2   8.2   8   0   0   8   8   8   6 Staphylococcus aureus subsp. aureus JKD6159, complete sequence
+NZ_LS483357.1_frame=1  -          Q2G2Y0|SSL7          -              3e-26   87.6  32.3   1.9e-13   45.7  10.8   3.3   3   0   0   3   3   3   0 Streptococcus pyogenes strain NCTC8326 chromosome 1, complete sequence
+#
+# Program:         jackhmmer
+# Version:         3.1b2 (February 2015)
+# Pipeline mode:   SEARCH
+# Query file:      data/ssl/SSL7.fasta
+# Target file:     data/ssl/genomes_6frame_proteins.fasta
+# Option settings: jackhmmer -N 10 -o data/jackhmmer_results/SSL7.jackhmmer.out -A data/jackhmmer_results/SSL7.jackhmmer.sto --tblout data/jackhmmer_results/SSL7.jackhmmer.tblout --domtblout data/jackhmmer_results/SSL7.jackhmmer.domtblout --chkali data/jackhmmer_results/SSL7 --noali --incT 200 --cpu 4 data/ssl/SSL7.fasta data/ssl/genomes_6frame_proteins.fasta 
+# Current dir:     /projects/health_sciences/bms/biochemistry/gardner_group/nadia/SSL_analysis
+# Date:            Fri Jan 30 14:46:34 2026
+# [ok]
