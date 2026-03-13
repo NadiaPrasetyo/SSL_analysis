@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 from Bio import SeqIO
 
-def align_mmseqs2(input_fasta: Path, output_dir: Path):
+def align_mmseqs2(input_fasta: Path, output_dir: Path, mode="protein"):
     """
     Runs MMseqs2 self-alignment for sequences in a FASTA file
     and writes a TSV alignment file.
@@ -37,16 +37,13 @@ def align_mmseqs2(input_fasta: Path, output_dir: Path):
                 check=True
             )
 
-            # Align (self-search)
-            subprocess.run(
-                [
-                    "mmseqs", "align",
-                    str(query_db), str(query_db),
-                    str(result_db),
-                    str(tmpdir)
-                ],
-                check=True
-            )
+            subprocess.run([
+                "mmseqs", "search",
+                str(query_db), str(query_db),
+                str(result_db),
+                str(tmpdir),
+                "--search-type", "1" if mode == "protein" else "3"
+            ], check=True)
 
             # Convert to TSV
             subprocess.run(
@@ -76,9 +73,10 @@ def main():
     parser = argparse.ArgumentParser(description="Align sequences using MMseqs2.")
     parser.add_argument("input_fasta", help="Input FASTA file")
     parser.add_argument("output_dir", help="Output directory")
+    parser.add_argument("--mode", default="protein", help="Alignment mode (protein or nucleotide)")
     args = parser.parse_args()
 
-    align_mmseqs2(args.input_fasta, Path(args.output_dir))
+    align_mmseqs2(args.input_fasta, Path(args.output_dir), mode=args.mode)
 
     print(f"[✓] Alignment complete for {args.input_fasta}")
 
