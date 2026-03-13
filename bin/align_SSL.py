@@ -42,7 +42,8 @@ def align_mmseqs2(input_fasta: Path, output_dir: Path, mode="protein"):
                 str(query_db), str(query_db),
                 str(result_db),
                 str(tmpdir),
-                "--search-type", "1" if mode == "protein" else "3"
+                "--search-type", "1" if mode == "protein" else "3",
+                "-a"
             ], check=True)
 
             # Convert to TSV
@@ -52,6 +53,7 @@ def align_mmseqs2(input_fasta: Path, output_dir: Path, mode="protein"):
                     str(query_db), str(query_db),
                     str(result_db),
                     str(raw_result),
+                    "--search-type", "1" if mode == "protein" else "3",
                     "--format-mode", "4",
                     "--format-output", ",".join(output_fields),
                 ],
