@@ -4,69 +4,72 @@ import argparse
 from pathlib import Path
 from Bio import SeqIO
 
-def align_mmseqs2(input_fasta, output_dir):
+def align_mmseqs2(input_fasta: Path, output_dir: Path):
     """
-    Runs MMseqs2 easy-search and saves alignment results.
+    Runs MMseqs2 self-alignment for sequences in a FASTA file
+    and writes a TSV alignment file.
+
+    Returns path to TSV if hits found, otherwise None.
     """
 
-    raw_result = output_dir/ f"{input_fasta}_alignment.tsv"
+    input_fasta = Path(input_fasta)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    raw_result = output_dir / f"{input_fasta.stem}_alignment.tsv"
+
+    output_fields = [
+        "query", "target", "pident", "alnlen",
+        "evalue", "bits", "qcov", "tcov",
+        "tstart", "tend", "taln"
+    ]
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_fields = [
-            "query", "target", "pident", "nident", "alnlen",
-            "evalue", "bits", "mismatch", "qcov", "tcov", "tstart", "tend", "taln"
-        ]
+        tmpdir = Path(tmpdir)
 
-        db = f"{tmpdir}/db"
-        result_db = f"{tmpdir}/result_db"
-        result_aln = f"{tmpdir}/result_aln"
-
-        cmd = [
-            "mmseqs", "createdb", str(input_fasta), db,
-        ]
+        query_db = tmpdir / "query_db"
+        result_db = tmpdir / "result_db"
 
         try:
-            subprocess.run(cmd, check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"[✗] MMseqs2 create db failed for {input_fasta}: {e}")
-            return None
+            # Create DB
+            subprocess.run(
+                ["mmseqs", "createdb", str(input_fasta), str(query_db)],
+                check=True
+            )
 
-        cmd = [
-            "mmseqs", "align", db, db,
-            result_db, result_aln
-        ]
+            # Align (self-search)
+            subprocess.run(
+                [
+                    "mmseqs", "align",
+                    str(query_db), str(query_db),
+                    str(result_db),
+                    str(tmpdir)
+                ],
+                check=True
+            )
 
-        try:
-            subprocess.run(cmd, check=True)
+            # Convert to TSV
+            subprocess.run(
+                [
+                    "mmseqs", "convertalis",
+                    str(query_db), str(query_db),
+                    str(result_db),
+                    str(raw_result),
+                    "--format-mode", "4",
+                    "--format-output", ",".join(output_fields),
+                ],
+                check=True
+            )
+
         except subprocess.CalledProcessError as e:
             print(f"[✗] MMseqs2 failed for {input_fasta}: {e}")
             return None
-        
-        cmd = [
-            "mmseqs", "convertalis", result_db, result_db, result_aln, str(raw_result),
-            "--format-mode", "4", "--format-output", ",".join(output_fields)
-        ]
 
-        try:
-            subprocess.run(cmd, check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"[✗] MMseqs2 convertalis failed for {input_fasta}: {e}")
-            return None
-
-        # ✅ Check for empty or header-only TSV
-        has_hits = False
-        if raw_result.exists():
-            with open(raw_result) as f:
-                lines = [ln.strip() for ln in f if ln.strip()]
-                if len(lines) > 1:  # more than just a header
-                    has_hits = True
-
-        if not has_hits:
-            print(f"[✗] No hits found for {input_fasta}")
-            return None
-
+    # Check if file contains hits
+    if raw_result.exists() and raw_result.stat().st_size > 0:
         return raw_result
-    
+
+    print(f"[✗] No hits found for {input_fasta}")
     return None
 
 def main():
