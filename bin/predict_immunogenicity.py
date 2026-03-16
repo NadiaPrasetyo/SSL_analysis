@@ -120,9 +120,6 @@ def build_antigen_jobs(
 
     for tool_name, runner in ANTIGEN_RUNNERS.items():
 
-        if tool_name not in args.tools:
-            continue
-
         output_dir = output_root / tool_name.lower()
         output_dir.mkdir(parents=True, exist_ok=True)
 
