@@ -29,13 +29,14 @@ from pathlib import Path
 import subprocess
 from tools import common
 
-def run(tool_path: Path, input_fasta: Path, output_dir: Path, job_type: int = 3):
+def run(tool_path: Path, input_fasta: Path, output_dir: Path, batch_size: int = 0, job_type: int = 3):
     """
     Run ifnepitope2 prediction tool from within the conda environment.
     Args:
         tool_path (Path): Directory containing tools (not used in this script).
         input_fasta (Path): Path to the input FASTA file.
         output_dir (Path): Directory where output will be saved.
+        batch_size (int, optional): Unused, present for interface compatibility.
         job_type (int, optional): IfNePitope2 job type (default: 3).
     """
 
