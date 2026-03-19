@@ -168,7 +168,7 @@ def parse_mhc_dir(directory):
                         continue
                     try:
                         id = parts[10 if prefix == "mhci" else 7]
-                        accession = f'{id.split("_")[0]}'
+                        accession = f'{id.split("_")[0]}|{id.split("_")[1]}'
                         score = float(parts[11 if prefix == "mhci" else 8])
                         percentile = float(parts[12 if prefix == "mhci" else 9])
                         binding_strength = parts[14 if prefix == "mhci" else 12] if len(parts) > (13 if prefix == "mhci" else 11) else "NA"
