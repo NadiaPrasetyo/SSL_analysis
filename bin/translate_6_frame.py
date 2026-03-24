@@ -50,7 +50,6 @@ def translate_6_frames(fasta_path: str, output_path: str):
         "-F",              # include frame info in header
         "-M",              # stop at first stop codon per frame
         "-w", "0",         # allow wobble / degenerate codons
-        "--fasta-line-width", "0",
     ]
 
     try:
