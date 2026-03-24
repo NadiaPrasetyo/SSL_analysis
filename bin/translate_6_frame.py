@@ -10,6 +10,7 @@ import argparse
 import os
 import subprocess
 from tqdm import tqdm
+import re
 
 
 def ensure_dir(path: str):
@@ -25,15 +26,57 @@ def check_seqkit():
     except (subprocess.CalledProcessError, FileNotFoundError):
         raise RuntimeError("❌ seqkit is not installed or not found in PATH. Please install it first.")
 
+def _replace_ambiguous(match: "re.Match") -> str:
+    """Replace every non-ACGT character in a sequence line with N."""
+    return re.sub(r"[^ACGTacgt]", "N", match.group(0))
+
 
 def translate_6_frames(fasta_path: str, output_path: str):
-    """Translate nucleotide sequences into 6-frame protein sequences using seqkit."""
+    """Translate nucleotide sequences into 6-frame protein sequences using seqkit.
+
+    Ambiguous IUPAC bases (R, Y, N, W, etc.) are replaced with N before
+    translation so seqkit does not abort with 'invalid DNA base'.
+    """
     ensure_dir(os.path.dirname(output_path))
-    cmd = ["seqkit", "translate", "-f", "6", "-F", "-M", fasta_path]
+
+    clean_cmd = [
+        "seqkit", "seq",
+        "--remove-gaps",   # drop '-' gap characters
+        fasta_path,
+    ]
+    translate_cmd = [
+        "seqkit", "translate",
+        "-f", "6",         # all 6 reading frames
+        "-F",              # include frame info in header
+        "-M",              # stop at first stop codon per frame
+        "-w", "0",         # allow wobble / degenerate codons
+        "--fasta-line-width", "0",
+    ]
 
     try:
+        # Step 1: strip gap characters via seqkit seq
+        clean_proc = subprocess.run(
+            clean_cmd,
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+        # Step 2: replace any remaining non-ACGT chars with N (Python-side)
+        # Only applies to sequence lines (not header lines starting with '>')
+        cleaned_fasta = re.sub(r"(?m)^(?!>).*", _replace_ambiguous, clean_proc.stdout)
+
+        # Step 3: pipe cleaned FASTA into seqkit translate
         with open(output_path, "w") as out_f:
-            subprocess.run(cmd, check=True, stdout=out_f, stderr=subprocess.PIPE, text=True)
+            subprocess.run(
+                translate_cmd,
+                input=cleaned_fasta,
+                check=True,
+                stdout=out_f,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"❌ seqkit translate failed for {fasta_path}:\n{e.stderr.strip()}")
 
