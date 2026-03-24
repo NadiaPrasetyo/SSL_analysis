@@ -3,6 +3,13 @@ from Bio import SeqIO
 import csv
 import sys
 
+def validate_seq(seq):
+    valid_bases = ['A', 'C', 'G', 'T']
+    for base in seq:
+        if base not in valid_bases:
+            return False
+    return True
+
 def main(input_fasta, output_file, unique_seq=False):
     # >11849|ERR163737|Staphylococcus_aureus|USA|2016|unknown||8|807188_10863:1-681 + SAUR0420
     # ATGAAATTTAAAGCGATAGCAAAAGCAAGTTTAGCATTGGGAATGTTAGCAACAGGTGTA
@@ -17,7 +24,7 @@ def main(input_fasta, output_file, unique_seq=False):
     # CTTAAACAAGGTCAAATTACAATTACAATGAATGATGGCACAACACATACAATCGATTTA
     # AGTCAAAAACTTGAAAAAGAACGTATGGGTGAGTCAATCGACGGCACTAAGATTAATAAA
     # ATTCTAGTAGAAATGAAATAA
-    # ids, isolate, species, country, year, disease, ST (MLST), seqbin id + position
+    # >ids|isolate|species|country|year|disease|epidemiology|ST (MLST)|seqbin id + position
 
     csv_data = {}
 
@@ -62,7 +69,7 @@ def main(input_fasta, output_file, unique_seq=False):
         seen_sequences = set()
         with open(unique_seq_file, "w") as f:
             for header, seq in loci.items():
-                if seq not in seen_sequences and seq != "-":
+                if seq not in seen_sequences and validate_seq(seq):
                     f.write(f"{header}\n{seq}\n")
                     seen_sequences.add(seq)
         print(f"Created {unique_seq_file}")
