@@ -48,8 +48,11 @@ def translate_6_frames(fasta_path: str, output_path: str):
         "seqkit", "translate",
         "-f", "6",         # all 6 reading frames
         "-F",              # include frame info in header
+        "-m", "1",
+        "-e",
         "-M",              # stop at first stop codon per frame
         "-w", "0",         # allow wobble / degenerate codons
+        "--clean"
     ]
 
     try:
