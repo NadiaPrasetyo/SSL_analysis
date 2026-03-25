@@ -178,7 +178,7 @@ def main(input_csv, newick_tree_file, output_file):
     norm = TwoSlopeNorm(vmin=-1, vcenter=0, vmax=1)
     cmap = plt.cm.bwr
 
-    z_arr = z.values
+    z_arr = z.values[::-1]
 
     im = ax_heat.imshow(
         z_arr,

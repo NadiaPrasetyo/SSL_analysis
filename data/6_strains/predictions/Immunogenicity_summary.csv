@@ -19,7 +19,7 @@ SSL11|CC30,bepipred3_median_epitope_score,0.18928642570972443
 SSL11|CC93,bepipred3_median_epitope_score,0.18577457964420319
 ACL82857.1,bepipred3_median_epitope_score,0.13381227850914001
 YP_499715.1,bepipred3_median_epitope_score,0.09254132211208344
-WP_000666757.1.1,bepipred3_median_epitope_score,0.06401556730270386
+WP_000666757.1,bepipred3_median_epitope_score,0.06401556730270386
 ACL82859.1,bepipred3_median_epitope_score,0.04324489086866379
 QZA65517.1,bepipred3_median_epitope_score,0.057617008686065674
 AEO79032.1,bepipred3_median_epitope_score,0.10023027658462524
@@ -44,7 +44,7 @@ SSL11|CC30,ifnepitope2_median_score,0.565
 SSL11|CC93,ifnepitope2_median_score,0.54
 ACL82857.1,ifnepitope2_median_score,0.6
 YP_499715.1,ifnepitope2_median_score,0.57
-WP_000666757.1.1,ifnepitope2_median_score,0.6
+WP_000666757.1,ifnepitope2_median_score,0.6
 ACL82859.1,ifnepitope2_median_score,0.61
 QZA65517.1,ifnepitope2_median_score,0.62
 AEO79032.1,ifnepitope2_median_score,0.615
