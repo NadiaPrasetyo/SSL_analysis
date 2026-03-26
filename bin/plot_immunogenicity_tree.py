@@ -3,6 +3,9 @@ Heatmap with phylogenetic tree (Newick) plotted on the left.
 - Y-axis: accessions (ordered by tree leaf order)
 - X-axis: features
 - Colour: z-score per feature (blue=-1, white=0, red=+1)
+
+Z-scores are computed across ALL accessions in the input CSV,
+but only accessions present in the tree are displayed in the heatmap.
 """
 
 import numpy as np
@@ -96,18 +99,29 @@ def main(input_csv, newick_tree_file, output_file):
 
     n_leaves = leaf_counter[0]
 
-    # ── 4.  PIVOT & Z-SCORE  ─────────────────────────────────────────────────────
-    pivot = df.pivot_table(index="accession", columns="feature", values="score")
-    pivot = pivot.loc[pivot.index.isin(leaf_order)]   # drop accessions not in tree
-    pivot = pivot.loc[leaf_order]                      # reorder rows to match tree
+    # ── 4.  PIVOT, Z-SCORE (all data), THEN FILTER TO TREE ACCESSIONS  ───────────
+    # Pivot using ALL accessions so z-scores reflect the full dataset distribution
+    pivot_all = df.pivot_table(index="accession", columns="feature", values="score")
 
     from scipy.stats import zscore as _zscore
-    z = pivot.apply(lambda col: _zscore(col, nan_policy="omit"), axis=0)
-    z = z.clip(-1, 1)   # clamp to [-1, 1]
 
-    features = list(z.columns)
-    n_acc    = len(leaf_order)
-    n_feat   = len(features)
+    # Compute z-scores column-wise across ALL accessions (housekeeping genes included)
+    z_all = pivot_all.apply(lambda col: _zscore(col, nan_policy="omit"), axis=0)
+    z_all = z_all.clip(-1, 1)   # clamp to [-1, 1]
+
+    # Now filter to only the accessions present in the tree, in tree leaf order
+    tree_accessions_in_data = [a for a in leaf_order if a in z_all.index]
+    z = z_all.loc[tree_accessions_in_data]
+
+    # Warn if any tree leaves are missing from the data
+    missing = [a for a in leaf_order if a not in z_all.index]
+    if missing:
+        print(f"Warning: {len(missing)} tree leaf/leaves not found in input CSV and will be skipped: {missing}")
+
+    features   = list(z.columns)
+    accessions = list(z.index)      # tree-filtered accessions, in tree order
+    n_acc      = len(accessions)
+    n_feat     = len(features)
 
     # ── 5.  FIGURE LAYOUT  ───────────────────────────────────────────────────────
     cell_h   = 0.45
@@ -116,22 +130,24 @@ def main(input_csv, newick_tree_file, output_file):
     cbar_w   = 0.4
     pad      = 0.3
 
+    label_w  = max(len(a) for a in accessions) * 0.07
     fig_h = max(6, n_acc * cell_h + 2.0)
-    fig_w = tree_w + n_feat * cell_w + cbar_w + pad * 3
+    fig_w = tree_w + n_feat * cell_w + label_w + cbar_w + pad * 3
 
     fig = plt.figure(figsize=(fig_w, fig_h), facecolor="white")
 
     gs = fig.add_gridspec(
-        1, 3,
-        width_ratios=[tree_w, n_feat * cell_w, cbar_w],
+        1, 4,
+        width_ratios=[tree_w, n_feat * cell_w, label_w, cbar_w],
         left=0.08, right=0.97,
         top=0.95, bottom=0.22,
         wspace=0.03,
     )
 
-    ax_tree = fig.add_subplot(gs[0])
-    ax_heat = fig.add_subplot(gs[1])
-    ax_cbar = fig.add_subplot(gs[2])
+    ax_tree  = fig.add_subplot(gs[0])
+    ax_heat  = fig.add_subplot(gs[1])
+    ax_label = fig.add_subplot(gs[2])
+    ax_cbar  = fig.add_subplot(gs[3])
 
     # ── 6.  DRAW TREE  ────────────────────────────────────────────────────────────
     tree_color = "black"
@@ -178,7 +194,7 @@ def main(input_csv, newick_tree_file, output_file):
     norm = TwoSlopeNorm(vmin=-1, vcenter=0, vmax=1)
     cmap = plt.cm.bwr
 
-    z_arr = z.values[::-1]
+    z_arr = z.values[::-1] # reverse rows so tree top = heatmap top
 
     im = ax_heat.imshow(
         z_arr,
@@ -202,6 +218,16 @@ def main(input_csv, newick_tree_file, output_file):
     ax_heat.xaxis.tick_bottom()
     ax_heat.set_yticks([])
     ax_heat.tick_params(axis="x", length=0, pad=3)
+
+    # dedicated label panel — mirrors the heatmap y-axis
+    ax_label.set_xlim(0, 1)
+    ax_label.set_ylim(n_acc - 0.5, -0.5)   # invert so row 0 is at the top
+    ax_label.axis("off")
+    for i, name in enumerate(reversed(accessions)):
+        grp = name.split("|")[0]
+        col = group_colors.get(grp, "black")
+        ax_label.text(0.05, i, name, va="center", ha="left",
+                      fontsize=7.5, fontfamily="monospace", color=col)
 
     # ── 8.  COLORBAR  ────────────────────────────────────────────────────────────
     cb = fig.colorbar(im, cax=ax_cbar)
