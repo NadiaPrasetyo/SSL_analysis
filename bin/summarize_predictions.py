@@ -44,12 +44,14 @@ def build_accession_map(canonical_accessions: list[str]):
     accession to the canonical form itself, so that downstream matching
     can be done with a single dict.get() call.
 
-    Variants generated:
+    Variants generated for each canonical (e.g. "YP_499715.1"):
     - The canonical string itself
     - Lower-cased version
-    - With '.' replaced by '|'  (e.g. "ACL82857.1" → "ACL82857|1")
-    - With '|' replaced by '.'  (in case a canonical uses '|')
-    - The prefix before the first '.' or '|'  (e.g. "ACL82857")
+    - '.' replaced by '|'           →  "YP_499715|1"
+    - '|' replaced by '.'           →  (handles SSL3|CC1 → SSL3.CC1 lookup)
+    - '_' replaced by '|'           →  "YP|499715.1"
+    - '_' replaced by '|', '.' → '' →  "YP|499715"   (MHC file format)
+    - bare prefix before first separator →  "YP_499715", "ACL82857"
     """
     mapping: dict[str, str] = {}
 
@@ -59,13 +61,15 @@ def build_accession_map(canonical_accessions: list[str]):
         variants.add(canon.lower())
         variants.add(canon.replace('.', '|'))
         variants.add(canon.replace('|', '.'))
-        # bare prefix (before the first separator)
-        prefix = re.split(r'[.|]', canon)[0]
+        variants.add(canon.replace('_', '|'))
+        # e.g. "YP_499715.1" → "YP|499715" (drop .version after underscore swap)
+        variants.add(re.sub(r'\.\d+$', '', canon.replace('_', '|')))
+        # bare prefix (before the first separator of any kind)
+        prefix = re.split(r'[.|_]', canon)[0]
         variants.add(prefix)
         variants.add(prefix.lower())
 
         for v in variants:
-            # Don't let a short/ambiguous prefix clobber a better match
             if v not in mapping or len(v) >= len(mapping.get(v, '')):
                 mapping[v] = canon
 
@@ -79,9 +83,11 @@ def resolve_accession(raw: str, acc_map: dict[str, str]) -> str:
     Lookup order:
     1. Exact match on the normalised string
     2. Case-insensitive match
-    3. Prefix match: return the canonical whose normalised form is a
-       prefix of the normalised raw accession (longest prefix wins)
-    4. Fall back to the normalised string as-is (unknown accession)
+    3. Prefix match: return the canonical whose variant is a prefix of
+       the normalised raw accession (longest prefix wins)
+    4. Unknown accession – auto-register all its variants into acc_map
+       so that the same protein resolves to the same string across all
+       tools even when it wasn't in the original FASTA.
     """
     norm = normalize_accession(raw)
 
@@ -93,18 +99,25 @@ def resolve_accession(raw: str, acc_map: dict[str, str]) -> str:
     if norm.lower() in acc_map:
         return acc_map[norm.lower()]
 
-    # 3. Prefix: find all canonicals that are a prefix of norm
+    # 3. Prefix: find the canonical whose registered variant is the
+    #    longest prefix of norm (guards against short spurious matches)
     best = None
     best_len = 0
     for variant, canon in acc_map.items():
-        if norm.startswith(variant) and len(variant) > best_len:
+        if len(variant) >= 6 and norm.startswith(variant) and len(variant) > best_len:
             best = canon
             best_len = len(variant)
     if best:
         return best
 
-    # 4. Unknown – return normalised form so output is still clean
-    logging.warning("Could not resolve accession %r (normalised: %r)", raw, norm)
+    # 4. Never-seen-before accession.
+    #    Register it now so all subsequent tools resolve it identically.
+    logging.debug(
+        "New accession %r (normalised: %r) – adding to map automatically.", raw, norm
+    )
+    # Reuse build_accession_map logic for a single entry
+    new_variants = build_accession_map([norm])
+    acc_map.update(new_variants)
     return norm
 
 
@@ -136,16 +149,21 @@ def setup_logging(verbose: bool, output_dir: Path):
 def parse_algpred(algpred_file, acc_map):
     # Subject,ML Score,MERCI Score,BLAST Score,Hybrid Score,Prediction
     results = []
-    with open(algpred_file, 'r') as f:
+    with open(algpred_file, 'r', encoding='utf-8-sig') as f:
         reader = csv.reader(f)
         for row in reader:
-            if row[0] == 'Subject':
+            if not row or row[0].strip().lower() in ('subject', ''):
+                continue
+            try:
+                score = float(row[4])
+            except (ValueError, IndexError):
+                logging.debug("Skipping algpred row (could not parse score): %s", row)
                 continue
             acc = resolve_accession(row[0], acc_map)
             results.append({
                 'accession': acc,
                 'feature': 'algpred2_hybrid_score',
-                'score': float(row[4])
+                'score': score
             })
     return results
 
@@ -154,13 +172,18 @@ def parse_bcell(bcell_file, acc_map):
     # Accession,Residue,BepiPred-3.0 score,BepiPred-3.0 linear epitope score
     data = defaultdict(list)
     results = []
-    with open(bcell_file, 'r') as f:
+    with open(bcell_file, 'r', encoding='utf-8-sig') as f:  # utf-8-sig strips BOM if present
         reader = csv.reader(f)
         for row in reader:
-            if row[0] == 'Accession':
+            if not row or row[0].strip().lower() in ('accession', ''):
+                continue
+            try:
+                score = float(row[2])
+            except (ValueError, IndexError):
+                logging.debug("Skipping bcell row (could not parse score): %s", row)
                 continue
             acc = resolve_accession(row[0], acc_map)
-            data[acc].append(float(row[2]))
+            data[acc].append(score)
 
     for acc, scores in data.items():
         results.append({'accession': acc, 'feature': 'bepipred3_max_epitope_score',    'score': max(scores)})
@@ -366,8 +389,16 @@ def main():
     logging.info("Results written to %s", output_file)
 
     # Summarise which accessions appeared
-    seen = {r['accession'] for r in all_results}
-    logging.info("Unique accessions in output: %d  →  %s", len(seen), sorted(seen))
+    seen    = {r['accession'] for r in all_results}
+    known   = seen & set(canonicals)
+    unknown = seen - set(canonicals)
+    logging.info("Unique accessions in output : %d", len(seen))
+    logging.info("  Matched to FASTA          : %d  ->  %s", len(known), sorted(known))
+    if unknown:
+        logging.warning(
+            "  Not in FASTA (auto-registered, check inputs): %d  ->  %s",
+            len(unknown), sorted(unknown)
+        )
 
 
 if __name__ == '__main__':
