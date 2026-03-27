@@ -21,18 +21,35 @@ def normalize_accession(raw: str) -> str:
     represented identically regardless of which tool produced the label.
 
     Rules applied in order:
-    1. Strip any FASTA-style description after the first whitespace
-       e.g. "ACL82857.1 carbamate kinase partial [...]"  →  "ACL82857.1"
-    2. Replace pipe-separated version numbers that look like a dot-version
-       e.g. "ACL82857|1"  →  "ACL82857.1"
-       but leave deliberate pipe IDs like "SSL3|CC1" alone (second part is
-       non-numeric or contains letters beyond a simple integer).
-    3. Collapse any remaining runs of whitespace.
+    1.  Strip any FASTA-style description after the first whitespace.
+        "ACL82857.1 carbamate kinase partial [...]"  →  "ACL82857.1"
+
+    2a. "ACL82857|1"  →  "ACL82857.1"
+        A pipe whose RIGHT side is a bare integer AND whose left side
+        contains no underscore (plain accession + version).  The pipe
+        is treated as a mis-encoded dot.
+
+    2b. "YP|499715"  →  "YP_499715"
+        A pipe whose LEFT side is a short all-letter prefix (2-4 chars)
+        AND whose right side is all-digits with no trailing version.
+        This is an NCBI-style accession where '_' was encoded as '|'
+        by the MHC prediction tool.  We restore the underscore.
+        The version suffix (.1) is intentionally left absent here so that
+        resolve_accession can match it via the version-stripped variant.
+
+    Rule 2b is tested BEFORE 2a so that "YP|499715" is caught first.
+
+    3.  Everything else containing '|' (e.g. "SSL3|CC1", "SSL10|A0A0H3K6Z9",
+        "sp|P64362.1|HIS6_STAAN") is left unchanged.
     """
     # Step 1 – drop trailing description
     acc = raw.strip().split()[0] if raw.strip() else raw.strip()
 
-    # Step 2 – "ACL82857|1" → "ACL82857.1"  (pipe followed by a pure integer)
+    # Step 2b – "YP|499715" → "YP_499715"
+    # Left side: 2-4 uppercase letters; right side: digits only (no dot)
+    acc = re.sub(r'^([A-Z]{2,4})\|(\d+)$', r'\1_\2', acc)
+
+    # Step 2a – "ACL82857|1" → "ACL82857.1"  (trailing |<integer> = version)
     acc = re.sub(r'\|(\d+)$', r'.\1', acc)
 
     return acc
@@ -41,36 +58,73 @@ def normalize_accession(raw: str) -> str:
 def build_accession_map(canonical_accessions: list[str]):
     """
     Build a lookup dict from every plausible variant of each canonical
-    accession to the canonical form itself, so that downstream matching
-    can be done with a single dict.get() call.
+    accession to the canonical form itself.
 
-    Variants generated for each canonical (e.g. "YP_499715.1"):
-    - The canonical string itself
-    - Lower-cased version
-    - '.' replaced by '|'           →  "YP_499715|1"
-    - '|' replaced by '.'           →  (handles SSL3|CC1 → SSL3.CC1 lookup)
-    - '_' replaced by '|'           →  "YP|499715.1"
-    - '_' replaced by '|', '.' → '' →  "YP|499715"   (MHC file format)
-    - bare prefix before first separator →  "YP_499715", "ACL82857"
+    For every canonical we register all the mangled forms that real
+    prediction tools have been observed to produce:
+
+    e.g. Canonical "YP_499715.1":
+      YP_499715.1          – identity
+      yp_499715.1          – lower-cased
+      YP_499715|1          – dot→pipe  (some tools)
+      YP|499715.1          – underscore→pipe
+      YP|499715            – underscore→pipe + version stripped  ← MHC format
+      YP_499715            – version stripped (no .1)
+      YP.499715.1          – underscore→dot  (occasionally seen)
+      YP.499715            – underscore→dot + version stripped
+
+    Canonical "ACL82857.1":
+      ACL82857.1  ACL82857|1  acl82857.1  ACL82857  …
+
+    Canonical "SSL3|CC1":
+      SSL3|CC1  ssl3|cc1  SSL3.CC1  …  (pipe IDs kept as-is)
+
+    Canonical "sp|P64362.1|HIS6_STAAN":
+      kept as-is plus lower-cased; we do not mangle multi-pipe UniProt IDs
+      further to avoid collisions.
     """
     mapping: dict[str, str] = {}
 
     for canon in canonical_accessions:
-        variants = set()
+        variants: set[str] = set()
         variants.add(canon)
         variants.add(canon.lower())
-        variants.add(canon.replace('.', '|'))
-        variants.add(canon.replace('|', '.'))
-        variants.add(canon.replace('_', '|'))
-        # e.g. "YP_499715.1" → "YP|499715" (drop .version after underscore swap)
-        variants.add(re.sub(r'\.\d+$', '', canon.replace('_', '|')))
-        # bare prefix (before the first separator of any kind)
-        prefix = re.split(r'[.|_]', canon)[0]
-        variants.add(prefix)
-        variants.add(prefix.lower())
+
+        # Only generate separator-swap variants for simple accessions
+        # (at most one underscore separator, at most one dot version suffix).
+        # Multi-pipe UniProt IDs like "sp|P64362.1|HIS6_STAAN" are kept verbatim.
+        pipe_count = canon.count('|')
+        has_underscore = '_' in canon
+
+        if pipe_count <= 1:
+            # dot ↔ pipe for the version suffix
+            variants.add(canon.replace('.', '|'))   # YP_499715|1
+            variants.add(canon.replace('|', '.'))   # SSL3.CC1
+            # pipe → underscore (MHC tools sometimes encode SSL10|A0A0H3K6Z9 as SSL10_A0A0H3K6Z9)
+            variants.add(canon.replace('|', '_'))   # SSL10_A0A0H3K6Z9
+
+        if has_underscore and pipe_count == 0:
+            # NCBI-style: swap underscore for pipe
+            us_to_pipe = canon.replace('_', '|')    # YP|499715.1
+            variants.add(us_to_pipe)
+
+            # MHC tool drops the .version entirely after the swap
+            us_pipe_no_ver = re.sub(r'\.\d+$', '', us_to_pipe)  # YP|499715
+            variants.add(us_pipe_no_ver)
+
+            # Also dot-separated variants (seen in auto-registered accessions)
+            us_to_dot = canon.replace('_', '.')     # YP.499715.1
+            variants.add(us_to_dot)
+            variants.add(re.sub(r'\.\d+$', '', us_to_dot))      # YP.499715
+
+        # Version-stripped form (drop trailing .N)
+        no_version = re.sub(r'\.\d+$', '', canon)
+        if no_version != canon:
+            variants.add(no_version)
+            variants.add(no_version.lower())
 
         for v in variants:
-            if v not in mapping or len(v) >= len(mapping.get(v, '')):
+            if v and (v not in mapping or len(v) >= len(mapping.get(v, ''))):
                 mapping[v] = canon
 
     return mapping
@@ -82,40 +136,44 @@ def resolve_accession(raw: str, acc_map: dict[str, str]) -> str:
 
     Lookup order:
     1. Exact match on the normalised string
-    2. Case-insensitive match
-    3. Prefix match: return the canonical whose variant is a prefix of
-       the normalised raw accession (longest prefix wins)
-    4. Unknown accession – auto-register all its variants into acc_map
-       so that the same protein resolves to the same string across all
-       tools even when it wasn't in the original FASTA.
+    2. Exact match on the raw first token (before normalisation) –
+       catches cases where normalisation inadvertently mangles a key
+       that was already stored verbatim (e.g. "SSL10|A0A0H3K6Z9")
+    3. Case-insensitive match on normalised string
+    4. Prefix match: the registered variant that is the longest prefix
+       of the normalised string (minimum 6 chars to avoid false hits)
+    5. Unknown accession – auto-register all its variants so the same
+       protein maps to the same string across all tools.
     """
-    norm = normalize_accession(raw)
+    norm     = normalize_accession(raw)
+    raw_tok  = raw.strip().split()[0]   # first token, no description, no normalisation
 
-    # 1. Exact
+    # 1. Exact on normalised
     if norm in acc_map:
         return acc_map[norm]
 
-    # 2. Case-insensitive
+    # 2. Exact on raw token (pre-normalisation)
+    if raw_tok in acc_map:
+        return acc_map[raw_tok]
+
+    # 3. Case-insensitive on normalised
     if norm.lower() in acc_map:
         return acc_map[norm.lower()]
 
-    # 3. Prefix: find the canonical whose registered variant is the
-    #    longest prefix of norm (guards against short spurious matches)
-    best = None
-    best_len = 0
+    # 4. Longest-prefix match (guards against short spurious matches)
+    best      = None
+    best_len  = 0
     for variant, canon in acc_map.items():
         if len(variant) >= 6 and norm.startswith(variant) and len(variant) > best_len:
-            best = canon
+            best     = canon
             best_len = len(variant)
     if best:
         return best
 
-    # 4. Never-seen-before accession.
-    #    Register it now so all subsequent tools resolve it identically.
+    # 5. Never-seen-before – register so cross-tool consistency is maintained
     logging.debug(
         "New accession %r (normalised: %r) – adding to map automatically.", raw, norm
     )
-    # Reuse build_accession_map logic for a single entry
     new_variants = build_accession_map([norm])
     acc_map.update(new_variants)
     return norm
@@ -250,11 +308,14 @@ def parse_mhc_dir(directory, acc_map):
                         continue
                     try:
                         raw_id   = parts[10 if prefix == "mhci" else 7]
-                        # MHC files use "GENE_ACCPART1_ACCPART2" style ids;
-                        # reconstruct the pipe-separated accession before resolving.
-                        id_parts = raw_id.split("_")
-                        raw_acc  = f'{id_parts[0]}|{id_parts[1]}' if len(id_parts) >= 2 else raw_id
-                        accession = resolve_accession(raw_acc, acc_map)
+                        # MHC files encode accessions as underscore-joined tokens,
+                        # e.g. "SSL10_A0A0H3K6Z9" or "YP_499715" (underscore used
+                        # instead of pipe/dot).  Pass raw_id directly to
+                        # resolve_accession; normalize_accession and the variant
+                        # map handle all the separator permutations correctly.
+                        # We do NOT split and rejoin here because that would
+                        # truncate IDs with multiple underscores (e.g. A0A0H3K6Z9).
+                        accession = resolve_accession(raw_id, acc_map)
 
                         score            = float(parts[11 if prefix == "mhci" else 8])
                         percentile       = float(parts[12 if prefix == "mhci" else 9])
