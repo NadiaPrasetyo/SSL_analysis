@@ -63,7 +63,7 @@ def build_accession_map(canonical_accessions: list[str]):
     For every canonical we register all the mangled forms that real
     prediction tools have been observed to produce:
 
-    e.g. Canonical "YP_499715.1":
+    Canonical "YP_499715.1":
       YP_499715.1          – identity
       yp_499715.1          – lower-cased
       YP_499715|1          – dot→pipe  (some tools)
@@ -127,55 +127,95 @@ def build_accession_map(canonical_accessions: list[str]):
             if v and (v not in mapping or len(v) >= len(mapping.get(v, ''))):
                 mapping[v] = canon
 
-    return mapping
+    # Build a secondary index keyed by separator-flattened canonical.
+    # This lets resolve_accession handle truncated all-underscore MHC ids.
+    # We index by the flattened *canonical* (not variants) so that the
+    # startswith probe in resolve_accession matches the longest real prefix.
+    flat_index: dict[str, str] = {}
+    for canon in canonical_accessions:
+        flat_canon = _flatten(canon)
+        # Only add if not already claimed by a longer canonical
+        if flat_canon not in flat_index or len(flat_canon) >= len(_flatten(flat_index[flat_canon])):
+            flat_index[flat_canon] = canon
+
+    return mapping, flat_index
 
 
-def resolve_accession(raw: str, acc_map: dict[str, str]) -> str:
+def _flatten(s: str) -> str:
+    """Replace all separator characters (|, ., -) with _ for fuzzy comparison."""
+    return re.sub(r'[|.\-]', '_', s)
+
+
+def resolve_accession(raw: str, acc_map: dict[str, str],
+                      flat_index: dict[str, str]) -> str:
     """
     Return the canonical accession for *raw*, using acc_map.
 
+    MHC prediction tools mangle accession IDs in two ways that must both
+    be handled:
+      - All separators (|  .  -) are replaced with underscores
+      - The result is truncated to a fixed column width
+
     Lookup order:
     1. Exact match on the normalised string
-    2. Exact match on the raw first token (before normalisation) –
-       catches cases where normalisation inadvertently mangles a key
-       that was already stored verbatim (e.g. "SSL10|A0A0H3K6Z9")
+    2. Exact match on the raw first token (catches pre-normalised keys)
     3. Case-insensitive match on normalised string
-    4. Prefix match: the registered variant that is the longest prefix
-       of the normalised string (minimum 6 chars to avoid false hits)
-    5. Unknown accession – auto-register all its variants so the same
-       protein maps to the same string across all tools.
+    4. Separator-variant prefix match via acc_map variants
+       (catches YP_499715 → YP_499715.1, SSL10_A0A0H3K6Z9 → SSL10|A0A0H3K6Z9)
+    5. Separator-flattened prefix match via flat_index
+       (catches truncated all-underscore forms like:
+        SSL10_A0A0H3K6Z  → SSL10|A0A0H3K6Z9
+        P0C0I5_Exotoxin  → P0C0I5|ExotoxinC
+        sp_P64362_1_HIS  → sp|P64362.1|HIS6_STAAN)
+    6. Unknown – auto-register for cross-tool consistency.
     """
-    norm     = normalize_accession(raw)
-    raw_tok  = raw.strip().split()[0]   # first token, no description, no normalisation
+    norm    = normalize_accession(raw)
+    raw_tok = raw.strip().split()[0]
 
     # 1. Exact on normalised
     if norm in acc_map:
         return acc_map[norm]
 
-    # 2. Exact on raw token (pre-normalisation)
+    # 2. Exact on raw token
     if raw_tok in acc_map:
         return acc_map[raw_tok]
 
-    # 3. Case-insensitive on normalised
+    # 3. Case-insensitive
     if norm.lower() in acc_map:
         return acc_map[norm.lower()]
 
-    # 4. Longest-prefix match (guards against short spurious matches)
-    best      = None
-    best_len  = 0
+    # 4. Longest-prefix match across all registered separator variants
+    best, best_len = None, 0
     for variant, canon in acc_map.items():
         if len(variant) >= 6 and norm.startswith(variant) and len(variant) > best_len:
-            best     = canon
-            best_len = len(variant)
+            best, best_len = canon, len(variant)
     if best:
         return best
 
-    # 5. Never-seen-before – register so cross-tool consistency is maintained
+    # 5. Separator-flattened prefix match.
+    #    The MHC tool truncates the id, so the probe is SHORTER than the
+    #    canonical.  We check: does the flat canonical START WITH the probe?
+    #    Longest probe match wins (avoids short spurious hits).
+    flat_norm = _flatten(norm)
+    flat_tok  = _flatten(raw_tok)
+    best, best_len = None, 0
+    for flat_canon, canon in flat_index.items():
+        for probe in (flat_norm, flat_tok):
+            if len(probe) >= 6 and flat_canon.startswith(probe) and len(probe) > best_len:
+                best, best_len = canon, len(probe)
+    if best:
+        logging.debug(
+            "Resolved %r via flattened-prefix match -> %r", raw, best
+        )
+        return best
+
+    # 6. Never-seen-before – register for consistency
     logging.debug(
         "New accession %r (normalised: %r) – adding to map automatically.", raw, norm
     )
     new_variants = build_accession_map([norm])
     acc_map.update(new_variants)
+    flat_index.update({_flatten(v): norm for v in new_variants})
     return norm
 
 
@@ -204,7 +244,7 @@ def setup_logging(verbose: bool, output_dir: Path):
 # Per-tool parsers  (each now accepts acc_map and calls resolve_accession)
 # ---------------------------------------------------------------------------
 
-def parse_algpred(algpred_file, acc_map):
+def parse_algpred(algpred_file, acc_map, flat_index):
     # Subject,ML Score,MERCI Score,BLAST Score,Hybrid Score,Prediction
     results = []
     with open(algpred_file, 'r', encoding='utf-8-sig') as f:
@@ -217,7 +257,7 @@ def parse_algpred(algpred_file, acc_map):
             except (ValueError, IndexError):
                 logging.debug("Skipping algpred row (could not parse score): %s", row)
                 continue
-            acc = resolve_accession(row[0], acc_map)
+            acc = resolve_accession(row[0], acc_map, flat_index)
             results.append({
                 'accession': acc,
                 'feature': 'algpred2_hybrid_score',
@@ -226,7 +266,7 @@ def parse_algpred(algpred_file, acc_map):
     return results
 
 
-def parse_bcell(bcell_file, acc_map):
+def parse_bcell(bcell_file, acc_map, flat_index):
     # Accession,Residue,BepiPred-3.0 score,BepiPred-3.0 linear epitope score
     data = defaultdict(list)
     results = []
@@ -240,7 +280,7 @@ def parse_bcell(bcell_file, acc_map):
             except (ValueError, IndexError):
                 logging.debug("Skipping bcell row (could not parse score): %s", row)
                 continue
-            acc = resolve_accession(row[0], acc_map)
+            acc = resolve_accession(row[0], acc_map, flat_index)
             data[acc].append(score)
 
     for acc, scores in data.items():
@@ -251,7 +291,7 @@ def parse_bcell(bcell_file, acc_map):
     return results
 
 
-def parse_ifnepitope(ifnepitope_file, acc_map):
+def parse_ifnepitope(ifnepitope_file, acc_map, flat_index):
     # Seq_ID,Pattern_ID,Sequence,ML_Score,BLAST_Score,Total_Score,Prediction
     data = defaultdict(list)
     results = []
@@ -260,8 +300,12 @@ def parse_ifnepitope(ifnepitope_file, acc_map):
         for row in reader:
             if row[0] == 'Seq_ID':
                 continue
-            acc = resolve_accession(row[0], acc_map)
-            data[acc].append(float(row[5]))
+            acc = resolve_accession(row[0], acc_map, flat_index)
+            try:
+                data[acc].append(float(row[5]))
+            except (ValueError, IndexError):
+                logging.debug("Skipping ifnepitope row (could not parse score): %s", row)
+                continue
 
     for acc, scores in data.items():
         results.append({'accession': acc, 'feature': 'ifnepitope2_max_score',    'score': max(scores)})
@@ -271,7 +315,7 @@ def parse_ifnepitope(ifnepitope_file, acc_map):
     return results
 
 
-def parse_mhc_dir(directory, acc_map):
+def parse_mhc_dir(directory, acc_map, flat_index):
     """
     Parse MHC epitope prediction files in the specified directory.
     """
@@ -315,7 +359,7 @@ def parse_mhc_dir(directory, acc_map):
                         # map handle all the separator permutations correctly.
                         # We do NOT split and rejoin here because that would
                         # truncate IDs with multiple underscores (e.g. A0A0H3K6Z9).
-                        accession = resolve_accession(raw_id, acc_map)
+                        accession = resolve_accession(raw_id, acc_map, flat_index)
 
                         score            = float(parts[11 if prefix == "mhci" else 8])
                         percentile       = float(parts[12 if prefix == "mhci" else 9])
@@ -399,7 +443,7 @@ def main():
         canonicals = []
         logging.info("No FASTA provided – accessions will be normalised but not cross-referenced.")
 
-    acc_map = build_accession_map(canonicals)
+    acc_map, flat_index = build_accession_map(canonicals)
 
     # ------------------------------------------------------------------
     # Locate input files
@@ -430,11 +474,11 @@ def main():
     # ------------------------------------------------------------------
     # Parse
     # ------------------------------------------------------------------
-    algpred_summary  = parse_algpred(algpred_file,    acc_map)
-    bcell_summary    = parse_bcell(bcell_file,         acc_map)
-    ifnepitope_summary = parse_ifnepitope(ifnepitope_file, acc_map)
-    mhci_summary     = parse_mhc_dir(mhci_dir,        acc_map)
-    mhcii_summary    = parse_mhc_dir(mhcii_dir,       acc_map)
+    algpred_summary    = parse_algpred(algpred_file,      acc_map, flat_index)
+    bcell_summary      = parse_bcell(bcell_file,           acc_map, flat_index)
+    ifnepitope_summary = parse_ifnepitope(ifnepitope_file, acc_map, flat_index)
+    mhci_summary       = parse_mhc_dir(mhci_dir,          acc_map, flat_index)
+    mhcii_summary      = parse_mhc_dir(mhcii_dir,         acc_map, flat_index)
 
     all_results = algpred_summary + bcell_summary + ifnepitope_summary + mhci_summary + mhcii_summary
 
