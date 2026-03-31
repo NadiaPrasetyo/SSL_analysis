@@ -57,7 +57,8 @@ def align_mmseqs2(input_fasta: Path, output_dir: Path, mode="protein", target_fa
             subprocess.run(
                 [
                     "mmseqs", "convertalis",
-                    str(query_db), str(query_db),
+                    str(query_db),
+                    str(query_db) if target_fasta is None else str(target_db),
                     str(result_db),
                     str(raw_result),
                     "--search-type", "1" if mode == "protein" else "3",
