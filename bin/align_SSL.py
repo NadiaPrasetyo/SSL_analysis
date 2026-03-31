@@ -35,10 +35,13 @@ def align_mmseqs2(input_fasta: Path, output_dir: Path, mode="protein", target_fa
             # Create DB
             subprocess.run(
                 ["mmseqs", "createdb", str(input_fasta), str(query_db)],
-                if target_fasta is not None:
-                    ["mmseqs", "createdb", str(target_fasta), str(target_db)],
                 check=True
             )
+            if target_fasta is not None:
+                subprocess.run(
+                    ["mmseqs", "createdb", str(target_fasta), str(target_db)],
+                    check=True
+                )
 
             subprocess.run([
                 "mmseqs", "search",
