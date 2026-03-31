@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 from Bio import SeqIO
 
-def align_mmseqs2(input_fasta: Path, output_dir: Path, mode="protein"):
+def align_mmseqs2(input_fasta: Path, output_dir: Path, mode="protein", target_fasta=None):
     """
     Runs MMseqs2 self-alignment for sequences in a FASTA file
     and writes a TSV alignment file.
@@ -28,18 +28,22 @@ def align_mmseqs2(input_fasta: Path, output_dir: Path, mode="protein"):
         tmpdir = Path(tmpdir)
 
         query_db = tmpdir / "query_db"
+        target_db = tmpdir / "target_db"
         result_db = tmpdir / "result_db"
 
         try:
             # Create DB
             subprocess.run(
                 ["mmseqs", "createdb", str(input_fasta), str(query_db)],
+                if target_fasta is not None:
+                    ["mmseqs", "createdb", str(target_fasta), str(target_db)],
                 check=True
             )
 
             subprocess.run([
                 "mmseqs", "search",
-                str(query_db), str(query_db),
+                str(query_db), 
+                str(query_db) if target_fasta is None else str(target_db),
                 str(result_db),
                 str(tmpdir),
                 "--search-type", "1" if mode == "protein" else "3",
@@ -76,9 +80,10 @@ def main():
     parser.add_argument("input_fasta", help="Input FASTA file")
     parser.add_argument("output_dir", help="Output directory")
     parser.add_argument("--mode", default="protein", help="Alignment mode (protein or nucleotide)")
+    parser.add_argument("--target_fasta", default=None, help="Target database for self-alignment")
     args = parser.parse_args()
 
-    align_mmseqs2(args.input_fasta, Path(args.output_dir), mode=args.mode)
+    align_mmseqs2(args.input_fasta, Path(args.output_dir), mode=args.mode, target_fasta=args.target_fasta)
 
     print(f"[✓] Alignment complete for {args.input_fasta}")
 
