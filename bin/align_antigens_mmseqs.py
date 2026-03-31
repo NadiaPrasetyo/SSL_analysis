@@ -114,13 +114,18 @@ def run_mmseqs2_and_process(strain_fasta_path, antigen_fasta, results_dir, fetch
         if fetch_qseq:
             output_fields.append("qseq")
 
-        # 2 = protein search, 3 = nucleotide search
-        search_type = "2" if mode == "protein" else "3"
+        # 1 = amino acid search, 2 = translated nucleotide search, 3 = nucleotide search, 
+        search_type = {
+            "protein": 1,
+            "translated": 2,
+            "nucleotide": 3
+        }
+        
         cmd = [
             "mmseqs", "easy-search",
             str(antigen_fasta), str(strain_fasta),
             str(raw_result), tmpdir,
-            "--search-type", search_type,
+            "--search-type", search_type[mode],
             "--format-mode", "4",
             "--format-output", ",".join(output_fields)
         ]
@@ -321,7 +326,7 @@ if __name__ == "__main__":
     parser.add_argument("pathogen_name", help='Prefix used in filenames (e.g., "staphylococcus aureus")')
     parser.add_argument("--genome-dir", help="Subdirectory under pathogen_directory containing strain genome or proteome FASTA files (default: strain_genomes)", default="strain_genomes")
     parser.add_argument("--threads", type=int, default=4, help="Number of threads (default: 4)")
-    parser.add_argument("--mode", choices=["protein", "nucleotide"], default="protein", help="Alignment mode (default: protein)")
+    parser.add_argument("--mode", choices=["protein", "nucleotide", "translated"], default="protein", help="Alignment mode (default: protein)")
     parser.add_argument(
         "--output-dir",
         default=None,
