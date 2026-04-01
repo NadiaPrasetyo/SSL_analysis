@@ -21,7 +21,7 @@ def align_mmseqs2(input_fasta: Path, output_dir: Path, mode="protein", target_fa
     output_fields = [
         "query", "target", "pident", "alnlen",
         "evalue", "bits", "qcov", "tcov",
-        "tstart", "tend", "taln"
+        "tstart", "tend", "taln",
     ]
 
     with tempfile.TemporaryDirectory() as tmpdir:
