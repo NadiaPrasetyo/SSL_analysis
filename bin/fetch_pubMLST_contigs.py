@@ -4,6 +4,7 @@ import sys
 import argparse
 from Bio import SeqIO
 import logging
+from pathlib import Path
 
 def setup_logging(verbose: bool, output_dir: Path):
     """Configure logging to console and file."""
@@ -76,5 +77,7 @@ if __name__ == "__main__":
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
     args = parser.parse_args()
 
+    # create the output directory if it doesn't exist
+    Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     setup_logging(args.verbose, Path(args.output_dir))
     fetch_pubMLST_contigs(args.database, args.output_dir, args.date)
