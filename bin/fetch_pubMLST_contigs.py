@@ -6,7 +6,7 @@ from Bio import SeqIO
 
 URL = "https://rest.pubmlst.org/db/"
 
-def fetch_pubMLST_contigs(database, date, output_dir):
+def fetch_pubMLST_contigs(database, output_dir, date):
     # Fetch the list of isolate records that have genome assemblies
     url = f"{URL}{database}/genomes?return_all=1&added_after={date}"
     response = requests.get(url)
@@ -29,22 +29,6 @@ def fetch_pubMLST_contigs(database, date, output_dir):
         response = requests.get(url)
         response.raise_for_status()
         isolate_info = response.json()
-        # ids|isolate|species|country|year|disease|epidemiology|ST
-            #provenance:	
-            # genogroup_notes	"A backbone: All essential capsule genes intact and present. Prediction code: https://github.com/ntopaz/characterize_neisseria_capsule."
-            # comments	
-            # 0	"Pili IIb"
-            # id	1
-            # genogroup	"A"
-            # epidemiology	"epidemic"
-            # disease	"invasive (unspecified/other)"
-            # species	"Neisseria meningitidis"
-            # year	1937
-            # datestamp	"2026-03-27"
-            # serogroup	"A"
-            # country	"USA"
-            # serotype	"4,21"
-            # curator	"https://rest.pubmlst.org/db/pubmlst_neisseria_isolates/users/-1"
 
         # change the headers of the contigs to include the isolate information
         # isolate,locus,country,year,clonal_complex,sequence
