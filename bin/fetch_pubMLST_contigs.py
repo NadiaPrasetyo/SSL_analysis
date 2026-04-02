@@ -9,6 +9,7 @@ URL = "https://rest.pubmlst.org/db/"
 def fetch_pubMLST_contigs(database, output_dir, date):
     # Fetch the list of isolate records that have genome assemblies
     url = f"{URL}{database}/genomes?return_all=1&added_after={date}"
+    print("Fetching isolate records with URL:", url)
     response = requests.get(url)
     response.raise_for_status()
     isolate_records = response.json()
@@ -25,6 +26,7 @@ def fetch_pubMLST_contigs(database, output_dir, date):
         contigs = SeqIO.parse(response.content, "fasta")
 
         # get other information about the isolate
+        print("Fetching isolate information for isolate", isolate_id)
         url = f"{URL}{database}/isolates/{isolate_id}"
         response = requests.get(url)
         response.raise_for_status()
@@ -44,6 +46,7 @@ def fetch_pubMLST_contigs(database, output_dir, date):
         with open(output_file, "w") as f:
             SeqIO.write(contigs, f, "fasta")
 
+        print(f"Saved contigs for isolate {isolate_id} to {output_file}")
         # add a time out to prevent overloading the server
         time.sleep(1)
 
