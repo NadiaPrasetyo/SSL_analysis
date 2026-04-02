@@ -5,6 +5,7 @@ import argparse
 from Bio import SeqIO
 import logging
 from pathlib import Path
+import traceback
 
 def setup_logging(verbose: bool, output_dir: Path):
     """Configure logging to console and file."""
@@ -80,4 +81,8 @@ if __name__ == "__main__":
     # create the output directory if it doesn't exist
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     setup_logging(args.verbose, Path(args.output_dir))
-    fetch_pubMLST_contigs(args.database, args.output_dir, args.date)
+    try:
+        fetch_pubMLST_contigs(args.database, args.output_dir, args.date)
+    except Exception as e:
+        logging.error(f"Error: {e}")
+        logging.debug(traceback.format_exc())
