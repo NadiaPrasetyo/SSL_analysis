@@ -44,6 +44,9 @@ def fetch_pubMLST_contigs(database, output_dir, date):
         with open(output_file, "w") as f:
             SeqIO.write(contigs, f, "fasta")
 
+        # add a time out to prevent overloading the server
+        time.sleep(1)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fetch pubMLST contigs")
     parser.add_argument("--database", default="pubmlst_saureus_isolates", help="Database name (e.g.: pubmlst_saureus_isolates)")
