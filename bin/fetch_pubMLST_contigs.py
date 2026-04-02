@@ -67,4 +67,4 @@ if __name__ == "__main__":
     parser.add_argument("--date", default="2016-01-01", help="Date (YYYY-MM-DD) (default: 2016-01-01)")
     args = parser.parse_args()
 
-    fetch_pubMLST_contigs(args.database, args.output_dir)
+    fetch_pubMLST_contigs(args.database, args.output_dir, args.date)
