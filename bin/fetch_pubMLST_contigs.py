@@ -46,7 +46,7 @@ def fetch_pubMLST_contigs(database, output_dir, date):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fetch pubMLST contigs")
-    parser.add_argument("--database", default="staphylococcus_aureus_isolates", help="Database name (e.g.: staphylococcus_aureus_isolates)")
+    parser.add_argument("--database", default="pubmlst_saureus_isolates", help="Database name (e.g.: pubmlst_saureus_isolates)")
     parser.add_argument("--output_dir", default="data/contigs", help="Output directory (default: data/contigs)")
     parser.add_argument("--date", default="2016-01-01", help="Date (YYYY-MM-DD) (default: 2016-01-01)")
     args = parser.parse_args()
