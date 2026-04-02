@@ -44,7 +44,7 @@ def fetch_pubMLST_contigs(database, output_dir, date):
         response.raise_for_status()
 
         # ✅ FIX: Wrap bytes in BytesIO so SeqIO treats it as a stream, not a filename
-        fasta_io = io.BytesIO(response.content)
+        fasta_io = io.StringIO(response.content.decode("utf-8"))
         contigs = list(SeqIO.parse(fasta_io, "fasta"))  # ✅ FIX: materialise generator into list
 
         # Fetch isolate metadata
