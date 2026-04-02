@@ -27,7 +27,7 @@ URL = "https://rest.pubmlst.org/db/"
 def fetch_pubMLST_contigs(database, output_dir, date):
     # Fetch the list of isolate records that have genome assemblies
     url = f"{URL}{database}/genomes?return_all=1&added_after={date}"
-    logging.info("Fetching isolate records with URL:", url)
+    logging.info(f"Fetching isolate records with URL: {url}")
     response = requests.get(url)
     response.raise_for_status()
     response_json = response.json()
@@ -35,7 +35,7 @@ def fetch_pubMLST_contigs(database, output_dir, date):
 
     for isolate in isolate_records:
         isolate_id = isolate.split("/")[-1]
-        logging.info("Fetching contigs for isolate", isolate_id)
+        logging.info(f"Fetching contigs for isolate {isolate_id}")
         # Fetch the contigs in FASTA format
         url = f"{URL}{database}/isolates/{isolate_id}/contigs_fasta"
         response = requests.get(url)
@@ -45,7 +45,7 @@ def fetch_pubMLST_contigs(database, output_dir, date):
         contigs = SeqIO.parse(response.content, "fasta")
 
         # get other information about the isolate
-        logging.info("Fetching isolate information for isolate", isolate_id)
+        logging.info(f"Fetching isolate information for isolate {isolate_id}")
         url = f"{URL}{database}/isolates/{isolate_id}"
         response = requests.get(url)
         response.raise_for_status()
