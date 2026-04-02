@@ -12,7 +12,8 @@ def fetch_pubMLST_contigs(database, output_dir, date):
     print("Fetching isolate records with URL:", url)
     response = requests.get(url)
     response.raise_for_status()
-    isolate_records = response.json()
+    response_json = response.json()
+    isolates = response_json["isolates"]
 
     for isolate in isolate_records:
         isolate_id = isolate.split("/")[-1]
