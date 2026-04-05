@@ -54,13 +54,15 @@ def fetch_pubMLST_contigs(database, output_dir, date):
         response.raise_for_status()
         isolate_info = response.json()
 
-        # ✅ FIX: Use .get() to handle missing fields gracefully
-        country = isolate_info.get("country", "unknown")
-        year = isolate_info.get("year", "unknown")
-        clonal_complex = isolate_info.get("clonal_complex", "unknown")
+        accession = isolate_info.get("provenance", {}).get("run_accession", "unknown")
+        country = isolate_info.get("provenance", {}).get("country", "unknown")
+        year = isolate_info.get("provenance", {}).get("year", "unknown")
+        if year == "unknown":
+            year = isolate_info.get("provenance", {}).get("date_entered", "unknown").split("-")[0]  # date_entered	"2016-04-21"
+        st = isolate_info.get("schemes", {}).get("0", {}).get("fields", {}).get("ST", "unknown")
 
         for record in contigs:
-            record.id = f"{isolate_id}|{record.id}|{country}|{year}|{clonal_complex}"
+            record.id = f"{isolate_id}|{record.id}|{country}|{year}|ST-{st}"
             record.description = ""  # prevent duplicate info in FASTA header
 
         output_file = os.path.join(output_dir, f"{isolate_id}.fasta")
