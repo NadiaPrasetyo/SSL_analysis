@@ -58,11 +58,17 @@ def fetch_pubMLST_contigs(database, output_dir, date):
         country = isolate_info.get("provenance", {}).get("country", "unknown")
         year = isolate_info.get("provenance", {}).get("year", "unknown")
         if year == "unknown":
-            year = isolate_info.get("provenance", {}).get("date_entered", "unknown").split("-")[0]  # date_entered	"2016-04-21"
-        st = isolate_info.get("schemes", {}).get("0", {}).get("fields", {}).get("ST", "unknown")
+            year = isolate_info.get("provenance", {}).get("date_entered", "unknown").split("-")[0]
+
+        # schemes is a list — find the MLST entry by description
+        st = "unknown"
+        for scheme in isolate_info.get("schemes", []):
+            if scheme.get("description") == "MLST":
+                st = scheme.get("fields", {}).get("ST", "unknown")
+                break
 
         for record in contigs:
-            record.id = f"{isolate_id}|{record.id}|{country}|{year}|ST-{st}"
+            record.id = f"{isolate_id}|{record.id}|{accession}|{country}|{year}|ST-{st}"
             record.description = ""  # prevent duplicate info in FASTA header
 
         output_file = os.path.join(output_dir, f"{isolate_id}.fasta")
