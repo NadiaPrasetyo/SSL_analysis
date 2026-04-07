@@ -17,7 +17,7 @@ def setup_logging(verbose: bool, output_dir: Path):
         level=log_level,
         format="%(asctime)s [%(levelname)s] %(message)s",
         handlers=[
-            logging.FileHandler(log_file, mode='w') if verbose else logging.NullHandler(),
+            logging.FileHandler(log_file, mode='a') if verbose else logging.NullHandler(),
             logging.StreamHandler(sys.stdout)
         ]
     )
@@ -34,21 +34,33 @@ def fetch_pubMLST_contigs(database, output_dir, date):
     response_json = response.json()
     isolate_records = response_json["isolates"]
 
-    for isolate in isolate_records:
+    total = len(isolate_records)
+    skipped = 0
+    fetched = 0
+
+    for i, isolate in enumerate(isolate_records, 1):
         isolate_id = isolate.split("/")[-1]
-        logging.info(f"Fetching contigs for isolate {isolate_id}")
+        output_file = os.path.join(output_dir, f"{isolate_id}.fasta")
+
+        # ✅ Skip if file already exists (resume support)
+        if os.path.exists(output_file):
+            logging.info(f"[{i}/{total}] Skipping isolate {isolate_id} — file already exists")
+            skipped += 1
+            continue
+
+        logging.info(f"[{i}/{total}] Fetching contigs for isolate {isolate_id}")
 
         # Fetch the contigs in FASTA format
         url = f"{URL}{database}/isolates/{isolate_id}/contigs_fasta"
         response = requests.get(url)
         response.raise_for_status()
 
-        # ✅ FIX: Wrap bytes in BytesIO so SeqIO treats it as a stream, not a filename
+        #Wrap bytes in BytesIO so SeqIO treats it as a stream, not a filename
         fasta_io = io.StringIO(response.content.decode("utf-8"))
-        contigs = list(SeqIO.parse(fasta_io, "fasta"))  # ✅ FIX: materialise generator into list
+        contigs = list(SeqIO.parse(fasta_io, "fasta"))
 
         # Fetch isolate metadata
-        logging.info(f"Fetching isolate information for isolate {isolate_id}")
+        logging.info(f"[{i}/{total}] Fetching isolate information for isolate {isolate_id}")
         url = f"{URL}{database}/isolates/{isolate_id}"
         response = requests.get(url)
         response.raise_for_status()
@@ -69,14 +81,19 @@ def fetch_pubMLST_contigs(database, output_dir, date):
 
         for record in contigs:
             record.id = f"{isolate_id}|{record.id}|{accession}|{country}|{year}|ST-{st}"
-            record.description = ""  # prevent duplicate info in FASTA header
+            record.description = ""
 
-        output_file = os.path.join(output_dir, f"{isolate_id}.fasta")
-        with open(output_file, "w") as f:
+        # ✅ Write to a temp file first, then rename atomically to avoid partial files
+        tmp_file = output_file + ".tmp"
+        with open(tmp_file, "w") as f:
             SeqIO.write(contigs, f, "fasta")
-        logging.info(f"Saved contigs for isolate {isolate_id} to {output_file}")
+        os.replace(tmp_file, output_file)
 
-        time.sleep(1)  # ✅ FIX: time is now imported
+        logging.info(f"[{i}/{total}] Saved contigs for isolate {isolate_id} to {output_file}")
+        fetched += 1
+        time.sleep(1)
+
+    logging.info(f"Done. {fetched} fetched, {skipped} skipped (already existed), {total} total.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fetch pubMLST contigs")
