@@ -4,6 +4,7 @@ data/ssl/genomes_6frame_proteins.fasta
 data/6_strains/predictions_extended/bcell/SSL_housekeeping_additional/output_interactive_figures.html
 data/6_strains/predictions_extended/mhci/SSL_housekeeping_additional_mhci_out
 bin/test.py
+data/pubMLST/contigs/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

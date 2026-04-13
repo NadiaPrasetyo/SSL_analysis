@@ -21,6 +21,7 @@ def main(input_csv, newick_tree_file, output_file):
 
     #  DATA
     df = pd.read_csv(input_csv)
+    df["score"] = pd.to_numeric(df["score"], errors="coerce") 
     df = df.sort_values(by=["accession", "feature"], ignore_index=True)
 
     # ── 2.  NEWICK TREE  ──────────────────────────────────────────────────────────

@@ -377,10 +377,10 @@ def parse_mhc_dir(directory, acc_map, flat_index):
                         logging.debug(f"Skipping line {i} in {file} due to error: {e}")
 
                 for accession in num_peptides:
-                    avg_score      = float(statistics.mean(scores[accession]))      if scores[accession]      else 0
-                    avg_percentile = float(statistics.mean(percentiles[accession])) if percentiles[accession] else 0
-                    results.append({"accession": accession, "feature": f"{prefix}_score",               "score": avg_score})
-                    results.append({"accession": accession, "feature": f"{prefix}_percentile",          "score": avg_percentile})
+                    med_score      = float(statistics.median(scores[accession]))      if scores[accession]      else 0
+                    med_percentile = float(statistics.median(percentiles[accession])) if percentiles[accession] else 0
+                    results.append({"accession": accession, "feature": f"{prefix}_median_score",               "score": med_score})
+                    results.append({"accession": accession, "feature": f"{prefix}_median_percentile",          "score": med_percentile})
                     results.append({"accession": accession, "feature": f"{prefix}_num_peptides",        "score": num_peptides[accession]})
                     results.append({"accession": accession, "feature": f"{prefix}_num_strong_binders",  "score": num_sb[accession]})
                     results.append({"accession": accession, "feature": f"{prefix}_num_weak_binders",    "score": num_wb[accession]})
