@@ -44,15 +44,17 @@ def main():
     
     setup_logging(args.verbose, output_dir)
     tool_path = args.tool_path
-    check_tool(tool_path/"bathsearch")
-    check_tool(tool_path/"bathbuild")
+    bathsearch_path = os.path.join(tool_path, "bathsearch")
+    bathbuild_path = os.path.join(tool_path, "bathbuild")
+    check_tool(bathbuild_path)
+    check_tool(bathsearch_path)
 
     # Run the bath tool to build a hmm profile from the input file
     temp_dir = tempfile.mkdtemp()
     bhmm_file = os.path.join(temp_dir, args.input.replace(".fasta", ".bhmm"))
     #    % bathbuild --unali three_seqs.bhmm three_seqs.fa
     cmd = [
-        tool_path/"bathbuild",
+        str(bathbuild_path),
         "--unali",
         bhmm_file,
         args.input
@@ -68,7 +70,7 @@ def main():
     #    % bathsearch -o PTH2.out PTH2.bhmm target-PTH2.fa
 
     cmd = [
-        tool_path/"bathsearch",
+        str(bathsearch_path),
         "-o", f"{args.output}.out",
         "--tblout", f"{args.output}.tbl", 
         bhmm_file,
