@@ -33,6 +33,7 @@ def check_tool(tool_path):
 def main():
     parser = argparse.ArgumentParser(description="Batch search SSL contig")
     parser.add_argument("-i", "--input", type=str, required=True, help="Input FASTA file")
+    parser.add_argument("-t", "--target", type=str, required=True, help="Target FASTA file")
     parser.add_argument("-o", "--output", type=str, default="ssl_contig.txt", help="Output file name (default: ssl_contig.txt)")
     parser.add_argument("--tool-path", type=str, required=True, help="Path to the tool root directory")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
@@ -71,7 +72,7 @@ def main():
         "-o", f"{args.output}.out",
         "--tblout", f"{args.output}.tbl", 
         bhmm_file,
-        args.input
+        args.target
     ]
 
     try:
@@ -81,3 +82,7 @@ def main():
         sys.exit(1)
 
     logging.info("Batch search SSL contig completed successfully.")
+
+
+if __name__ == "__main__":
+    main()
