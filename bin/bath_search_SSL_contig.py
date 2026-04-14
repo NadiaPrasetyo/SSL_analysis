@@ -31,12 +31,14 @@ def check_tool(tool_path):
         sys.exit(1)
 
 
-def already_done(output_dir: Path, file_stem: str) -> bool:
+def already_done(output_file: Path) -> bool:
     """Return True if both expected output files exist and are non-empty."""
-    out_file = output_dir / f"{file_stem}_bath_results.out"
-    tbl_file = output_dir / f"{file_stem}_bath_results.tbl"
-    return out_file.exists() and out_file.stat().st_size > 0 \
-       and tbl_file.exists() and tbl_file.stat().st_size > 0
+    out_file = output_file.with_suffix(".out")
+    tbl_file = output_file.with_suffix(".tbl")
+    return (
+        out_file.exists() and out_file.stat().st_size > 0
+        and tbl_file.exists() and tbl_file.stat().st_size > 0
+    )
 
 
 def main():
@@ -65,9 +67,24 @@ def main():
         logging.error("No FASTA files found in the target directory.")
         sys.exit(1)
 
+    total = len(target_files)
+
+    # Pre-scan to report how many are already done
+    if not args.reset:
+        already_done_count = sum(
+            1 for f in target_files
+            if already_done(output_dir / f"{Path(f).stem}_bath_results")
+        )
+        pending = total - already_done_count
+        logging.info(
+            "Found %d total files. Already processed: %d. To process: %d.",
+            total, already_done_count, pending
+        )
+    else:
+        logging.info("Found %d total files. --reset flag set; reprocessing all.", total)
+
     # ── bathbuild ──────────────────────────────────────────────────────────────
     temp_dir = tempfile.mkdtemp()
-    # Use only the stem of the input filename to avoid nested subdirs in temp
     input_stem = Path(args.input).stem
     bhmm_file = os.path.join(temp_dir, f"{input_stem}.bhmm")
 
@@ -80,24 +97,25 @@ def main():
         sys.exit(1)
 
     # ── bathsearch loop ────────────────────────────────────────────────────────
-    total     = len(target_files)
     skipped   = 0
     processed = 0
+    pending_idx = 0  # counter over files actually queued for processing
 
     for idx, file in enumerate(target_files, start=1):
         file_stem   = Path(file).stem
         output_file = output_dir / f"{file_stem}_bath_results"
 
-        if not args.reset and already_done(output_dir, file_stem):
+        if not args.reset and already_done(output_file):
             logging.info("[%d/%d] Skipping %s (output already exists).", idx, total, file)
             skipped += 1
             continue
 
+        pending_idx += 1
         logging.info("[%d/%d] Processing: %s", idx, total, file)
         cmd = [
             str(bathsearch_path),
-            "-o",       f"{output_file}.out",
-            "--tblout", f"{output_file}.tbl",
+            "-o",       str(output_file) + ".out",
+            "--tblout", str(output_file) + ".tbl",
             bhmm_file,
             str(os.path.join(args.target, file))
         ]
@@ -112,7 +130,10 @@ def main():
         processed += 1
         logging.info("Completed %s (%d/%d).", file, idx, total)
 
-    logging.info("Done. Processed: %d, Skipped: %d, Total: %d.", processed, skipped, total)
+    logging.info(
+        "Done. Processed: %d, Skipped: %d, Total on disk: %d.",
+        processed, skipped, total
+    )
 
 
 if __name__ == "__main__":
