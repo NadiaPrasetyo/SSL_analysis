@@ -67,7 +67,7 @@ def main():
         str(bathbuild_path),
         "--unali",
         bhmm_file,
-        str(os.path.join(args.input, file))
+        args.input
     ]
 
     try:
