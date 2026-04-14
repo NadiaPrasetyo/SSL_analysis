@@ -33,8 +33,8 @@ def check_tool(tool_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Batch search SSL contig")
-    parser.add_argument("-i", "--input", type=str, required=True, help="Input directory with FASTA files")
-    parser.add_argument("-t", "--target", type=str, required=True, help="Target FASTA file")
+    parser.add_argument("-i", "--input", type=str, required=True, help="Input Query FASTA")
+    parser.add_argument("-t", "--target", type=str, required=True, help="Target Directory that contains FASTA files")
     parser.add_argument("-o", "--output", type=str, default="bath_results", help="Output folder (default: bath_results)")
     parser.add_argument("--tool-path", type=str, required=True, help="Path to the tool root directory")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
@@ -50,32 +50,33 @@ def main():
     check_tool(bathbuild_path)
     check_tool(bathsearch_path)
 
-    fasta_files = [f for f in os.listdir(args.input) if f.endswith(".fa")]
-    if not fasta_files:
+    target_files = [f for f in os.listdir(args.target) if f.endswith(".fa")]
+    if not target_files:
         logging.error("No FASTA files found in the input directory.")
         sys.exit(1) 
 
     # Run the bath tool to build a hmm profile from the input file
     temp_dir = tempfile.mkdtemp()
     # Use only the stem of the input filename to avoid nested subdirs in temp
-    for file in fasta_files:
-        input_stem = Path(file).stem
-        bhmm_file = os.path.join(temp_dir, f"{input_stem}.bhmm")
-        output_file = os.path.join(temp_dir, f"{input_stem}_bath_results")
-        #    % bathbuild --unali three_seqs.bhmm three_seqs.fa
+    input_stem = Path(args.input).stem
+    bhmm_file = os.path.join(temp_dir, f"{input_stem}.bhmm")
+    output_file = os.path.join(temp_dir, f"{input_stem}_bath_results")
+    #    % bathbuild --unali three_seqs.bhmm three_seqs.fa
 
-        cmd = [
-            str(bathbuild_path),
-            "--unali",
-            bhmm_file,
-            str(os.path.join(args.input, file))
-        ]
+    cmd = [
+        str(bathbuild_path),
+        "--unali",
+        bhmm_file,
+        str(os.path.join(args.input, file))
+    ]
 
-        try:
-            subprocess.run(cmd, check=True)
-        except subprocess.CalledProcessError as e:
-            logging.error("Error running bathbuild command: %s", e)
-            sys.exit(1)
+    try:
+        subprocess.run(cmd, check=True)
+    except subprocess.CalledProcessError as e:
+        logging.error("Error running bathbuild command: %s", e)
+        sys.exit(1)
+
+    for file in target_files:
 
         # run bath search
         #    % bathsearch -o PTH2.out PTH2.bhmm target-PTH2.fa
@@ -85,7 +86,7 @@ def main():
             "-o", f"{output_file}.out",
             "--tblout", f"{output_file}.tbl", 
             bhmm_file,
-            args.target
+            str(os.path.join(args.target, file))
         ]
 
         try:
