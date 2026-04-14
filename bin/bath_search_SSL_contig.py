@@ -33,9 +33,9 @@ def check_tool(tool_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Batch search SSL contig")
-    parser.add_argument("-i", "--input", type=str, required=True, help="Input FASTA file")
+    parser.add_argument("-i", "--input", type=str, required=True, help="Input directory with FASTA files")
     parser.add_argument("-t", "--target", type=str, required=True, help="Target FASTA file")
-    parser.add_argument("-o", "--output", type=str, default="ssl_contig.txt", help="Output file name (default: ssl_contig.txt)")
+    parser.add_argument("-o", "--output", type=str, default="bath_results", help="Output folder (default: bath_results)")
     parser.add_argument("--tool-path", type=str, required=True, help="Path to the tool root directory")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
     args = parser.parse_args()
@@ -50,44 +50,51 @@ def main():
     check_tool(bathbuild_path)
     check_tool(bathsearch_path)
 
+    fasta_files = [f for f in os.listdir(args.input) if f.endswith(".fa")]
+    if not fasta_files:
+        logging.error("No FASTA files found in the input directory.")
+        sys.exit(1) 
+
     # Run the bath tool to build a hmm profile from the input file
     temp_dir = tempfile.mkdtemp()
     # Use only the stem of the input filename to avoid nested subdirs in temp
-    input_stem = Path(args.input).stem
-    bhmm_file = os.path.join(temp_dir, f"{input_stem}.bhmm")
-    
-    #    % bathbuild --unali three_seqs.bhmm three_seqs.fa
-    cmd = [
-        str(bathbuild_path),
-        "--unali",
-        bhmm_file,
-        args.input
-    ]
+    for file in fasta_files:
+        input_stem = Path(file).stem
+        bhmm_file = os.path.join(temp_dir, f"{input_stem}.bhmm")
+        output_file = os.path.join(temp_dir, f"{input_stem}_bath_results")
+        #    % bathbuild --unali three_seqs.bhmm three_seqs.fa
 
-    try:
-        subprocess.run(cmd, check=True)
-    except subprocess.CalledProcessError as e:
-        logging.error("Error running bathbuild command: %s", e)
-        sys.exit(1)
+        cmd = [
+            str(bathbuild_path),
+            "--unali",
+            bhmm_file,
+            str(os.path.join(args.input, file))
+        ]
 
-    # run bath search
-    #    % bathsearch -o PTH2.out PTH2.bhmm target-PTH2.fa
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            logging.error("Error running bathbuild command: %s", e)
+            sys.exit(1)
 
-    cmd = [
-        str(bathsearch_path),
-        "-o", f"{args.output}.out",
-        "--tblout", f"{args.output}.tbl", 
-        bhmm_file,
-        args.target
-    ]
+        # run bath search
+        #    % bathsearch -o PTH2.out PTH2.bhmm target-PTH2.fa
 
-    try:
-        subprocess.run(cmd, check=True)
-    except subprocess.CalledProcessError as e:
-        logging.error("Error running bathsearch command: %s", e)
-        sys.exit(1)
+        cmd = [
+            str(bathsearch_path),
+            "-o", f"{output_file}.out",
+            "--tblout", f"{output_file}.tbl", 
+            bhmm_file,
+            args.target
+        ]
 
-    logging.info("Batch search SSL contig completed successfully.")
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            logging.error("Error running bathsearch command: %s", e)
+            sys.exit(1)
+
+        logging.info(f"Batch search SSL contig completed successfully for {file}")
 
 
 if __name__ == "__main__":
