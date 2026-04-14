@@ -50,9 +50,9 @@ def main():
     check_tool(bathbuild_path)
     check_tool(bathsearch_path)
 
-    target_files = [f for f in os.listdir(args.target) if f.endswith(".fa")]
+    target_files = [f for f in os.listdir(args.target) if f.endswith(".fasta")]
     if not target_files:
-        logging.error("No FASTA files found in the input directory.")
+        logging.error("No FASTA files found in the target directory.")
         sys.exit(1) 
 
     # Run the bath tool to build a hmm profile from the input file
