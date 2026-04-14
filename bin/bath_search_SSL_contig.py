@@ -41,7 +41,8 @@ def main():
     args = parser.parse_args()
 
     # Set up logging
-    output_dir = Path(args.output).parent
+    output_dir = Path(args.output)
+    output_dir.mkdir(parents=True, exist_ok=True)
     
     setup_logging(args.verbose, output_dir)
     tool_path = args.tool_path
@@ -60,7 +61,6 @@ def main():
     # Use only the stem of the input filename to avoid nested subdirs in temp
     input_stem = Path(args.input).stem
     bhmm_file = os.path.join(temp_dir, f"{input_stem}.bhmm")
-    output_file = os.path.join(temp_dir, f"{input_stem}_bath_results")
     #    % bathbuild --unali three_seqs.bhmm three_seqs.fa
 
     cmd = [
@@ -77,6 +77,8 @@ def main():
         sys.exit(1)
 
     for file in target_files:
+        file_stem = Path(file).stem
+        output_file = os.path.join(output_dir, f"{file_stem}_bath_results")
 
         # run bath search
         #    % bathsearch -o PTH2.out PTH2.bhmm target-PTH2.fa
