@@ -4,6 +4,7 @@ import argparse
 import logging
 from pathlib import Path
 import tempfile
+import subprocess
 
 def setup_logging(verbose: bool, output_dir: Path):
     """Configure logging to console and file."""
@@ -51,7 +52,10 @@ def main():
 
     # Run the bath tool to build a hmm profile from the input file
     temp_dir = tempfile.mkdtemp()
-    bhmm_file = os.path.join(temp_dir, args.input.replace(".fasta", ".bhmm"))
+    # Use only the stem of the input filename to avoid nested subdirs in temp
+    input_stem = Path(args.input).stem
+    bhmm_file = os.path.join(temp_dir, f"{input_stem}.bhmm")
+    
     #    % bathbuild --unali three_seqs.bhmm three_seqs.fa
     cmd = [
         str(bathbuild_path),
