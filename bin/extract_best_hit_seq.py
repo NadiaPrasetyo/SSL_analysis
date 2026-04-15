@@ -169,8 +169,8 @@ def write_fasta(records, out_fh):
     for rec in records:
         # Header: target sequence | query SSL name | coordinates | evalue
         header = (
-            f">{rec['target']} "
-            f"query={rec['query']} "
+            f">{rec['target']}"
+            f"|{rec['query']} "
             f"ali_from={rec['ali_from']} ali_to={rec['ali_to']} "
             f"evalue={rec['evalue']}"
         )
@@ -187,26 +187,52 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument("-i", "--input", required=True, help="Bath output file")
+    parser.add_argument("-i", "--input", required=False, help="Bath output file")
+    parser.add_argument("--input-dir", required=False, help="Directory containing Bath output files")
     parser.add_argument("-o", "--output", default="bath_best_hits.fasta", nargs='?', help="Output FASTA file (default: bath_best_hits.fasta)")
+    parser.add_argument("--output-dir", default="./data", nargs='?', help="Output directory (default: data/)")
 
     args = parser.parse_args()
 
-    output_file = args.output
-    records = parse_bath_output(args.input)
-
-    if not records:
-        print("[WARNING] No best hits extracted.", file=sys.stderr)
+    if not args.input and not args.input_dir:
+        parser.print_help()
         sys.exit(1)
 
-    print(f"[INFO] Extracted {len(records)} best hit(s).", file=sys.stderr)
+    if args.input:
+        records = parse_bath_output(args.input)
+        
+        if not records:
+            print(f"[WARNING] No best hits extracted for {f}", file=sys.stderr)
+            sys.exit(1)
 
-    if output_file:
-        with open(output_file, 'w') as fh:
-            write_fasta(records, fh)
-        print(f"[INFO] FASTA written to: {output_file}", file=sys.stderr)
-    else:
-        write_fasta(records, sys.stdout)
+        print(f"[INFO] Extracted {len(records)} best hit(s).", file=sys.stderr)
+        output_file = args.output
+        if output_file:
+            with open(output_file, 'w') as fh:
+                write_fasta(records, fh)
+            print(f"[INFO] FASTA written to: {output_file}", file=sys.stderr)
+        else:
+            write_fasta(records, sys.stdout)
+        sys.exit(0)
+
+    if args.input_dir:
+        input_files = glob.glob(os.path.join(args.input_dir, "*.out"))
+        if not input_files:
+            print("[WARNING] No input files found.", file=sys.stderr)
+            sys.exit(1)
+        records = []
+        for f in input_files:
+            records = (parse_bath_output(f))
+            
+            print(f"[INFO] Extracted {len(records)} best hit(s).", file=sys.stderr)
+
+            f_stem = f.split("/")[-1].split("_")[0]
+            os.makedirs(args.output_dir, exist_ok=True)
+            output_file = os.path.join(args.output_dir, f"{f_stem}_best_hits.fasta")
+            with open(output_file, 'w') as fh:
+                write_fasta(records, fh)
+            print(f"[INFO] FASTA written to: {output_file}", file=sys.stderr)
+        sys.exit(0)
 
 
 if __name__ == '__main__':
