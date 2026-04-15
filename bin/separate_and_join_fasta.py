@@ -1,0 +1,70 @@
+from Bio import SeqIO
+import argparse
+from pathlib import Path
+
+def join_fasta(input_dir):
+    """
+    Concatenate all FASTA files in a directory into one list of records.
+
+    Parameters
+    ----------
+    input_dir : Path
+        Directory containing FASTA files to concatenate.
+
+    Returns
+    -------
+    list[SeqRecord]
+        A list of SeqRecord objects containing the concatenated FASTA records.
+    """
+    print(f"Joining FASTA files from {input_dir}")
+    records = []
+    for file in input_dir.iterdir():
+        records.extend(list(SeqIO.parse(file, "fasta")))
+    return records
+
+def separate_fasta(records, output_dir):
+    print(f"Separating FASTA records into {output_dir}")
+    num_SSL3 = 0
+    num_SSL7 = 0
+    num_SSL11 = 0
+    for record in records:
+        if "SSL3" in record.id:
+            num_SSL3 += 1
+            SeqIO.write(record, output_dir / "SSL3_matched.fasta", "fasta")
+        elif "SSL7" in record.id:
+            num_SSL7 += 1
+            SeqIO.write(record, output_dir / "SSL7_matched.fasta", "fasta")
+        elif "SSL11" in record.id:
+            num_SSL11 += 1
+            SeqIO.write(record, output_dir / "SSL11_matched.fasta", "fasta")
+
+        else:
+            SeqIO.write(record, output_dir / "not_matched.fasta", "fasta")
+
+    print(f"Separated FASTA records into {output_dir}, number of records:\nSSL3: {num_SSL3}\nSSL7: {num_SSL7}\nSSL11: {num_SSL11}")
+    return
+
+def deduplicate_fasta_records(records):
+    seen_seqs = set()
+    deduped_records = [record for record in records if record.seq not in seen_seqs and not seen_seqs.add(record.seq)]
+    return deduped_records
+
+def main():
+    parser = argparse.ArgumentParser(description="Separate and join FASTA files based on SSL number.")
+    parser.add_argument("-i", "--input_dir", required=True, help="Input directory containing FASTA files.")
+    parser.add_argument("-o", "output_dir", default="separated_fasta", help="Output directory for separated FASTA files. (default: separated_fasta)")
+    parser.add_argument("--deduplicate", action="store_true", help="Deduplicate the FASTA records.")
+    args = parser.parse_args()
+
+    input_dir = Path(args.input_dir)
+    output_dir = Path(args.output_dir)
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    records = join_fasta(input_dir)
+    if args.deduplicate:
+        print(f"Deduplicating FASTA records: starting with {len(records)} records.")
+        records = deduplicate_fasta_records(records)
+        print(f"Deduplicated FASTA records: {len(records)} records.")
+    separate_fasta(records, output_dir)
+
