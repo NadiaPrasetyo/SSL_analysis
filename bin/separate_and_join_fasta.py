@@ -28,7 +28,9 @@ def separate_fasta(records, output_dir):
     num_SSL7 = 0
     num_SSL11 = 0
     for record in records:
+        # >3882|2505034|ERR410047|Unknown|2016|ST-39|Q2G0X4|SSL11 ali_from=16582 ali_to=17274 evalue=1.9e-82
         record.id = record.id.split(" ")[0]
+        record.id = record.id.split("|")[2] + "_" + record.id.split("|")[3] + "_" + record.id.split("|")[4] + "_" + (record.id.split("|")[5].replace("-","")) + "_" + record.id.split("|")[7]
         record.description = ""
         if "SSL3" in record.id:
             num_SSL3 += 1
