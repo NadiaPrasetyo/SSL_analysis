@@ -6,7 +6,6 @@ Overview:
     - Runs MAFFT (L-INS-i algorithm) on the provided input FASTA file using the external_tools_env Conda environment.
     - Outputs the aligned sequences in Clustal format, along with a guide tree.
     - Restores original headers in the alignment and tree files.
-    - Optionally runs Rate4Site on the aligned sequences and guide tree if both are successfully generated.
 Arguments:
     tool_path (Path): Path to the MAFFT executable (ignored, required by interface).
     input_fasta (Path): Path to the input FASTA file.
@@ -19,7 +18,6 @@ Requirements:
 Outputs:
     <output_dir>/<input_fasta_stem>_aligned.fasta   # Aligned sequences in Clustal format.
     <output_dir>/<input_fasta_stem>.tree            # Guide tree in Newick format (if generated).
-    <output_dir>/rate4site_results/                 # Rate4Site results directory (if Rate4Site is run).
 Author: Nadia
 """
 import subprocess
@@ -92,7 +90,6 @@ def run(input_fasta: Path, output_dir: Path):
     - tool_path: Optional[Path] to the MAFFT executable (ignored, required by interface); can be None.
     - input_fasta: Path to the input FASTA file.
     - output_dir: Path to the output directory.
-    - rate4site: Boolean flag to indicate if Rate4Site analysis should be run.
     Raises:
     - RuntimeError: If Conda is not available or if the MAFFT command fails.
     Outputs:
@@ -100,7 +97,7 @@ def run(input_fasta: Path, output_dir: Path):
     - <output_dir>/<input_fasta_stem>.tree: Guide tree in Newick format (if generated).
     """
     # Check if the conda environment exists
-    common.create_conda_env_if_needed(common.EXT_TOOLS_ENV_NAME, common.EXT_TOOLS_ENV_YML)")
+    common.create_conda_env_if_needed(common.EXT_TOOLS_ENV_NAME, common.EXT_TOOLS_ENV_YML)
 
     # Check if the input FASTA file contains more than one sequence
     sequence_count = count_sequences(input_fasta)
@@ -167,4 +164,4 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    run(args.input_fasta, args.output_dir, rate4site=args.rate4site)
+    run(args.input_fasta, args.output_dir)

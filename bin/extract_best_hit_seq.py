@@ -14,6 +14,8 @@ Usage:
 import sys
 import re
 import argparse
+import glob
+import os
 
 # Standard codon table (table 1)
 CODON_TABLE = {

@@ -1,10 +1,12 @@
 # Project Specific files and folders to ignore
 notes.md
 data/ssl/genomes_6frame_proteins.fasta
-data/6_strains/*/bcell/SSL_housekeeping_additional/output_interactive_figures.html
-data/6_strains/*/mhci/SSL_housekeeping_additional_mhci_out
+data/6_strains/*/bcell/*
+data/6_strains/*/mhci/*
 bin/test.py
 data/pubMLST/contigs/*
+data/pubMLST/bath/bath_results/
+data/pubMLST/bath/best_hits/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

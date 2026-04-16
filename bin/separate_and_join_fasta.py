@@ -28,18 +28,24 @@ def separate_fasta(records, output_dir):
     num_SSL7 = 0
     num_SSL11 = 0
     for record in records:
+        record.id = record.id.split(" ")[0]
+        record.description = ""
         if "SSL3" in record.id:
             num_SSL3 += 1
-            SeqIO.write(record, output_dir / "SSL3_matched.fasta", "fasta")
+            with open(output_dir / "SSL3.fasta", "a") as f:
+                SeqIO.write(record, f, "fasta")
         elif "SSL7" in record.id:
             num_SSL7 += 1
-            SeqIO.write(record, output_dir / "SSL7_matched.fasta", "fasta")
+            with open(output_dir / "SSL7.fasta", "a") as f:
+                SeqIO.write(record, f, "fasta")
         elif "SSL11" in record.id:
             num_SSL11 += 1
-            SeqIO.write(record, output_dir / "SSL11_matched.fasta", "fasta")
+            with open(output_dir / "SSL11.fasta", "a") as f:
+                SeqIO.write(record, f, "fasta")
 
         else:
-            SeqIO.write(record, output_dir / "not_matched.fasta", "fasta")
+            with open(output_dir / "not_matched.fasta", "a") as f:
+                SeqIO.write(record, f, "fasta")
 
     print(f"Separated FASTA records into {output_dir}, number of records:\nSSL3: {num_SSL3}\nSSL7: {num_SSL7}\nSSL11: {num_SSL11}")
     return
@@ -51,8 +57,8 @@ def deduplicate_fasta_records(records):
 
 def main():
     parser = argparse.ArgumentParser(description="Separate and join FASTA files based on SSL number.")
-    parser.add_argument("-i", "--input_dir", required=True, help="Input directory containing FASTA files.")
-    parser.add_argument("-o", "output_dir", default="separated_fasta", help="Output directory for separated FASTA files. (default: separated_fasta)")
+    parser.add_argument("-i", "--input-dir", required=True, help="Input directory containing FASTA files.")
+    parser.add_argument("-o", "--output-dir", default="separated_fasta", help="Output directory for separated FASTA files. (default: separated_fasta)")
     parser.add_argument("--deduplicate", action="store_true", help="Deduplicate the FASTA records.")
     args = parser.parse_args()
 
@@ -68,3 +74,5 @@ def main():
         print(f"Deduplicated FASTA records: {len(records)} records.")
     separate_fasta(records, output_dir)
 
+if __name__ == "__main__":
+    main()
