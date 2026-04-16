@@ -30,6 +30,7 @@ def separate_fasta(records, output_dir):
     for record in records:
         # >3882|2505034|ERR410047|Unknown|2016|ST-39|Q2G0X4|SSL11 ali_from=16582 ali_to=17274 evalue=1.9e-82
         record.id = record.id.split(" ")[0]
+        print(record.id)
         record.id = record.id.split("|")[2] + "_" + record.id.split("|")[3] + "_" + record.id.split("|")[4] + "_" + (record.id.split("|")[5].replace("-","")) + "_" + record.id.split("|")[7]
         record.description = ""
         if "SSL3" in record.id:
@@ -54,7 +55,14 @@ def separate_fasta(records, output_dir):
 
 def deduplicate_fasta_records(records):
     seen_seqs = set()
-    deduped_records = [record for record in records if record.seq not in seen_seqs and not seen_seqs.add(record.seq)]
+    deduped_records = []
+    # check the headers that they have the correct pattern before deduplicating
+    for record in records:
+        if len(record.id.split("|")) < 8:
+            # skip this record
+            continue
+        if record.seq not in seen_seqs and not seen_seqs.add(record.seq):
+            deduped_records.append(record)
     return deduped_records
 
 def main():
