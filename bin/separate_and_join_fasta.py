@@ -19,13 +19,6 @@ def join_fasta(input_dir):
     print(f"Joining FASTA files from {input_dir}")
     records = []
 
-    ref_path = "data/SSL_seq.fasta"
-    chosen_path = "data/6_strains/aa/SSL_aa.fasta"
-
-    # Add reference and chosen sequences to the records
-    records.extend(SeqIO.parse(ref_path, "fasta"))
-    records.extend(SeqIO.parse(chosen_path, "fasta"))
-
     for file in input_dir.iterdir():
         records.extend(SeqIO.parse(file, "fasta"))
 
@@ -105,6 +98,14 @@ def main():
         print(f"Deduplicating FASTA records: starting with {len(records)} records.")
         records = deduplicate_fasta_records(records)
         print(f"Deduplicated FASTA records: {len(records)} records.")
+
+    ref_path = "data/SSL_seq.fasta"
+    chosen_path = "data/6_strains/aa/SSL_aa.fasta"
+
+    # Add reference and chosen sequences to the records
+    records.extend(SeqIO.parse(ref_path, "fasta"))
+    records.extend(SeqIO.parse(chosen_path, "fasta"))
+
     separate_fasta(records, output_dir)
 
 if __name__ == "__main__":
