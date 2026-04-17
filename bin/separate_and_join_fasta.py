@@ -33,7 +33,8 @@ def separate_fasta(records, output_dir):
         # >3882|2505034|ERR410047|Unknown|2016|ST-39|Q2G0X4|SSL11 ali_from=16582 ali_to=17274 evalue=1.9e-82
         record.id = record.id.split(" ")[0]
         print(record.id)
-        record.id = record.id.split("|")[2] + "_" + record.id.split("|")[3] + "_" + record.id.split("|")[4] + "_" + (record.id.split("|")[5].replace("-","")) + "_" + record.id.split("|")[7]
+        if len(record.id.split("|")) >= 8:
+            record.id = record.id.split("|")[2] + "_" + record.id.split("|")[3] + "_" + record.id.split("|")[4] + "_" + (record.id.split("|")[5].replace("-","")) + "_" + record.id.split("|")[7]
         record.description = ""
         if "SSL3" in record.id:
             num_SSL3 += 1
@@ -68,9 +69,10 @@ def deduplicate_fasta_records(records):
     return deduped_records
 
 def remove_unknown_records(records):
+    print("Removing records with 'unknown' in the header")
     new_records = []
     for record in records:
-        if "Unknown" not in record.id:
+        if "unknown" not in record.id.lower():
             new_records.append(record)
     return new_records
 
@@ -101,6 +103,8 @@ def main():
 
     ref_path = "data/SSL_seq.fasta"
     chosen_path = "data/6_strains/aa/SSL_aa.fasta"
+
+    print(f"Adding reference and chosen sequences from {ref_path} and {chosen_path}")
 
     # Add reference and chosen sequences to the records
     records.extend(SeqIO.parse(ref_path, "fasta"))
