@@ -41,9 +41,11 @@ def main(tool_root, maxid, msafile, output_file):
 
     keep = [s for s in all_seqs_ordered if s not in removed]
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".keeplist", delete=False) as f:
-        tmpfile = f.name
-        f.write("\n".join(keep) + "\n")
+    # write to keep list on an intermediate file (NOT TEMP)
+    to_keep_file = output_file + ".keep"
+    with open(to_keep_file, "w") as f:
+        f.write("\n".join(keep))
+
 
     # the suffix directly — don't re-join with output_dir or the path doubles up
     tree_path = f"{output_file}.tree"
@@ -52,10 +54,9 @@ def main(tool_root, maxid, msafile, output_file):
 
     subprocess.run(
         [str(alimanip_path), "--informat", "afa", "--amino", "--seq-k",
-         tmpfile, msafile, "-o", output_file, "--tree", tree_path],
+         to_keep_file, msafile, "-o", output_file, "--tree", tree_path],
         check=True
     )
-    os.unlink(tmpfile)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Remove sequences from an MSA based on pairwise ID")
