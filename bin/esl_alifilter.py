@@ -12,7 +12,7 @@ def main(tool_root, maxid, msafile, output_file):
     alipid_path = os.path.join(tool_root, "easel", "miniapps", "esl-alipid")
     # Run esl-alipid to get all pairwise IDs
     result = subprocess.run(
-        [str(alipid_path), "--amino", "--informat", "fasta", " msafile],
+        [str(alipid_path), "--amino", "--informat", "fasta", msafile],
         capture_output=True, text=True, check=True
     )
 
