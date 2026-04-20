@@ -8,11 +8,11 @@ import tempfile
 import os
 import argparse
 
-def main(tool_root, maxid, msafile):
+def main(tool_root, maxid, msafile, output_file):
     alipid_path = os.path.join(tool_root, "easel", "miniapps", "esl-alipid")
     # Run esl-alipid to get all pairwise IDs
     result = subprocess.run(
-        [str(alipid_path), "--amino", msafile],
+        [str(alipid_path), "--amino", "--informat", "fasta", " msafile],
         capture_output=True, text=True, check=True
     )
 
@@ -47,9 +47,12 @@ def main(tool_root, maxid, msafile):
         tmpfile = f.name
         f.write("\n".join(keep) + "\n")
 
+    output_dir = os.path.dirname(output_file)
+    tree_path = os.path.join(output_dir, f"{output_file}.tree")
     alimaniop_path = os.path.join(tool_root, "easel", "miniapps", "esl-alimanip")
     subprocess.run(
-        [str(alimaniop_path), "--seq-k", tmpfile, msafile],
+        [str(alimaniop_path), "--informat", "fasta", "--amino", "--seq-k", 
+        tmpfile, msafile, "-o", output_file, "--tree", tree_path],
         check=True
     )
     os.unlink(tmpfile)
@@ -59,6 +62,7 @@ if __name__ == "__main__":
     parser.add_argument("--tool-root", required=True, help="Root directory containing EASEL tools")
     parser.add_argument("--maxid", default=0.9, type=float, help="Maximum pairwise ID")
     parser.add_argument("--msafile", required=True, type=str, help="Input MSA file")
+    parser.add_argument("-o","--output-file", required=True, type=str, help="Output MSA file")
     args = parser.parse_args()
 
-    main(args.tool_root, args.maxid, args.msafile)
+    main(args.tool_root, args.maxid, args.msafile, args.output_file)
