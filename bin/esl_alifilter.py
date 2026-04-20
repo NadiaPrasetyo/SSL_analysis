@@ -12,7 +12,7 @@ def main(tool_root, maxid, msafile, output_file):
     alipid_path = os.path.join(tool_root, "easel", "miniapps", "esl-alipid")
     # Run esl-alipid to get all pairwise IDs
     result = subprocess.run(
-        [str(alipid_path), "--amino", "--informat", "fasta", msafile],
+        [str(alipid_path), "--amino", "--informat", "afa", msafile],
         capture_output=True, text=True, check=True
     )
 
@@ -51,7 +51,7 @@ def main(tool_root, maxid, msafile, output_file):
     tree_path = os.path.join(output_dir, f"{output_file}.tree")
     alimaniop_path = os.path.join(tool_root, "easel", "miniapps", "esl-alimanip")
     subprocess.run(
-        [str(alimaniop_path), "--informat", "fasta", "--amino", "--seq-k", 
+        [str(alimaniop_path), "--informat", "afa", "--amino", "--seq-k", 
         tmpfile, msafile, "-o", output_file, "--tree", tree_path],
         check=True
     )
