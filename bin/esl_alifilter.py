@@ -41,6 +41,28 @@ def main(tool_root, maxid, msafile, output_file):
 
     keep = [s for s in all_seqs_ordered if s not in removed]
 
+    always_keep_SSL3 = [
+        "SSL3|CC1", "SSL3|CC5", "SSL3|CC8", "SSL3|CC22", "SSL3|CC30", "SSL3|CC93"
+    ]
+
+    always_keep_SSL7 = [
+        "SSL7|CC1", "SSL7|CC5", "SSL7|CC8", "SSL7|CC22", "SSL7|CC30", "SSL7|CC93"
+    ]
+
+    always_keep_SSL11 = [
+        "SSL11|CC1", "SSL11|CC5", "SSL11|CC8", "SSL11|CC22", "SSL11|CC30", "SSL11|CC93"
+    ]
+
+    # add specific sequences to keep list
+    if "SSL3" in output_file:
+        keep.extend(always_keep_SSL3)
+    elif "SSL7" in output_file:
+        keep.extend(always_keep_SSL7)
+    elif "SSL11" in output_file:
+        keep.extend(always_keep_SSL11)
+
+    keep = list(set(keep))  # deduplicate
+    
     # write to keep list on an intermediate file (NOT TEMP)
     to_keep_file = output_file + ".keep"
     with open(to_keep_file, "w") as f:
@@ -54,7 +76,7 @@ def main(tool_root, maxid, msafile, output_file):
 
     subprocess.run(
         [str(alimanip_path), "--informat", "afa", "--amino", "--seq-k",
-         to_keep_file, msafile, "-o", output_file, "--tree", tree_path],
+         to_keep_file, "-o", output_file, "--tree", tree_path, msafile],
         check=True
     )
 
