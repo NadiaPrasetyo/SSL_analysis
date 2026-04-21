@@ -95,15 +95,14 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         [str(alipid_path), "--amino", "--informat", "afa", msafile],
         capture_output=True, text=True, check=True
     )
-
+    
     # Parse pairwise IDs; greedily remove the "worse" of any pair above threshold
-    # with preference given to newer sequences
+    # with preference given to newer sequences and against unknown sequences
     removed = set()
     all_seqs_ordered = []
     all_seqs_seen = set()
     skipped_count = 0
     processed_count = 0
-
     for line in result.stdout.splitlines():
         if line.startswith("#"):
             continue
@@ -133,14 +132,21 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         if pid >= maxid * 100.0:
             year1 = get_year(seq1)
             year2 = get_year(seq2)
-
-            if year1 > 2016 and year2 <= 2016:
+            has_unknown_1 = "unknown" in full_seq1.lower()
+            has_unknown_2 = "unknown" in full_seq2.lower()
+            
+            # Decision logic: prefer sequences without "unknown"
+            if has_unknown_1 and not has_unknown_2:
+                to_remove = full_seq1  # prefer seq2 (no unknown)
+            elif has_unknown_2 and not has_unknown_1:
+                to_remove = full_seq2  # prefer seq1 (no unknown)
+            elif year1 > 2016 and year2 <= 2016:
                 to_remove = full_seq2  # prefer seq1 (newer)
             elif year2 > 2016 and year1 <= 2016:
                 to_remove = full_seq1  # prefer seq2 (newer)
             else:
                 to_remove = full_seq2  # both same era: fall back to original behaviour
-
+            
             if to_remove not in removed:
                 other = full_seq1 if to_remove == full_seq2 else full_seq2
                 if other not in removed:
@@ -152,7 +158,6 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         logging.info(f"Processed {processed_count} pairs where sequences are in alignment")
         logging.info(f"Skipped {skipped_count} pairs where sequences weren't in alignment")
         logging.info(f"Removed {len(removed)} sequences based on pairwise identity")
-
     keep = [s for s in all_seqs_ordered if s not in removed]
 
     always_keep_SSL3 = [
