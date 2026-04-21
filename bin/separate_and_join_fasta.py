@@ -89,7 +89,7 @@ def main():
     parser.add_argument("-o", "--output-dir", default="separated_fasta", help="Output directory for separated FASTA files. (default: separated_fasta)")
     parser.add_argument("--deduplicate", action="store_true", help="Deduplicate the FASTA records.")
     parser.add_argument("--remove-unknown", action="store_true", help="Remove unknown records.")
-    parser.add_argument("--filter-year", default=2016, type=int, help="Filter records by year. (default: 2016)")
+    parser.add_argument("--filter-year", type=int, help="Filter records by year. (default: None)")
     args = parser.parse_args()
 
     input_dir = Path(args.input_dir)
@@ -109,7 +109,7 @@ def main():
         records = deduplicate_fasta_records(records)
         print(f"Deduplicated FASTA records: {len(records)} records.")
 
-    if args.filter_year:
+    if args.filter_year != None:
         print(f"Filtering records by year: starting with {len(records)} records.")
         records = filter_year(records, args.filter_year)
         print(f"Filtered records by year: {len(records)} records.")
