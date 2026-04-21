@@ -31,18 +31,6 @@ def get_year(seq_name):
     except (IndexError, ValueError):
         return 0  # fallback if parsing fails
 
-def get_seqs_in_fasta(fasta_file):
-    """Extract all sequence names from a FASTA file"""
-    seqs = set()
-    with open(fasta_file, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith('>'):
-                # Remove '>' and take only the first word (in case of descriptions)
-                header = line[1:].split()[0]
-                seqs.add(header)
-    return seqs
-
 def get_seqs_in_stockholm(stockholm_file):
     """Extract all sequence names from a Stockholm format file"""
     seqs = set()
@@ -83,7 +71,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     seqs_in_alignment = get_seqs_in_stockholm(tmp_sto)
     if verbose:
         logging.info(f"Found {len(seqs_in_alignment)} sequences in Stockholm alignment")
-        logging.debug(f"Sample sequence names: {list(seqs_in_alignment)[:5]}")
+        logging.debug(f"Sample sequence names: {list(seqs_in_alignment)[:10]}")
 
     # Run esl-alipid to get all pairwise IDs
     if verbose:
@@ -104,6 +92,8 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         if line.startswith("#"):
             continue
         fields = line.split()
+        if len(fields) < 3:
+            continue
         seq1, seq2, pid = fields[0], fields[1], float(fields[2])
         
         # Only process if both sequences exist in the alignment
@@ -138,6 +128,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
 
     if verbose:
         logging.info(f"Skipped {skipped_count} pairs where sequences weren't in alignment")
+        logging.info(f"Removed {len(removed)} sequences based on pairwise identity")
 
     keep = [s for s in all_seqs_ordered if s not in removed]
 
@@ -157,36 +148,64 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     if "SSL3" in output_file:
         for s in always_keep_SSL3:
             if s in seqs_in_alignment:
-                keep.append(s)
-                added_count += 1
+                if s not in keep:
+                    keep.append(s)
+                    added_count += 1
     elif "SSL7" in output_file:
         for s in always_keep_SSL7:
             if s in seqs_in_alignment:
-                keep.append(s)
-                added_count += 1
+                if s not in keep:
+                    keep.append(s)
+                    added_count += 1
     elif "SSL11" in output_file:
         for s in always_keep_SSL11:
             if s in seqs_in_alignment:
-                keep.append(s)
-                added_count += 1
+                if s not in keep:
+                    keep.append(s)
+                    added_count += 1
     
     if verbose:
         logging.info(f"Added {added_count} reference sequences to keep list")
 
-    keep = list(set(keep))  # deduplicate
+    # Deduplicate and clean
+    keep = list(set(keep))
+    keep = sorted([s.strip() for s in keep if s and s.strip()])
     
     if verbose:
         logging.info(f"Final keep list: {len(keep)} sequences")
         if len(keep) == 0:
-            logging.warning("WARNING: Keep list is empty! No sequences will be retained.")
+            logging.error("ERROR: Keep list is empty! No sequences will be retained.")
+            logging.error(f"Alignment has {len(seqs_in_alignment)} sequences")
+            return
+        logging.info(f"Sample keep sequences: {keep[:5]}")
 
     # Write keep-list to a persistent intermediate file (not temp)
     to_keep_file = os.path.join(output_dir, "temp", "to_keep.txt")
+    
+    # Write carefully - one sequence per line, no extra whitespace
     with open(to_keep_file, "w") as f:
-        f.write("\n".join(keep) + "\n")
+        for seq in keep:
+            # Ensure no trailing whitespace
+            f.write(seq.strip() + "\n")
     
     if verbose:
         logging.info(f"Wrote keep list to {to_keep_file}")
+        # Verify the file was written correctly
+        with open(to_keep_file, "r") as f:
+            file_contents = f.read()
+            written_lines = [line for line in file_contents.split('\n') if line.strip()]
+        logging.info(f"Verified {len(written_lines)} non-empty sequences in keep list file")
+        
+        # Show file size and content sample
+        file_size = os.path.getsize(to_keep_file)
+        logging.info(f"Keep list file size: {file_size} bytes")
+        
+        # Check for problematic characters
+        with open(to_keep_file, 'rb') as f:
+            binary_content = f.read()
+            if b'\x00' in binary_content:
+                logging.error("ERROR: Keep list file contains null bytes!")
+                return
 
     tree_path = output_file.replace(".fasta", ".tree")
 
@@ -194,10 +213,18 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     if verbose:
         logging.info("Filtering sequences with esl-alimanip --seq-k...")
     tmp_filtered_sto = os.path.join(output_dir, "temp", "filtered.sto")
-    subprocess.run(
-        [str(alimanip_path), "--seq-k", to_keep_file, "-o", tmp_filtered_sto, tmp_sto],
-        check=True
-    )
+    
+    try:
+        subprocess.run(
+            [str(alimanip_path), "--seq-k", to_keep_file, "-o", tmp_filtered_sto, tmp_sto],
+            check=True
+        )
+    except subprocess.CalledProcessError as e:
+        logging.error(f"esl-alimanip failed: {e}")
+        logging.error("This might be due to sequence names mismatch.")
+        logging.error(f"First 5 alignment sequence names: {list(seqs_in_alignment)[:5]}")
+        logging.error(f"First 5 keep list sequences: {keep[:5]}")
+        raise
 
     # Step 3: reorder to tree order and save Newick tree (incompatible with --seq-k)
     if verbose:
