@@ -23,6 +23,14 @@ def setup_logging(verbose, output_dir):
     if verbose:
         logging.info("Logging initialized. Log file: %s", log_file)
 
+def get_year(seq_name):
+    """Extract year from header format: accession_country_year_ST_protein"""
+    parts = seq_name.split("_")
+    try:
+        return int(parts[2])
+    except (IndexError, ValueError):
+        return 0  # fallback if parsing fails
+        
 def main(tool_root, maxid, msafile, output_file, verbose=False):
     alipid_path      = os.path.join(tool_root, "easel", "miniapps", "esl-alipid")
     alimanip_path    = os.path.join(tool_root, "easel", "miniapps", "esl-alimanip")
@@ -36,9 +44,9 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     )
 
     # Parse pairwise IDs; greedily remove the "worse" of any pair above threshold
-    # (keeps first-seen sequence, discards its high-id partners -- simple greedy)
+    # with preference given to newer sequences
     removed = set()
-    all_seqs_ordered = []  # preserve insertion order for keep-list
+    all_seqs_ordered = []
     all_seqs_seen = set()
 
     for line in result.stdout.splitlines():
@@ -46,15 +54,25 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
             continue
         fields = line.split()
         seq1, seq2, pid = fields[0], fields[1], float(fields[2])
-
         for s in (seq1, seq2):
             if s not in all_seqs_seen:
                 all_seqs_ordered.append(s)
                 all_seqs_seen.add(s)
-
         if pid >= maxid * 100.0:
-            if seq1 not in removed:
-                removed.add(seq2)   # keep seq1, drop seq2
+            year1 = get_year(seq1)
+            year2 = get_year(seq2)
+
+            if year1 > 2016 and year2 <= 2016:
+                to_remove = seq2  # prefer seq1 (newer)
+            elif year2 > 2016 and year1 <= 2016:
+                to_remove = seq1  # prefer seq2 (newer)
+            else:
+                to_remove = seq2  # both same era: fall back to original behaviour
+
+            if to_remove not in removed:
+                other = seq1 if to_remove == seq2 else seq2
+                if other not in removed:
+                    removed.add(to_remove)
 
     keep = [s for s in all_seqs_ordered if s not in removed]
 
