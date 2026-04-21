@@ -6,10 +6,12 @@ import subprocess
 import tempfile
 import os
 import argparse
+import logging
+import shutil
 
 def setup_logging(verbose, output_dir):
     log_level = logging.DEBUG if verbose else logging.INFO
-    log_file = output_dir / "alifilter.log"
+    log_file = os.path.join(output_dir, "alifilter.log")
     logging.basicConfig(
         level=log_level,
         format="%(asctime)s [%(levelname)s] %(message)s",
@@ -77,11 +79,12 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     keep = list(set(keep))  # deduplicate
 
     # Write keep-list to a persistent intermediate file (not temp)
+    os.makedirs(os.path.join(output_dir, "temp"), exist_ok=True)
     to_keep_file = os.path.join(output_dir, "temp", "to_keep.txt")
     with open(to_keep_file, "w") as f:
         f.write("\n".join(keep) + "\n")
 
-    tree_path = f"{output_file}.tree"
+    tree_path = output_file.replace(".fasta", ".tree")
 
     # Step 1: convert input AFA -> Stockholm (--seq-k requires Stockholm format)
     tmp_sto = os.path.join(output_dir, "temp", "tmp.sto")
@@ -133,6 +136,6 @@ if __name__ == "__main__":
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
     args = parser.parse_args()
 
-    setup_logging(args.verbose, output_dir=Path(args.output_file).parent)
+    setup_logging(args.verbose, output_dir=os.path.dirname(args.output_file))
 
     main(args.tool_root, args.maxid, args.msafile, args.output_file, verbose=args.verbose)
