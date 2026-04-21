@@ -60,7 +60,7 @@ def filter_year(records, year):
     new_records = []
     for record in records:
         print(f"{record.id} year = {record.id.split('|')[4]}")
-        if record.id.split("|")[4] >= year:
+        if int(record.id.split("|")[4]) >= year:
             new_records.append(record)
         else:
             print(f"skipping {record.id}")
