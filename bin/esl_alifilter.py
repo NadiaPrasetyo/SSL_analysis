@@ -10,7 +10,7 @@ import argparse
 def main(tool_root, maxid, msafile, output_file):
     alipid_path      = os.path.join(tool_root, "easel", "miniapps", "esl-alipid")
     alimanip_path    = os.path.join(tool_root, "easel", "miniapps", "esl-alimanip")
-    alireformat_path = os.path.join(tool_root, "easel", "miniapps", "esl-alireformat")
+    reformat_path = os.path.join(tool_root, "easel", "miniapps", "esl-reformat")
 
     # Run esl-alipid to get all pairwise IDs
     result = subprocess.run(
@@ -72,7 +72,7 @@ def main(tool_root, maxid, msafile, output_file):
     tmp_sto = tempfile.mktemp(suffix=".sto")
     with open(tmp_sto, "w") as out:
         subprocess.run(
-            [str(alireformat_path), "--informat", "afa", "stockholm", msafile],
+            [str(reformat_path), "--informat", "afa", "stockholm", msafile],
             stdout=out, check=True
         )
 
@@ -93,7 +93,7 @@ def main(tool_root, maxid, msafile, output_file):
     # Step 4: convert final Stockholm back to aligned fasta
     with open(output_file, "w") as out:
         subprocess.run(
-            [str(alireformat_path), "afa", tmp_tree_sto],
+            [str(reformat_path), "afa", tmp_tree_sto],
             stdout=out, check=True
         )
 
