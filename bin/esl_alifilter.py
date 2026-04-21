@@ -32,8 +32,11 @@ def get_year(seq_name):
         return 0  # fallback if parsing fails
 
 def get_seqs_in_stockholm(stockholm_file):
-    """Extract all sequence names from a Stockholm format file"""
-    seqs = set()
+    """Extract all sequence names from a Stockholm format file.
+    Returns both full names (with prefix) and base names (without prefix)."""
+    full_names = set()
+    base_names = {}  # maps base name -> full name (with prefix)
+    
     with open(stockholm_file, 'r') as f:
         for line in f:
             line = line.rstrip('\n')
@@ -45,9 +48,20 @@ def get_seqs_in_stockholm(stockholm_file):
             parts = line.split()
             if len(parts) >= 1 and not line.startswith(' '):
                 # This is a sequence line
-                seqs.add(parts[0])
-    return seqs
-        
+                full_name = parts[0]
+                full_names.add(full_name)
+                
+                # Extract base name (remove numeric prefix like "000|")
+                # Format: "000|original_name"
+                if '|' in full_name:
+                    base_name = '|'.join(full_name.split('|')[1:])
+                else:
+                    base_name = full_name
+                    
+                base_names[base_name] = full_name
+    
+    return full_names, base_names
+
 def main(tool_root, maxid, msafile, output_file, verbose=False):
     alipid_path      = os.path.join(tool_root, "easel", "miniapps", "esl-alipid")
     alimanip_path    = os.path.join(tool_root, "easel", "miniapps", "esl-alimanip")
@@ -67,11 +81,12 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
             stdout=out, check=True
         )
 
-    # Get all sequences actually in the Stockholm file (canonical names)
-    seqs_in_alignment = get_seqs_in_stockholm(tmp_sto)
+    # Get all sequences actually in the Stockholm file
+    full_names, base_names_map = get_seqs_in_stockholm(tmp_sto)
     if verbose:
-        logging.info(f"Found {len(seqs_in_alignment)} sequences in Stockholm alignment")
-        logging.debug(f"Sample sequence names: {list(seqs_in_alignment)[:10]}")
+        logging.info(f"Found {len(full_names)} sequences in Stockholm alignment")
+        logging.debug(f"Sample full names: {list(full_names)[:5]}")
+        logging.debug(f"Sample base name mappings: {dict(list(base_names_map.items())[:5])}")
 
     # Run esl-alipid to get all pairwise IDs
     if verbose:
@@ -87,6 +102,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     all_seqs_ordered = []
     all_seqs_seen = set()
     skipped_count = 0
+    processed_count = 0
 
     for line in result.stdout.splitlines():
         if line.startswith("#"):
@@ -96,14 +112,20 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
             continue
         seq1, seq2, pid = fields[0], fields[1], float(fields[2])
         
+        # Convert base names to full names (with prefix)
+        full_seq1 = base_names_map.get(seq1, seq1)
+        full_seq2 = base_names_map.get(seq2, seq2)
+        
         # Only process if both sequences exist in the alignment
-        if seq1 not in seqs_in_alignment or seq2 not in seqs_in_alignment:
+        if full_seq1 not in full_names or full_seq2 not in full_names:
             if verbose:
-                logging.debug(f"Skipping pair: {seq1} vs {seq2} (one or both not in alignment)")
+                logging.debug(f"Skipping pair: {seq1} -> {full_seq1} vs {seq2} -> {full_seq2} (one or both not in alignment)")
             skipped_count += 1
             continue
         
-        for s in (seq1, seq2):
+        processed_count += 1
+        
+        for s in (full_seq1, full_seq2):
             if s not in all_seqs_seen:
                 all_seqs_ordered.append(s)
                 all_seqs_seen.add(s)
@@ -113,20 +135,21 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
             year2 = get_year(seq2)
 
             if year1 > 2016 and year2 <= 2016:
-                to_remove = seq2  # prefer seq1 (newer)
+                to_remove = full_seq2  # prefer seq1 (newer)
             elif year2 > 2016 and year1 <= 2016:
-                to_remove = seq1  # prefer seq2 (newer)
+                to_remove = full_seq1  # prefer seq2 (newer)
             else:
-                to_remove = seq2  # both same era: fall back to original behaviour
+                to_remove = full_seq2  # both same era: fall back to original behaviour
 
             if to_remove not in removed:
-                other = seq1 if to_remove == seq2 else seq2
+                other = full_seq1 if to_remove == full_seq2 else full_seq2
                 if other not in removed:
                     removed.add(to_remove)
                     if verbose:
                         logging.debug(f"Marking for removal: {to_remove} (PID: {pid:.1f}% with {other})")
 
     if verbose:
+        logging.info(f"Processed {processed_count} pairs where sequences are in alignment")
         logging.info(f"Skipped {skipped_count} pairs where sequences weren't in alignment")
         logging.info(f"Removed {len(removed)} sequences based on pairwise identity")
 
@@ -147,21 +170,24 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     added_count = 0
     if "SSL3" in output_file:
         for s in always_keep_SSL3:
-            if s in seqs_in_alignment:
-                if s not in keep:
-                    keep.append(s)
+            if s in base_names_map:
+                full_s = base_names_map[s]
+                if full_s not in keep:
+                    keep.append(full_s)
                     added_count += 1
     elif "SSL7" in output_file:
         for s in always_keep_SSL7:
-            if s in seqs_in_alignment:
-                if s not in keep:
-                    keep.append(s)
+            if s in base_names_map:
+                full_s = base_names_map[s]
+                if full_s not in keep:
+                    keep.append(full_s)
                     added_count += 1
     elif "SSL11" in output_file:
         for s in always_keep_SSL11:
-            if s in seqs_in_alignment:
-                if s not in keep:
-                    keep.append(s)
+            if s in base_names_map:
+                full_s = base_names_map[s]
+                if full_s not in keep:
+                    keep.append(full_s)
                     added_count += 1
     
     if verbose:
@@ -175,7 +201,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         logging.info(f"Final keep list: {len(keep)} sequences")
         if len(keep) == 0:
             logging.error("ERROR: Keep list is empty! No sequences will be retained.")
-            logging.error(f"Alignment has {len(seqs_in_alignment)} sequences")
+            logging.error(f"Alignment has {len(full_names)} sequences")
             return
         logging.info(f"Sample keep sequences: {keep[:5]}")
 
@@ -222,7 +248,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     except subprocess.CalledProcessError as e:
         logging.error(f"esl-alimanip failed: {e}")
         logging.error("This might be due to sequence names mismatch.")
-        logging.error(f"First 5 alignment sequence names: {list(seqs_in_alignment)[:5]}")
+        logging.error(f"First 5 alignment sequence names: {list(full_names)[:5]}")
         logging.error(f"First 5 keep list sequences: {keep[:5]}")
         raise
 
