@@ -56,6 +56,13 @@ def separate_fasta(records, output_dir):
     print(f"Separated FASTA records into {output_dir}, number of records:\nSSL3: {num_SSL3}\nSSL7: {num_SSL7}\nSSL11: {num_SSL11}")
     return
 
+def filter_year(records, year):
+    new_records = []
+    for record in records:
+        if record.id.split("|")[4] >= year:
+            new_records.append(record)
+    return new_records
+
 def deduplicate_fasta_records(records):
     seen_seqs = set()
     deduped_records = []
@@ -82,6 +89,7 @@ def main():
     parser.add_argument("-o", "--output-dir", default="separated_fasta", help="Output directory for separated FASTA files. (default: separated_fasta)")
     parser.add_argument("--deduplicate", action="store_true", help="Deduplicate the FASTA records.")
     parser.add_argument("--remove-unknown", action="store_true", help="Remove unknown records.")
+    parser.add_argument("--filter-year", default=2016, type=int, help="Filter records by year. (default: 2016)")
     args = parser.parse_args()
 
     input_dir = Path(args.input_dir)
@@ -100,6 +108,11 @@ def main():
         print(f"Deduplicating FASTA records: starting with {len(records)} records.")
         records = deduplicate_fasta_records(records)
         print(f"Deduplicated FASTA records: {len(records)} records.")
+
+    if args.filter_year:
+        print(f"Filtering records by year: starting with {len(records)} records.")
+        records = filter_year(records, args.filter_year)
+        print(f"Filtered records by year: {len(records)} records.")
 
     ref_path = "data/SSL_seq.fasta"
     chosen_path = "data/6_strains/aa/SSL_aa.fasta"
