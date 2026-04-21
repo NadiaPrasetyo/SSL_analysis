@@ -30,12 +30,27 @@ def get_year(seq_name):
         return int(parts[2])
     except (IndexError, ValueError):
         return 0  # fallback if parsing fails
+
+def get_seqs_in_alignment(msafile):
+    """Extract all sequence names from the alignment file"""
+    seqs = set()
+    with open(msafile, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith('>'):
+                seqs.add(line[1:])  # remove '>' prefix
+    return seqs
         
 def main(tool_root, maxid, msafile, output_file, verbose=False):
     alipid_path      = os.path.join(tool_root, "easel", "miniapps", "esl-alipid")
     alimanip_path    = os.path.join(tool_root, "easel", "miniapps", "esl-alimanip")
     reformat_path = os.path.join(tool_root, "easel", "miniapps", "esl-reformat")
     output_dir = os.path.dirname(output_file)
+
+    # Get all sequences actually in the alignment
+    seqs_in_alignment = get_seqs_in_alignment(msafile)
+    if verbose:
+        logging.info(f"Found {len(seqs_in_alignment)} sequences in alignment")
 
     # Run esl-alipid to get all pairwise IDs
     result = subprocess.run(
@@ -87,14 +102,24 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     ]
 
     # Add specific sequences to keep list based on output file name
+    # ONLY if they actually exist in the alignment
     if "SSL3" in output_file:
-        keep.extend(always_keep_SSL3)
+        keep.extend([s for s in always_keep_SSL3 if s in seqs_in_alignment])
     elif "SSL7" in output_file:
-        keep.extend(always_keep_SSL7)
+        keep.extend([s for s in always_keep_SSL7 if s in seqs_in_alignment])
     elif "SSL11" in output_file:
-        keep.extend(always_keep_SSL11)
+        keep.extend([s for s in always_keep_SSL11 if s in seqs_in_alignment])
 
     keep = list(set(keep))  # deduplicate
+
+    # Filter keep list to only include sequences that actually exist
+    keep = [s for s in keep if s in seqs_in_alignment]
+    
+    if verbose:
+        logging.info(f"After filtering: keeping {len(keep)} sequences")
+        invalid = [s for s in list(set(keep)) if s not in seqs_in_alignment]
+        if invalid:
+            logging.warning(f"Removed {len(invalid)} invalid sequences from keep list")
 
     # Write keep-list to a persistent intermediate file (not temp)
     os.makedirs(os.path.join(output_dir, "temp"), exist_ok=True)
