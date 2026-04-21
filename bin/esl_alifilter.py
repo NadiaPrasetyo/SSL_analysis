@@ -8,7 +8,9 @@ import os
 import argparse
 
 def main(tool_root, maxid, msafile, output_file):
-    alipid_path = os.path.join(tool_root, "easel", "miniapps", "esl-alipid")
+    alipid_path      = os.path.join(tool_root, "easel", "miniapps", "esl-alipid")
+    alimanip_path    = os.path.join(tool_root, "easel", "miniapps", "esl-alimanip")
+    alireformat_path = os.path.join(tool_root, "easel", "miniapps", "esl-alireformat")
 
     # Run esl-alipid to get all pairwise IDs
     result = subprocess.run(
@@ -28,8 +30,6 @@ def main(tool_root, maxid, msafile, output_file):
         fields = line.split()
         seq1, seq2, pid = fields[0], fields[1], float(fields[2])
 
-        # Collect all sequence names (BUG FIX 1: was reading from wrong variable
-        # all_seqs_result.stdout which was never populated correctly)
         for s in (seq1, seq2):
             if s not in all_seqs_seen:
                 all_seqs_ordered.append(s)
@@ -44,16 +44,14 @@ def main(tool_root, maxid, msafile, output_file):
     always_keep_SSL3 = [
         "SSL3|CC1", "SSL3|CC5", "SSL3|CC8", "SSL3|CC22", "SSL3|CC30", "SSL3|CC93"
     ]
-
     always_keep_SSL7 = [
         "SSL7|CC1", "SSL7|CC5", "SSL7|CC8", "SSL7|CC22", "SSL7|CC30", "SSL7|CC93"
     ]
-
     always_keep_SSL11 = [
         "SSL11|CC1", "SSL11|CC5", "SSL11|CC8", "SSL11|CC22", "SSL11|CC30", "SSL11|CC93"
     ]
 
-    # add specific sequences to keep list
+    # Add specific sequences to keep list based on output file name
     if "SSL3" in output_file:
         keep.extend(always_keep_SSL3)
     elif "SSL7" in output_file:
@@ -62,23 +60,53 @@ def main(tool_root, maxid, msafile, output_file):
         keep.extend(always_keep_SSL11)
 
     keep = list(set(keep))  # deduplicate
-    
-    # write to keep list on an intermediate file (NOT TEMP)
+
+    # Write keep-list to a persistent intermediate file (not temp)
     to_keep_file = output_file + ".keep"
     with open(to_keep_file, "w") as f:
-        f.write("\n".join(keep))
+        f.write("\n".join(keep) + "\n")
 
-
-    # the suffix directly — don't re-join with output_dir or the path doubles up
     tree_path = f"{output_file}.tree"
 
-    alimanip_path = os.path.join(tool_root, "easel", "miniapps", "esl-alimanip")  # BUG FIX 3: typo alimaniop -> alimanip
+    # Step 1: convert input AFA -> Stockholm (--seq-k requires Stockholm format)
+    tmp_sto = tempfile.mktemp(suffix=".sto")
+    with open(tmp_sto, "w") as out:
+        subprocess.run(
+            [str(alireformat_path), "--informat", "afa", "stockholm", msafile],
+            stdout=out, check=True
+        )
 
+    # Step 2: filter sequences with --seq-k (Stockholm in, Stockholm out)
+    tmp_filtered_sto = tempfile.mktemp(suffix="_filtered.sto")
     subprocess.run(
-        [str(alimanip_path), "--informat", "afa", "--amino", "--seq-k",
-         to_keep_file, "-o", output_file, "--tree", tree_path, msafile],
+        [str(alimanip_path), "--seq-k", to_keep_file, "-o", tmp_filtered_sto, tmp_sto],
         check=True
     )
+
+    # Step 3: reorder to tree order and save Newick tree (incompatible with --seq-k)
+    tmp_tree_sto = tempfile.mktemp(suffix="_tree.sto")
+    subprocess.run(
+        [str(alimanip_path), "--tree", tree_path, "-o", tmp_tree_sto, tmp_filtered_sto],
+        check=True
+    )
+
+    # Step 4: convert final Stockholm back to aligned fasta
+    with open(output_file, "w") as out:
+        subprocess.run(
+            [str(alireformat_path), "afa", tmp_tree_sto],
+            stdout=out, check=True
+        )
+
+    # Temp files retained for debugging:
+    #   Stockholm conversion : {tmp_sto}
+    #   Filtered alignment   : {tmp_filtered_sto}
+    #   Tree-reordered       : {tmp_tree_sto}
+    #   Keep list            : {to_keep_file}
+    print(f"Debug temp files retained:")
+    print(f"  Stockholm input:    {tmp_sto}")
+    print(f"  Filtered Stockholm: {tmp_filtered_sto}")
+    print(f"  Tree-ordered:       {tmp_tree_sto}")
+    print(f"  Keep list:          {to_keep_file}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Remove sequences from an MSA based on pairwise ID")
