@@ -31,14 +31,33 @@ def get_year(seq_name):
     except (IndexError, ValueError):
         return 0  # fallback if parsing fails
 
-def get_seqs_in_alignment(msafile):
-    """Extract all sequence names from the alignment file"""
+def get_seqs_in_fasta(fasta_file):
+    """Extract all sequence names from a FASTA file"""
     seqs = set()
-    with open(msafile, 'r') as f:
+    with open(fasta_file, 'r') as f:
         for line in f:
             line = line.strip()
             if line.startswith('>'):
-                seqs.add(line[1:])  # remove '>' prefix
+                # Remove '>' and take only the first word (in case of descriptions)
+                header = line[1:].split()[0]
+                seqs.add(header)
+    return seqs
+
+def get_seqs_in_stockholm(stockholm_file):
+    """Extract all sequence names from a Stockholm format file"""
+    seqs = set()
+    with open(stockholm_file, 'r') as f:
+        for line in f:
+            line = line.rstrip('\n')
+            # In Stockholm format, sequences are like: "NAME  SEQUENCE"
+            # Skip comments and blank lines
+            if not line or line.startswith('#') or line.startswith('//'):
+                continue
+            # Split on whitespace
+            parts = line.split()
+            if len(parts) >= 1 and not line.startswith(' '):
+                # This is a sequence line
+                seqs.add(parts[0])
     return seqs
         
 def main(tool_root, maxid, msafile, output_file, verbose=False):
@@ -46,13 +65,29 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     alimanip_path    = os.path.join(tool_root, "easel", "miniapps", "esl-alimanip")
     reformat_path = os.path.join(tool_root, "easel", "miniapps", "esl-reformat")
     output_dir = os.path.dirname(output_file)
+    if not output_dir:
+        output_dir = "."
 
-    # Get all sequences actually in the alignment
-    seqs_in_alignment = get_seqs_in_alignment(msafile)
+    # Step 1: convert input AFA -> Stockholm first (to get canonical sequence names)
+    os.makedirs(os.path.join(output_dir, "temp"), exist_ok=True)
+    tmp_sto = os.path.join(output_dir, "temp", "tmp.sto")
     if verbose:
-        logging.info(f"Found {len(seqs_in_alignment)} sequences in alignment")
+        logging.info(f"Converting {msafile} to Stockholm format...")
+    with open(tmp_sto, "w") as out:
+        subprocess.run(
+            [str(reformat_path), "--informat", "afa", "stockholm", msafile],
+            stdout=out, check=True
+        )
+
+    # Get all sequences actually in the Stockholm file (canonical names)
+    seqs_in_alignment = get_seqs_in_stockholm(tmp_sto)
+    if verbose:
+        logging.info(f"Found {len(seqs_in_alignment)} sequences in Stockholm alignment")
+        logging.debug(f"Sample sequence names: {list(seqs_in_alignment)[:5]}")
 
     # Run esl-alipid to get all pairwise IDs
+    if verbose:
+        logging.info("Running esl-alipid to get pairwise identities...")
     result = subprocess.run(
         [str(alipid_path), "--amino", "--informat", "afa", msafile],
         capture_output=True, text=True, check=True
@@ -63,16 +98,26 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     removed = set()
     all_seqs_ordered = []
     all_seqs_seen = set()
+    skipped_count = 0
 
     for line in result.stdout.splitlines():
         if line.startswith("#"):
             continue
         fields = line.split()
         seq1, seq2, pid = fields[0], fields[1], float(fields[2])
+        
+        # Only process if both sequences exist in the alignment
+        if seq1 not in seqs_in_alignment or seq2 not in seqs_in_alignment:
+            if verbose:
+                logging.debug(f"Skipping pair: {seq1} vs {seq2} (one or both not in alignment)")
+            skipped_count += 1
+            continue
+        
         for s in (seq1, seq2):
             if s not in all_seqs_seen:
                 all_seqs_ordered.append(s)
                 all_seqs_seen.add(s)
+        
         if pid >= maxid * 100.0:
             year1 = get_year(seq1)
             year2 = get_year(seq2)
@@ -88,6 +133,11 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
                 other = seq1 if to_remove == seq2 else seq2
                 if other not in removed:
                     removed.add(to_remove)
+                    if verbose:
+                        logging.debug(f"Marking for removal: {to_remove} (PID: {pid:.1f}% with {other})")
+
+    if verbose:
+        logging.info(f"Skipped {skipped_count} pairs where sequences weren't in alignment")
 
     keep = [s for s in all_seqs_ordered if s not in removed]
 
@@ -103,41 +153,46 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
 
     # Add specific sequences to keep list based on output file name
     # ONLY if they actually exist in the alignment
+    added_count = 0
     if "SSL3" in output_file:
-        keep.extend([s for s in always_keep_SSL3 if s in seqs_in_alignment])
+        for s in always_keep_SSL3:
+            if s in seqs_in_alignment:
+                keep.append(s)
+                added_count += 1
     elif "SSL7" in output_file:
-        keep.extend([s for s in always_keep_SSL7 if s in seqs_in_alignment])
+        for s in always_keep_SSL7:
+            if s in seqs_in_alignment:
+                keep.append(s)
+                added_count += 1
     elif "SSL11" in output_file:
-        keep.extend([s for s in always_keep_SSL11 if s in seqs_in_alignment])
-
-    keep = list(set(keep))  # deduplicate
-
-    # Filter keep list to only include sequences that actually exist
-    keep = [s for s in keep if s in seqs_in_alignment]
+        for s in always_keep_SSL11:
+            if s in seqs_in_alignment:
+                keep.append(s)
+                added_count += 1
     
     if verbose:
-        logging.info(f"After filtering: keeping {len(keep)} sequences")
-        invalid = [s for s in list(set(keep)) if s not in seqs_in_alignment]
-        if invalid:
-            logging.warning(f"Removed {len(invalid)} invalid sequences from keep list")
+        logging.info(f"Added {added_count} reference sequences to keep list")
+
+    keep = list(set(keep))  # deduplicate
+    
+    if verbose:
+        logging.info(f"Final keep list: {len(keep)} sequences")
+        if len(keep) == 0:
+            logging.warning("WARNING: Keep list is empty! No sequences will be retained.")
 
     # Write keep-list to a persistent intermediate file (not temp)
-    os.makedirs(os.path.join(output_dir, "temp"), exist_ok=True)
     to_keep_file = os.path.join(output_dir, "temp", "to_keep.txt")
     with open(to_keep_file, "w") as f:
         f.write("\n".join(keep) + "\n")
+    
+    if verbose:
+        logging.info(f"Wrote keep list to {to_keep_file}")
 
     tree_path = output_file.replace(".fasta", ".tree")
 
-    # Step 1: convert input AFA -> Stockholm (--seq-k requires Stockholm format)
-    tmp_sto = os.path.join(output_dir, "temp", "tmp.sto")
-    with open(tmp_sto, "w") as out:
-        subprocess.run(
-            [str(reformat_path), "--informat", "afa", "stockholm", msafile],
-            stdout=out, check=True
-        )
-
     # Step 2: filter sequences with --seq-k (Stockholm in, Stockholm out)
+    if verbose:
+        logging.info("Filtering sequences with esl-alimanip --seq-k...")
     tmp_filtered_sto = os.path.join(output_dir, "temp", "filtered.sto")
     subprocess.run(
         [str(alimanip_path), "--seq-k", to_keep_file, "-o", tmp_filtered_sto, tmp_sto],
@@ -145,6 +200,8 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     )
 
     # Step 3: reorder to tree order and save Newick tree (incompatible with --seq-k)
+    if verbose:
+        logging.info("Building tree and reordering sequences...")
     tmp_tree_sto = os.path.join(output_dir, "temp", "tree.sto")
     subprocess.run(
         [str(alimanip_path), "--tree", tree_path, "-o", tmp_tree_sto, tmp_filtered_sto],
@@ -152,6 +209,8 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     )
 
     # Step 4: convert final Stockholm back to aligned fasta
+    if verbose:
+        logging.info("Converting final Stockholm back to FASTA format...")
     with open(output_file, "w") as out:
         subprocess.run(
             [str(reformat_path), "afa", tmp_tree_sto],
@@ -159,13 +218,14 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         )
 
     if verbose:
+        logging.info(f"Success! Output written to {output_file}")
         logging.info(f"Debug temp files retained:")
         logging.info(f"  Stockholm input:    {tmp_sto}")
         logging.info(f"  Filtered Stockholm: {tmp_filtered_sto}")
         logging.info(f"  Tree-ordered:       {tmp_tree_sto}")
         logging.info(f"  Keep list:          {to_keep_file}")
     else:
-        logging.info("Debug temp files removed.")
+        logging.info("Cleaning up temporary files...")
         shutil.rmtree(os.path.join(output_dir, "temp"))
 
 
