@@ -8,6 +8,8 @@ import os
 import argparse
 import logging
 import shutil
+import json
+from collections import defaultdict
 
 def setup_logging(verbose, output_dir):
     log_level = logging.DEBUG if verbose else logging.INFO
@@ -30,6 +32,17 @@ def get_year(seq_name):
         return int(parts[2])
     except (IndexError, ValueError):
         return 0  # fallback if parsing fails
+
+def get_branch_from_sequence(seq_name):
+    """Extract branch identifier from sequence name (e.g., SSL3, SSL7, SSL11)"""
+    if '|' in seq_name:
+        branch = seq_name.split('|')[0]
+        return branch
+    # fallback: try to extract from beginning
+    for prefix in ["SSL3", "SSL7", "SSL11", "SSL1", "SSL2"]:
+        if seq_name.startswith(prefix):
+            return prefix
+    return "Unknown"
 
 def get_seqs_in_stockholm(stockholm_file):
     """Extract all sequence names from a Stockholm format file.
@@ -62,6 +75,29 @@ def get_seqs_in_stockholm(stockholm_file):
     
     return full_names, base_names
 
+def parse_newick_tree(tree_file):
+    """Parse a Newick format tree file and extract branch structure"""
+    with open(tree_file, 'r') as f:
+        newick_str = f.read().strip()
+    
+    # Simple Newick parser to extract branch names and structure
+    branches = {}
+    
+    # Extract leaf node labels (sequences)
+    import re
+    # Match patterns like "name:distance" or just "name"
+    pattern = r'([A-Za-z0-9|_\-\.]+)(?::[\d\.e\-]+)?'
+    matches = re.findall(pattern, newick_str)
+    
+    for match in matches:
+        if match and not match.startswith('(') and not match.startswith(')'):
+            branch = get_branch_from_sequence(match)
+            if branch not in branches:
+                branches[branch] = {'total': 0, 'kept': 0, 'removed': 0, 'sequences': []}
+            branches[branch]['sequences'].append(match)
+    
+    return branches
+
 def main(tool_root, maxid, msafile, output_file, verbose=False):
     alipid_path      = os.path.join(tool_root, "easel", "miniapps", "esl-alipid")
     alimanip_path    = os.path.join(tool_root, "easel", "miniapps", "esl-alimanip")
@@ -87,6 +123,13 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         logging.info(f"Found {len(full_names)} sequences in Stockholm alignment")
         logging.debug(f"Sample full names: {list(full_names)[:5]}")
         logging.debug(f"Sample base name mappings: {dict(list(base_names_map.items())[:5])}")
+
+    # Track sequences by branch for coverage calculation
+    branch_stats = defaultdict(lambda: {'total': 0, 'kept': [], 'removed': []})
+    
+    for full_name in full_names:
+        branch = get_branch_from_sequence(full_name)
+        branch_stats[branch]['total'] += 1
 
     # Run esl-alipid to get all pairwise IDs
     if verbose:
@@ -151,6 +194,9 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
                 other = full_seq1 if to_remove == full_seq2 else full_seq2
                 if other not in removed:
                     removed.add(to_remove)
+                    # Track removal by branch
+                    branch = get_branch_from_sequence(to_remove)
+                    branch_stats[branch]['removed'].append(to_remove)
                     if verbose:
                         logging.debug(f"Marking for removal: {to_remove} (PID: {pid:.1f}% with {other})")
 
@@ -158,7 +204,12 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         logging.info(f"Processed {processed_count} pairs where sequences are in alignment")
         logging.info(f"Skipped {skipped_count} pairs where sequences weren't in alignment")
         logging.info(f"Removed {len(removed)} sequences based on pairwise identity")
+    
+    # Track kept sequences by branch
     keep = [s for s in all_seqs_ordered if s not in removed]
+    for seq in keep:
+        branch = get_branch_from_sequence(seq)
+        branch_stats[branch]['kept'].append(seq)
 
     always_keep_SSL3 = [
         "SSL3|CC1", "SSL3|CC5", "SSL3|CC8", "SSL3|CC22", "SSL3|CC30", "SSL3|CC93"
@@ -170,6 +221,9 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         "SSL11|CC1", "SSL11|CC5", "SSL11|CC8", "SSL11|CC22", "SSL11|CC30", "SSL11|CC93"
     ]
 
+    # Track which always-keep sequences are kept
+    always_keep_found = set()
+
     # Add specific sequences to keep list based on output file name
     # ONLY if they actually exist in the alignment
     added_count = 0
@@ -180,6 +234,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
                 if full_s not in keep:
                     keep.append(full_s)
                     added_count += 1
+                always_keep_found.add(s)
     elif "SSL7" in output_file:
         for s in always_keep_SSL7:
             if s in base_names_map:
@@ -187,6 +242,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
                 if full_s not in keep:
                     keep.append(full_s)
                     added_count += 1
+                always_keep_found.add(s)
     elif "SSL11" in output_file:
         for s in always_keep_SSL11:
             if s in base_names_map:
@@ -194,6 +250,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
                 if full_s not in keep:
                     keep.append(full_s)
                     added_count += 1
+                always_keep_found.add(s)
     
     if verbose:
         logging.info(f"Added {added_count} reference sequences to keep list")
@@ -286,6 +343,59 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         logging.info("Cleaning up temporary files...")
         shutil.rmtree(os.path.join(output_dir, "temp"))
 
+    # ============================================================================
+    # BRANCH COVERAGE ANALYSIS
+    # ============================================================================
+    logging.info("\n" + "="*70)
+    logging.info("BRANCH COVERAGE SUMMARY")
+    logging.info("="*70)
+    
+    branch_coverage = {}
+    for branch in sorted(branch_stats.keys()):
+        stats = branch_stats[branch]
+        total = stats['total']
+        kept = len(stats['kept'])
+        removed = len(stats['removed'])
+        coverage = (kept / total * 100) if total > 0 else 0
+        
+        branch_coverage[branch] = {
+            'total': total,
+            'kept': kept,
+            'removed': removed,
+            'coverage_percent': coverage
+        }
+        
+        logging.info(f"{branch:15s}: {kept:4d}/{total:4d} sequences ({coverage:6.2f}% coverage)")
+    
+    # Write branch coverage to JSON file for visualization
+    coverage_file = os.path.join(output_dir, "temp", "branch_coverage.json")
+    with open(coverage_file, "w") as f:
+        json.dump(branch_coverage, f, indent=2)
+    if verbose:
+        logging.info(f"\nBranch coverage data written to {coverage_file}")
+    
+    # Write always-keep reference info
+    always_keep_file = os.path.join(output_dir, "temp", "always_keep_references.json")
+    with open(always_keep_file, "w") as f:
+        json.dump({
+            'found': list(always_keep_found),
+            'SSL3': always_keep_SSL3,
+            'SSL7': always_keep_SSL7,
+            'SSL11': always_keep_SSL11
+        }, f, indent=2)
+    
+    if verbose:
+        logging.info(f"Always-keep reference data written to {always_keep_file}")
+    
+    logging.info("="*70 + "\n")
+    
+    return {
+        'branch_coverage': branch_coverage,
+        'tree_file': tree_path,
+        'output_file': output_file,
+        'always_keep_found': list(always_keep_found)
+    }
+
 
 
 if __name__ == "__main__":
@@ -299,4 +409,4 @@ if __name__ == "__main__":
 
     setup_logging(args.verbose, output_dir=os.path.dirname(args.output_file))
 
-    main(args.tool_root, args.maxid, args.msafile, args.output_file, verbose=args.verbose)
+    result = main(args.tool_root, args.maxid, args.msafile, args.output_file, verbose=args.verbose)
