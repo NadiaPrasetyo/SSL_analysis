@@ -8,6 +8,8 @@ import os
 import argparse
 import logging
 import shutil
+import json
+from collections import defaultdict
 
 def setup_logging(verbose, output_dir):
     log_level = logging.DEBUG if verbose else logging.INFO
