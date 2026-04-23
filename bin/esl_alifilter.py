@@ -8,8 +8,6 @@ import os
 import argparse
 import logging
 import shutil
-import json
-from collections import defaultdict
 
 def setup_logging(verbose, output_dir):
     log_level = logging.DEBUG if verbose else logging.INFO
@@ -32,17 +30,6 @@ def get_year(seq_name):
         return int(parts[2])
     except (IndexError, ValueError):
         return 0  # fallback if parsing fails
-
-def get_branch_from_sequence(seq_name):
-    """Extract branch identifier from sequence name (e.g., SSL3, SSL7, SSL11)"""
-    if '|' in seq_name:
-        branch = seq_name.split('|')[0]
-        return branch
-    # fallback: try to extract from beginning
-    for prefix in ["SSL3", "SSL7", "SSL11", "SSL1", "SSL2"]:
-        if seq_name.startswith(prefix):
-            return prefix
-    return "Unknown"
 
 def get_seqs_in_stockholm(stockholm_file):
     """Extract all sequence names from a Stockholm format file.
@@ -75,29 +62,6 @@ def get_seqs_in_stockholm(stockholm_file):
     
     return full_names, base_names
 
-def parse_newick_tree(tree_file):
-    """Parse a Newick format tree file and extract branch structure"""
-    with open(tree_file, 'r') as f:
-        newick_str = f.read().strip()
-    
-    # Simple Newick parser to extract branch names and structure
-    branches = {}
-    
-    # Extract leaf node labels (sequences)
-    import re
-    # Match patterns like "name:distance" or just "name"
-    pattern = r'([A-Za-z0-9|_\-\.]+)(?::[\d\.e\-]+)?'
-    matches = re.findall(pattern, newick_str)
-    
-    for match in matches:
-        if match and not match.startswith('(') and not match.startswith(')'):
-            branch = get_branch_from_sequence(match)
-            if branch not in branches:
-                branches[branch] = {'total': 0, 'kept': 0, 'removed': 0, 'sequences': []}
-            branches[branch]['sequences'].append(match)
-    
-    return branches
-
 def main(tool_root, maxid, msafile, output_file, verbose=False):
     alipid_path      = os.path.join(tool_root, "easel", "miniapps", "esl-alipid")
     alimanip_path    = os.path.join(tool_root, "easel", "miniapps", "esl-alimanip")
@@ -124,13 +88,6 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         logging.debug(f"Sample full names: {list(full_names)[:5]}")
         logging.debug(f"Sample base name mappings: {dict(list(base_names_map.items())[:5])}")
 
-    # Track sequences by branch for coverage calculation
-    branch_stats = defaultdict(lambda: {'total': 0, 'kept': [], 'removed': []})
-    
-    for full_name in full_names:
-        branch = get_branch_from_sequence(full_name)
-        branch_stats[branch]['total'] += 1
-
     # Run esl-alipid to get all pairwise IDs
     if verbose:
         logging.info("Running esl-alipid to get pairwise identities...")
@@ -141,15 +98,36 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     
     # Parse pairwise IDs; greedily remove the "worse" of any pair above threshold
     # with preference given to newer sequences and against unknown sequences
-    
-    # Track which sequences had high PID pairs with which reps
-    pid_pairs = defaultdict(list)  # Maps rep_seq -> [(high_pid_seq, pid), ...]
-    
+    rep_num_removed = defaultdict(int)
     removed = set()
     all_seqs_ordered = []
     all_seqs_seen = set()
     skipped_count = 0
     processed_count = 0
+    
+    # Define always-keep sequences upfront
+    always_keep_SSL3 = {
+        "SSL3|CC1", "SSL3|CC5", "SSL3|CC8", "SSL3|CC22", "SSL3|CC30", "SSL3|CC93"
+    }
+    always_keep_SSL7 = {
+        "SSL7|CC1", "SSL7|CC5", "SSL7|CC8", "SSL7|CC22", "SSL7|CC30", "SSL7|CC93"
+    }
+    always_keep_SSL11 = {
+        "SSL11|CC1", "SSL11|CC5", "SSL11|CC8", "SSL11|CC22", "SSL11|CC30", "SSL11|CC93"
+    }
+    
+    # Determine which always-keep set applies based on output_file name
+    always_keep_sequences = set()
+    if "SSL3" in output_file:
+        always_keep_sequences = always_keep_SSL3
+    elif "SSL7" in output_file:
+        always_keep_sequences = always_keep_SSL7
+    elif "SSL11" in output_file:
+        always_keep_sequences = always_keep_SSL11
+    
+    # Track coverage: map of kept_seq -> list of removed seqs it represents
+    coverage_map = defaultdict(set)
+    
     for line in result.stdout.splitlines():
         if line.startswith("#"):
             continue
@@ -179,61 +157,58 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         if pid >= maxid * 100.0:
             year1 = get_year(seq1)
             year2 = get_year(seq2)
-            has_unknown_1 = "unknown" in full_seq1.lower()
-            has_unknown_2 = "unknown" in full_seq2.lower()
+            num_unknown_1 = full_seq1.count("unknown")
+            num_unknown_2 = full_seq2.count("unknown")
             
-            # Decision logic: prefer sequences without "unknown"
-            if has_unknown_1 and not has_unknown_2:
-                to_remove = full_seq1  # prefer seq2 (no unknown)
-                to_keep = full_seq2
-            elif has_unknown_2 and not has_unknown_1:
-                to_remove = full_seq2  # prefer seq1 (no unknown)
+            # Check if either sequence is in the always-keep list
+            seq1_is_always_kept = full_seq1 in always_keep_sequences
+            seq2_is_always_kept = full_seq2 in always_keep_sequences
+            
+            # Decision logic: NEVER remove always-keep sequences
+            if seq1_is_always_kept and seq2_is_always_kept:
+                # Both are always-kept: don't remove either
+                continue
+            elif seq1_is_always_kept:
+                # seq1 must be kept, remove seq2
+                to_remove = full_seq2
                 to_keep = full_seq1
-            elif year1 > 2016 and year2 <= 2016:
-                to_remove = full_seq2  # prefer seq1 (newer)
-                to_keep = full_seq1
-            elif year2 > 2016 and year1 <= 2016:
-                to_remove = full_seq1  # prefer seq2 (newer)
+            elif seq2_is_always_kept:
+                # seq2 must be kept, remove seq1
+                to_remove = full_seq1
                 to_keep = full_seq2
             else:
-                to_remove = full_seq2  # both same era: fall back to original behaviour
-                to_keep = full_seq1
+                # Neither is always-kept: apply original decision logic
+                if num_unknown_1 < num_unknown_2:
+                    to_remove = full_seq2
+                    to_keep = full_seq1
+                elif num_unknown_2 < num_unknown_1:
+                    to_remove = full_seq1
+                    to_keep = full_seq2
+                elif year1 > 2016 and year2 <= 2016:
+                    to_remove = full_seq2  # prefer seq1 (newer)
+                    to_keep = full_seq1
+                elif year2 > 2016 and year1 <= 2016:
+                    to_remove = full_seq1  # prefer seq2 (newer)
+                    to_keep = full_seq2
+                else:
+                    to_remove = full_seq2  # both same era: fall back to original behaviour
+                    to_keep = full_seq1
             
             if to_remove not in removed:
                 if to_keep not in removed:
+                    rep_num_removed[to_keep] += 1
                     removed.add(to_remove)
-                    # Track which sequences are removed relative to this kept sequence
-                    pid_pairs[to_keep].append((to_remove, pid))
-                    # Track removal by branch
-                    branch = get_branch_from_sequence(to_remove)
-                    branch_stats[branch]['removed'].append(to_remove)
+                    coverage_map[to_keep].add(to_remove)
                     if verbose:
                         logging.debug(f"Marking for removal: {to_remove} (PID: {pid:.1f}% with {to_keep})")
-
+    
     if verbose:
         logging.info(f"Processed {processed_count} pairs where sequences are in alignment")
         logging.info(f"Skipped {skipped_count} pairs where sequences weren't in alignment")
         logging.info(f"Removed {len(removed)} sequences based on pairwise identity")
     
-    # Track kept sequences by branch
     keep = [s for s in all_seqs_ordered if s not in removed]
-    for seq in keep:
-        branch = get_branch_from_sequence(seq)
-        branch_stats[branch]['kept'].append(seq)
-
-    always_keep_SSL3 = [
-        "SSL3|CC1", "SSL3|CC5", "SSL3|CC8", "SSL3|CC22", "SSL3|CC30", "SSL3|CC93"
-    ]
-    always_keep_SSL7 = [
-        "SSL7|CC1", "SSL7|CC5", "SSL7|CC8", "SSL7|CC22", "SSL7|CC30", "SSL7|CC93"
-    ]
-    always_keep_SSL11 = [
-        "SSL11|CC1", "SSL11|CC5", "SSL11|CC8", "SSL11|CC22", "SSL11|CC30", "SSL11|CC93"
-    ]
-
-    # Track which always-keep sequences are kept
-    always_keep_found = set()
-
+    
     # Add specific sequences to keep list based on output file name
     # ONLY if they actually exist in the alignment
     added_count = 0
@@ -244,7 +219,6 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
                 if full_s not in keep:
                     keep.append(full_s)
                     added_count += 1
-                always_keep_found.add(s)
     elif "SSL7" in output_file:
         for s in always_keep_SSL7:
             if s in base_names_map:
@@ -252,7 +226,6 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
                 if full_s not in keep:
                     keep.append(full_s)
                     added_count += 1
-                always_keep_found.add(s)
     elif "SSL11" in output_file:
         for s in always_keep_SSL11:
             if s in base_names_map:
@@ -260,11 +233,10 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
                 if full_s not in keep:
                     keep.append(full_s)
                     added_count += 1
-                always_keep_found.add(s)
     
     if verbose:
         logging.info(f"Added {added_count} reference sequences to keep list")
-
+    
     # Deduplicate and clean
     keep = list(set(keep))
     keep = sorted([s.strip() for s in keep if s and s.strip()])
@@ -276,7 +248,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
             logging.error(f"Alignment has {len(full_names)} sequences")
             return
         logging.info(f"Sample keep sequences: {keep[:5]}")
-
+    
     # Write keep-list to a persistent intermediate file (not temp)
     to_keep_file = os.path.join(output_dir, "temp", "to_keep.txt")
     
@@ -304,6 +276,56 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
             if b'\x00' in binary_content:
                 logging.error("ERROR: Keep list file contains null bytes!")
                 return
+    
+    # ============================================================================
+    # COVERAGE TRACKING AND REPORTING
+    # ============================================================================
+    
+    # Calculate total number of sequences in the original unfiltered alignment
+    total_original_sequences = len(full_names)
+    
+    # Build coverage report for each non-removed sequence
+    coverage_report = {}
+    
+    for kept_seq in keep:
+        # Count how many sequences this one represents:
+        # 1. Itself (1)
+        # 2. All sequences marked as removed because they matched above PID threshold
+        num_represented = 1 + len(coverage_map.get(kept_seq, set()))
+        
+        # Calculate coverage percentage
+        coverage_percent = (num_represented / total_original_sequences) * 100.0
+        
+        coverage_report[kept_seq] = {
+            "num": num_represented,
+            "coverage_percent": round(coverage_percent, 2),
+            "removed_sequences": sorted(list(coverage_map.get(kept_seq, set())))
+        }
+    
+    # Output coverage report as JSON if verbose
+    if verbose:
+        coverage_json_file = os.path.join(output_dir, "temp", "sequence_coverage.json")
+        with open(coverage_json_file, "w") as f:
+            json.dump(coverage_report, f, indent=2)
+        
+        logging.info(f"Coverage report written to {coverage_json_file}")
+        
+        # Log summary statistics
+        total_coverage = sum(item["num"] for item in coverage_report.values())
+        logging.info(f"Coverage Summary:")
+        logging.info(f"  Total kept sequences: {len(coverage_report)}")
+        logging.info(f"  Total sequences represented: {total_coverage}")
+        logging.info(f"  Original sequences in alignment: {total_original_sequences}")
+        logging.info(f"  Cumulative coverage: {(total_coverage / total_original_sequences) * 100.0:.2f}%")
+        
+        # Show top 10 coverage sequences
+        sorted_coverage = sorted(coverage_report.items(), 
+                                key=lambda x: x[1]["num"], 
+                                reverse=True)
+        logging.info(f"Top 10 sequences by coverage:")
+        for seq, data in sorted_coverage[:10]:
+            logging.info(f"  {seq}: {data['num']} sequences ({data['coverage_percent']}%)")
+
 
     tree_path = output_file.replace(".fasta", ".tree")
 
@@ -353,88 +375,6 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         logging.info("Cleaning up temporary files...")
         shutil.rmtree(os.path.join(output_dir, "temp"))
 
-    # ============================================================================
-    # BRANCH COVERAGE ANALYSIS - Calculate per-representative coverage
-    # ============================================================================
-    logging.info("\n" + "="*70)
-    logging.info("BRANCH COVERAGE SUMMARY")
-    logging.info("="*70)
-    logging.info("(Coverage = kept sequences / (kept + sequences removed by PID to that kept seq))")
-    logging.info("="*70)
-    
-    branch_coverage = {}
-    rep_level_coverage = {}  # Per-representative coverage
-    
-    for branch in sorted(branch_stats.keys()):
-        stats = branch_stats[branch]
-        kept_seqs = stats['kept']
-        removed_seqs = stats['removed']
-        
-        # For this branch, calculate coverage per kept sequence
-        branch_coverage_list = []
-        total_with_reps = 0
-        total_removed_by_pid = 0
-        
-        for rep_seq in kept_seqs:
-            # Count sequences removed relative to this representative
-            removed_by_this_rep = len(pid_pairs.get(rep_seq, []))
-            total_removed_by_pid += removed_by_this_rep
-            # Total for this rep = itself + sequences removed by PID
-            total_for_rep = 1 + removed_by_this_rep
-            total_with_reps += total_for_rep
-            branch_coverage_list.append({
-                'sequence': rep_seq,
-                'removed_by_pid': removed_by_this_rep,
-                'cluster_size': total_for_rep
-            })
-        
-        # Summary for branch
-        num_reps = len(kept_seqs)
-        coverage = (num_reps / total_with_reps * 100) if total_with_reps > 0 else 0
-        
-        branch_coverage[branch] = {
-            'num_representatives': num_reps,
-            'total_removed_by_pid_to_reps': total_removed_by_pid,
-            'total_cluster_size': total_with_reps,
-            'coverage_percent': coverage,
-            'representative_details': branch_coverage_list
-        }
-        
-        logging.info(f"{branch:15s}: {num_reps:4d}/{total_with_reps:4d} sequences ({coverage:6.2f}% coverage)")
-        if verbose:
-            logging.debug(f"  Details: {num_reps} reps + {total_removed_by_pid} removed by PID")
-            for detail in branch_coverage_list[:3]:  # Show first 3 reps
-                logging.debug(f"    {detail['sequence']}: 1 rep + {detail['removed_by_pid']} removed = {detail['cluster_size']} total")
-    
-    # Write branch coverage to JSON file for visualization
-    coverage_file = os.path.join(output_dir, "temp", "branch_coverage.json")
-    with open(coverage_file, "w") as f:
-        json.dump(branch_coverage, f, indent=2)
-    if verbose:
-        logging.info(f"\nBranch coverage data written to {coverage_file}")
-    
-    # Write always-keep reference info
-    always_keep_file = os.path.join(output_dir, "temp", "always_keep_references.json")
-    with open(always_keep_file, "w") as f:
-        json.dump({
-            'found': list(always_keep_found),
-            'SSL3': always_keep_SSL3,
-            'SSL7': always_keep_SSL7,
-            'SSL11': always_keep_SSL11
-        }, f, indent=2)
-    
-    if verbose:
-        logging.info(f"Always-keep reference data written to {always_keep_file}")
-    
-    logging.info("="*70 + "\n")
-    
-    return {
-        'branch_coverage': branch_coverage,
-        'tree_file': tree_path,
-        'output_file': output_file,
-        'always_keep_found': list(always_keep_found)
-    }
-
 
 
 if __name__ == "__main__":
@@ -448,4 +388,4 @@ if __name__ == "__main__":
 
     setup_logging(args.verbose, output_dir=os.path.dirname(args.output_file))
 
-    result = main(args.tool_root, args.maxid, args.msafile, args.output_file, verbose=args.verbose)
+    main(args.tool_root, args.maxid, args.msafile, args.output_file, verbose=args.verbose)
