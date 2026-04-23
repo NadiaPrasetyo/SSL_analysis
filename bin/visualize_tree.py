@@ -75,12 +75,26 @@ def parse_newick(newick_str):
     return parse_node()
 
 
+def clean_seq_name(seq_name):
+    """Remove leading sequence number (e.g., '861|ERR212785_...' -> 'ERR212785_...')"""
+    if '|' in seq_name:
+        parts = seq_name.split('|', 1)
+        # If first part is numeric, it's the sequence number to remove
+        if parts[0].isdigit():
+            return parts[1]
+        return seq_name
+    return seq_name
+
+
 def extract_branch_from_seq(seq_name):
     """Extract branch (SSL3, SSL7, etc.) from sequence name"""
-    if '|' in seq_name:
-        return seq_name.split('|')[0]
+    # Clean the name first
+    clean_name = clean_seq_name(seq_name)
+    
+    if '|' in clean_name:
+        return clean_name.split('|')[0]
     for prefix in ["SSL3", "SSL7", "SSL11", "SSL1", "SSL2"]:
-        if seq_name.startswith(prefix):
+        if clean_name.startswith(prefix):
             return prefix
     return "Unknown"
 
@@ -88,7 +102,7 @@ def extract_branch_from_seq(seq_name):
 def collect_leaf_sequences(node):
     """Recursively collect all leaf sequences from a tree node"""
     if not node.children:
-        return [node.name] if node.name else []
+        return [clean_seq_name(node.name)] if node.name else []
     
     leaves = []
     for child in node.children:
@@ -96,7 +110,7 @@ def collect_leaf_sequences(node):
     return leaves
 
 
-def analyze_branch_composition(node, coverage_data):
+def analyze_branch_composition(node, sequence_coverage, branch_coverage_cache):
     """
     Analyze the composition of sequences under a node.
     Returns: (dominant_branch, num_sequences, coverage_percent, branch_breakdown)
@@ -112,10 +126,10 @@ def analyze_branch_composition(node, coverage_data):
     # Determine dominant branch
     dominant_branch = max(branch_count.items(), key=lambda x: x[1])[0] if branch_count else "Unknown"
     
-    # Get coverage for dominant branch if available
+    # Get average coverage for dominant branch if available
     coverage_percent = 0.0
-    if dominant_branch in coverage_data:
-        coverage_percent = coverage_data[dominant_branch]['coverage_percent']
+    if dominant_branch in branch_coverage_cache:
+        coverage_percent = branch_coverage_cache[dominant_branch]
     
     return {
         'dominant_branch': dominant_branch,
@@ -152,28 +166,27 @@ def generate_html_visualization(tree_path, coverage_json_path, output_html):
     with open(coverage_json_path, 'r') as f:
         sequence_coverage = json.load(f)
     
-    # Build branch-level coverage statistics from sequence-level data
-    branch_coverage = {}
+    # Build branch-level coverage cache (average coverage per branch)
+    branch_coverage_cache = {}
     for seq_name, seq_data in sequence_coverage.items():
         branch = extract_branch_from_seq(seq_name)
-        if branch not in branch_coverage:
-            branch_coverage[branch] = {
-                'total_num': 0,
+        if branch not in branch_coverage_cache:
+            branch_coverage_cache[branch] = {
                 'total_coverage_percent': 0.0,
                 'count': 0,
                 'sequences': []
             }
-        branch_coverage[branch]['total_num'] += seq_data['num']
-        branch_coverage[branch]['total_coverage_percent'] += seq_data['coverage_percent']
-        branch_coverage[branch]['count'] += 1
-        branch_coverage[branch]['sequences'].append(seq_name)
+        branch_coverage_cache[branch]['total_coverage_percent'] += seq_data['coverage_percent']
+        branch_coverage_cache[branch]['count'] += 1
+        branch_coverage_cache[branch]['sequences'].append(seq_name)
     
     # Calculate average coverage per branch
-    for branch in branch_coverage:
-        branch_coverage[branch]['avg_coverage_percent'] = (
-            branch_coverage[branch]['total_coverage_percent'] / 
-            branch_coverage[branch]['count']
-        ) if branch_coverage[branch]['count'] > 0 else 0.0
+    for branch in branch_coverage_cache:
+        avg_cov = (
+            branch_coverage_cache[branch]['total_coverage_percent'] / 
+            branch_coverage_cache[branch]['count']
+        ) if branch_coverage_cache[branch]['count'] > 0 else 0.0
+        branch_coverage_cache[branch] = avg_cov  # Store just the average value
     
     # Color mapping for branches
     branch_colors = {
@@ -193,23 +206,24 @@ def generate_html_visualization(tree_path, coverage_json_path, output_html):
         
         if not node.children:
             # Leaf node
+            clean_name = clean_seq_name(node.name)
             branch = extract_branch_from_seq(node.name)
             color = branch_colors.get(branch, '#CCCCCC')
             
-            is_reference = node.name in always_keep_set
+            is_reference = clean_name in always_keep_set
             marker_class = 'reference-seq' if is_reference else 'regular-seq'
             
             # Leaf circle
             svg_elements.append(f'''
-                <circle cx="{x}" cy="{y}" r="5" fill="{color}" class="leaf-node {marker_class}" data-seq="{node.name}">
-                    <title>{node.name}</title>
+                <circle cx="{x}" cy="{y}" r="5" fill="{color}" class="leaf-node {marker_class}" data-seq="{clean_name}">
+                    <title>{clean_name}</title>
                 </circle>
             ''')
             
             # Leaf label (shorter, cleaner)
-            label = node.name.split('|')[-1] if '|' in node.name else node.name
+            label = clean_name.split('|')[-1] if '|' in clean_name else clean_name
             svg_elements.append(f'''
-                <text x="{x + 10}" y="{y + 4}" font-size="11" class="leaf-label" data-seq="{node.name}">
+                <text x="{x + 10}" y="{y + 4}" font-size="11" class="leaf-label" data-seq="{clean_name}">
                     {label}
                 </text>
             ''')
@@ -218,7 +232,7 @@ def generate_html_visualization(tree_path, coverage_json_path, output_html):
         
         else:
             # Internal node - analyze composition
-            analysis = analyze_branch_composition(node, branch_coverage)
+            analysis = analyze_branch_composition(node, sequence_coverage, branch_coverage_cache)
             branch = analysis['dominant_branch']
             color = branch_colors.get(branch, '#CCCCCC')
             coverage_pct = analysis['coverage_percent']
@@ -258,7 +272,7 @@ def generate_html_visualization(tree_path, coverage_json_path, output_html):
                 mid_y = (y + child_y) / 2
                 
                 # Get coverage for the child's dominant branch
-                child_analysis = analyze_branch_composition(child, branch_coverage)
+                child_analysis = analyze_branch_composition(child, sequence_coverage, branch_coverage_cache)
                 child_coverage = child_analysis['coverage_percent']
                 
                 if child_coverage > 0:
@@ -314,20 +328,20 @@ def generate_html_visualization(tree_path, coverage_json_path, output_html):
         </div>
     '''
     
-    # Create coverage table
+    # Create coverage table from sequence-level data
     coverage_rows = ''
-    for branch in sorted(sequence_coverage.keys()):
-        stats = sequence_coverage[branch]
+    for seq_name in sorted(sequence_coverage.keys()):
+        stats = sequence_coverage[seq_name]
         num = stats['num']
         cov_pct = stats['coverage_percent']
         
         # Highlight reference sequences
-        is_ref = branch in always_keep_set
+        is_ref = seq_name in always_keep_set
         ref_marker = '⭐ ' if is_ref else ''
         
         coverage_rows += f'''
         <tr {'class="reference-row"' if is_ref else ''}>
-            <td><strong>{ref_marker}{branch}</strong></td>
+            <td><strong>{ref_marker}{seq_name}</strong></td>
             <td class="numeric">{num}</td>
             <td class="numeric">{cov_pct:.2f}%</td>
         </tr>
