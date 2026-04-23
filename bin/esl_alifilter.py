@@ -141,6 +141,10 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     
     # Parse pairwise IDs; greedily remove the "worse" of any pair above threshold
     # with preference given to newer sequences and against unknown sequences
+    
+    # Track which sequences had high PID pairs with which reps
+    pid_pairs = defaultdict(list)  # Maps rep_seq -> [(high_pid_seq, pid), ...]
+    
     removed = set()
     all_seqs_ordered = []
     all_seqs_seen = set()
@@ -181,24 +185,30 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
             # Decision logic: prefer sequences without "unknown"
             if has_unknown_1 and not has_unknown_2:
                 to_remove = full_seq1  # prefer seq2 (no unknown)
+                to_keep = full_seq2
             elif has_unknown_2 and not has_unknown_1:
                 to_remove = full_seq2  # prefer seq1 (no unknown)
+                to_keep = full_seq1
             elif year1 > 2016 and year2 <= 2016:
                 to_remove = full_seq2  # prefer seq1 (newer)
+                to_keep = full_seq1
             elif year2 > 2016 and year1 <= 2016:
                 to_remove = full_seq1  # prefer seq2 (newer)
+                to_keep = full_seq2
             else:
                 to_remove = full_seq2  # both same era: fall back to original behaviour
+                to_keep = full_seq1
             
             if to_remove not in removed:
-                other = full_seq1 if to_remove == full_seq2 else full_seq2
-                if other not in removed:
+                if to_keep not in removed:
                     removed.add(to_remove)
+                    # Track which sequences are removed relative to this kept sequence
+                    pid_pairs[to_keep].append((to_remove, pid))
                     # Track removal by branch
                     branch = get_branch_from_sequence(to_remove)
                     branch_stats[branch]['removed'].append(to_remove)
                     if verbose:
-                        logging.debug(f"Marking for removal: {to_remove} (PID: {pid:.1f}% with {other})")
+                        logging.debug(f"Marking for removal: {to_remove} (PID: {pid:.1f}% with {to_keep})")
 
     if verbose:
         logging.info(f"Processed {processed_count} pairs where sequences are in alignment")
@@ -344,28 +354,57 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         shutil.rmtree(os.path.join(output_dir, "temp"))
 
     # ============================================================================
-    # BRANCH COVERAGE ANALYSIS
+    # BRANCH COVERAGE ANALYSIS - Calculate per-representative coverage
     # ============================================================================
     logging.info("\n" + "="*70)
     logging.info("BRANCH COVERAGE SUMMARY")
     logging.info("="*70)
+    logging.info("(Coverage = kept sequences / (kept + sequences removed by PID to that kept seq))")
+    logging.info("="*70)
     
     branch_coverage = {}
+    rep_level_coverage = {}  # Per-representative coverage
+    
     for branch in sorted(branch_stats.keys()):
         stats = branch_stats[branch]
-        total = stats['total']
-        kept = len(stats['kept'])
-        removed = len(stats['removed'])
-        coverage = (kept / total * 100) if total > 0 else 0
+        kept_seqs = stats['kept']
+        removed_seqs = stats['removed']
+        
+        # For this branch, calculate coverage per kept sequence
+        branch_coverage_list = []
+        total_with_reps = 0
+        total_removed_by_pid = 0
+        
+        for rep_seq in kept_seqs:
+            # Count sequences removed relative to this representative
+            removed_by_this_rep = len(pid_pairs.get(rep_seq, []))
+            total_removed_by_pid += removed_by_this_rep
+            # Total for this rep = itself + sequences removed by PID
+            total_for_rep = 1 + removed_by_this_rep
+            total_with_reps += total_for_rep
+            branch_coverage_list.append({
+                'sequence': rep_seq,
+                'removed_by_pid': removed_by_this_rep,
+                'cluster_size': total_for_rep
+            })
+        
+        # Summary for branch
+        num_reps = len(kept_seqs)
+        coverage = (num_reps / total_with_reps * 100) if total_with_reps > 0 else 0
         
         branch_coverage[branch] = {
-            'total': total,
-            'kept': kept,
-            'removed': removed,
-            'coverage_percent': coverage
+            'num_representatives': num_reps,
+            'total_removed_by_pid_to_reps': total_removed_by_pid,
+            'total_cluster_size': total_with_reps,
+            'coverage_percent': coverage,
+            'representative_details': branch_coverage_list
         }
         
-        logging.info(f"{branch:15s}: {kept:4d}/{total:4d} sequences ({coverage:6.2f}% coverage)")
+        logging.info(f"{branch:15s}: {num_reps:4d}/{total_with_reps:4d} sequences ({coverage:6.2f}% coverage)")
+        if verbose:
+            logging.debug(f"  Details: {num_reps} reps + {total_removed_by_pid} removed by PID")
+            for detail in branch_coverage_list[:3]:  # Show first 3 reps
+                logging.debug(f"    {detail['sequence']}: 1 rep + {detail['removed_by_pid']} removed = {detail['cluster_size']} total")
     
     # Write branch coverage to JSON file for visualization
     coverage_file = os.path.join(output_dir, "temp", "branch_coverage.json")

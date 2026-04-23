@@ -251,31 +251,60 @@ def generate_html_visualization(tree_path, coverage_data, always_keep_data, outp
     coverage_rows = ''
     for branch in sorted(coverage_data.keys()):
         stats = coverage_data[branch]
+        num_reps = stats['num_representatives']
+        total_removed = stats['total_removed_by_pid_to_reps']
+        total_cluster = stats['total_cluster_size']
+        coverage = stats['coverage_percent']
+        
         coverage_rows += f'''
         <tr>
-            <td>{branch}</td>
-            <td>{stats['kept']}</td>
-            <td>{stats['total']}</td>
-            <td>{stats['coverage_percent']:.2f}%</td>
+            <td><strong>{branch}</strong></td>
+            <td>{num_reps}</td>
+            <td>{total_removed}</td>
+            <td>{total_cluster}</td>
+            <td>{coverage:.2f}%</td>
         </tr>
         '''
     
     coverage_table = f'''
         <div class="coverage-section">
             <h3>Branch Coverage Statistics</h3>
+            <p style="font-size: 0.9em; color: #bdc3c7; margin-bottom: 12px;">
+                <strong>Coverage</strong> = Representatives / (Representatives + Sequences Removed by PID)
+            </p>
             <table class="coverage-table">
                 <thead>
                     <tr>
                         <th>Branch</th>
-                        <th>Kept</th>
-                        <th>Total</th>
-                        <th>Coverage</th>
+                        <th>Reps Kept</th>
+                        <th>Removed by PID</th>
+                        <th>Cluster Size</th>
+                        <th>Coverage %</th>
                     </tr>
                 </thead>
                 <tbody>
                     {coverage_rows}
                 </tbody>
             </table>
+            
+            <div class="rep-details">
+                <h4>📊 How to Read This Table</h4>
+                <div class="rep-item">
+                    <strong>Reps Kept:</strong> Number of representative sequences retained for this branch
+                </div>
+                <div class="rep-item">
+                    <strong>Removed by PID:</strong> Total sequences removed because they were &gt;90% identical to a kept representative
+                </div>
+                <div class="rep-item">
+                    <strong>Cluster Size:</strong> Total sequences in clusters (reps + those removed by PID)
+                </div>
+                <div class="rep-item">
+                    <strong>Coverage %:</strong> Reps / Cluster Size × 100 — represents the proportion of unique representatives
+                </div>
+                <div class="rep-item" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #2a3a5e;">
+                    <strong>Example:</strong> If a branch has 100 reps and 200 removed by PID → 100 reps / (100+200) = 33.3% coverage
+                </div>
+            </div>
         </div>
     '''
     
@@ -472,6 +501,11 @@ def generate_html_visualization(tree_path, coverage_data, always_keep_data, outp
                 border-bottom: 1px solid #2a3a5e;
             }}
             
+            .coverage-table td {{
+                padding: 8px 10px;
+                border-bottom: 1px solid #2a3a5e;
+            }}
+            
             .coverage-table tr:hover {{
                 background: #172445;
             }}
@@ -480,7 +514,26 @@ def generate_html_visualization(tree_path, coverage_data, always_keep_data, outp
                 border-bottom: none;
             }}
             
-            @media (max-width: 1200px) {{
+            .rep-details {{
+                font-size: 0.85em;
+                color: #bdc3c7;
+                margin-top: 15px;
+                padding: 15px;
+                background: #0f3460;
+                border-left: 3px solid #00d4ff;
+                border-radius: 4px;
+            }}
+            
+            .rep-details h4 {{
+                color: #00d4ff;
+                margin-bottom: 8px;
+                font-size: 0.95em;
+            }}
+            
+            .rep-item {{
+                padding: 4px 0;
+                line-height: 1.4;
+            }}
                 .layout {{
                     grid-template-columns: 1fr;
                 }}
