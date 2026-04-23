@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """
 Tree visualization tool for alifilter output
-Generates an interactive HTML visualization of the Newick tree with:
-- Branch-level coverage percentages displayed on branches
-- Always-keep reference sequences highlighted
-- Taxonomic coloring by branch
+Generates a rectangular phylogenetic tree with coverage metrics and reference highlighting.
 """
 
 import json
@@ -15,10 +12,7 @@ from pathlib import Path
 
 
 def parse_newick(newick_str):
-    """
-    Parse a Newick format tree string.
-    Returns a tree structure suitable for visualization.
-    """
+    """Parse Newick format tree string."""
     newick_str = newick_str.strip().rstrip(';')
     
     class Node:
@@ -35,8 +29,7 @@ def parse_newick(newick_str):
         node = Node()
         
         if pos < len(newick_str) and newick_str[pos] == '(':
-            # Internal node
-            pos += 1  # skip '('
+            pos += 1
             while pos < len(newick_str) and newick_str[pos] != ')':
                 if newick_str[pos] == ',':
                     pos += 1
@@ -44,22 +37,19 @@ def parse_newick(newick_str):
                     child = parse_node()
                     node.children.append(child)
             
-            pos += 1  # skip ')'
+            pos += 1
             
-            # Parse node label (optional)
             label_start = pos
             while pos < len(newick_str) and newick_str[pos] not in '(),;:':
                 pos += 1
             if pos > label_start:
                 node.name = newick_str[label_start:pos]
         else:
-            # Leaf node
             label_start = pos
             while pos < len(newick_str) and newick_str[pos] not in '(),;:':
                 pos += 1
             node.name = newick_str[label_start:pos]
         
-        # Parse distance (optional)
         if pos < len(newick_str) and newick_str[pos] == ':':
             pos += 1
             dist_start = pos
@@ -79,7 +69,6 @@ def clean_seq_name(seq_name):
     """Remove leading sequence number (e.g., '861|ERR212785_...' -> 'ERR212785_...')"""
     if '|' in seq_name:
         parts = seq_name.split('|', 1)
-        # If first part is numeric, it's the sequence number to remove
         if parts[0].isdigit():
             return parts[1]
         return seq_name
@@ -88,9 +77,7 @@ def clean_seq_name(seq_name):
 
 def extract_branch_from_seq(seq_name):
     """Extract branch (SSL3, SSL7, etc.) from sequence name"""
-    # Clean the name first
     clean_name = clean_seq_name(seq_name)
-    
     if '|' in clean_name:
         return clean_name.split('|')[0]
     for prefix in ["SSL3", "SSL7", "SSL11", "SSL1", "SSL2"]:
@@ -103,45 +90,21 @@ def collect_leaf_sequences(node):
     """Recursively collect all leaf sequences from a tree node"""
     if not node.children:
         return [clean_seq_name(node.name)] if node.name else []
-    
     leaves = []
     for child in node.children:
         leaves.extend(collect_leaf_sequences(child))
     return leaves
 
 
-def analyze_branch_composition(node, sequence_coverage, branch_coverage_cache):
-    """
-    Analyze the composition of sequences under a node.
-    Returns: (dominant_branch, num_sequences, coverage_percent, branch_breakdown)
-    """
-    leaves = collect_leaf_sequences(node)
-    
-    # Count branches
-    branch_count = {}
-    for leaf in leaves:
-        branch = extract_branch_from_seq(leaf)
-        branch_count[branch] = branch_count.get(branch, 0) + 1
-    
-    # Determine dominant branch
-    dominant_branch = max(branch_count.items(), key=lambda x: x[1])[0] if branch_count else "Unknown"
-    
-    # Get average coverage for dominant branch if available
-    coverage_percent = 0.0
-    if dominant_branch in branch_coverage_cache:
-        coverage_percent = branch_coverage_cache[dominant_branch]
-    
-    return {
-        'dominant_branch': dominant_branch,
-        'sequence_count': len(leaves),
-        'coverage_percent': coverage_percent,
-        'branch_breakdown': branch_count,
-        'leaves': leaves
-    }
+def get_tree_depth(node):
+    """Get maximum depth of tree from this node"""
+    if not node.children:
+        return node.distance
+    return max(child.distance + get_tree_depth(child) for child in node.children)
 
 
-def generate_html_visualization(tree_path, coverage_json_path, output_html):
-    """Generate interactive HTML visualization of the tree"""
+def generate_rectangular_tree_svg(tree_path, coverage_json_path, svg_output_path):
+    """Generate rectangular phylogenetic tree SVG."""
     
     # Hardcoded always-keep sequences
     always_keep_SSL3 = {
@@ -153,189 +116,199 @@ def generate_html_visualization(tree_path, coverage_json_path, output_html):
     always_keep_SSL11 = {
         "SSL11|CC1", "SSL11|CC5", "SSL11|CC8", "SSL11|CC22", "SSL11|CC30", "SSL11|CC93"
     }
-    
     always_keep_set = always_keep_SSL3 | always_keep_SSL7 | always_keep_SSL11
     
-    # Read tree
+    # Read tree and coverage data
     with open(tree_path, 'r') as f:
         newick_str = f.read().strip()
-    
     tree = parse_newick(newick_str)
     
-    # Load coverage data (new format: {seq_name: {num, coverage_percent, removed_sequences}})
     with open(coverage_json_path, 'r') as f:
         sequence_coverage = json.load(f)
     
-    # Build branch-level coverage cache (average coverage per branch)
+    # Build branch coverage cache
     branch_coverage_cache = {}
     for seq_name, seq_data in sequence_coverage.items():
         branch = extract_branch_from_seq(seq_name)
         if branch not in branch_coverage_cache:
-            branch_coverage_cache[branch] = {
-                'total_coverage_percent': 0.0,
-                'count': 0,
-                'sequences': []
-            }
-        branch_coverage_cache[branch]['total_coverage_percent'] += seq_data['coverage_percent']
+            branch_coverage_cache[branch] = {'total': 0.0, 'count': 0}
+        branch_coverage_cache[branch]['total'] += seq_data['coverage_percent']
         branch_coverage_cache[branch]['count'] += 1
-        branch_coverage_cache[branch]['sequences'].append(seq_name)
     
-    # Calculate average coverage per branch
     for branch in branch_coverage_cache:
-        avg_cov = (
-            branch_coverage_cache[branch]['total_coverage_percent'] / 
-            branch_coverage_cache[branch]['count']
-        ) if branch_coverage_cache[branch]['count'] > 0 else 0.0
-        branch_coverage_cache[branch] = avg_cov  # Store just the average value
+        avg = (branch_coverage_cache[branch]['total'] / 
+               branch_coverage_cache[branch]['count']) if branch_coverage_cache[branch]['count'] > 0 else 0.0
+        branch_coverage_cache[branch] = avg
     
-    # Color mapping for branches
+    # Color mapping
     branch_colors = {
-        'SSL1': '#FF6B6B',
-        'SSL2': '#4ECDC4',
-        'SSL3': '#45B7D1',
-        'SSL5': '#96CEB4',
-        'SSL7': '#FFEAA7',
-        'SSL11': '#DDA15E',
-        'Unknown': '#CCCCCC'
+        'SSL1': '#e74c3c',
+        'SSL2': '#3498db',
+        'SSL3': '#2980b9',
+        'SSL5': '#27ae60',
+        'SSL7': '#f39c12',
+        'SSL11': '#d35400',
+        'Unknown': '#95a5a6'
     }
     
-    # Generate SVG tree visualization with coverage on branches
-    def generate_tree_svg(node, x, y, dx, dy, depth=0):
-        """Recursively generate SVG for tree nodes"""
-        svg_elements = []
+    # Calculate tree layout
+    all_leaves = collect_leaf_sequences(tree)
+    num_leaves = len(all_leaves)
+    
+    # SVG dimensions
+    margin = 100
+    leaf_y_spacing = 40
+    max_tree_distance = get_tree_depth(tree)
+    x_scale = 400 / max(max_tree_distance, 0.1)
+    
+    svg_width = margin * 2 + max_tree_distance * x_scale
+    svg_height = margin * 2 + num_leaves * leaf_y_spacing
+    
+    # Build rectangular tree layout
+    leaf_counter = [0]
+    node_positions = {}
+    
+    def layout_tree(node, depth=0):
+        """Calculate positions for rectangular tree layout"""
+        x = margin + depth * x_scale
         
         if not node.children:
-            # Leaf node
-            clean_name = clean_seq_name(node.name)
-            branch = extract_branch_from_seq(node.name)
-            color = branch_colors.get(branch, '#CCCCCC')
-            
-            is_reference = clean_name in always_keep_set
-            marker_class = 'reference-seq' if is_reference else 'regular-seq'
-            
-            # Leaf circle
-            svg_elements.append(f'''
-                <circle cx="{x}" cy="{y}" r="5" fill="{color}" class="leaf-node {marker_class}" data-seq="{clean_name}">
-                    <title>{clean_name}</title>
-                </circle>
-            ''')
-            
-            # Leaf label (shorter, cleaner)
-            label = clean_name.split('|')[-1] if '|' in clean_name else clean_name
-            svg_elements.append(f'''
-                <text x="{x + 10}" y="{y + 4}" font-size="11" class="leaf-label" data-seq="{clean_name}">
-                    {label}
-                </text>
-            ''')
-            
-            return svg_elements, x, y
+            y = margin + leaf_counter[0] * leaf_y_spacing
+            leaf_counter[0] += 1
+            node_positions[id(node)] = (x, y, node.name)
+            return x, y
         
-        else:
-            # Internal node - analyze composition
-            analysis = analyze_branch_composition(node, sequence_coverage, branch_coverage_cache)
-            branch = analysis['dominant_branch']
-            color = branch_colors.get(branch, '#CCCCCC')
-            coverage_pct = analysis['coverage_percent']
-            
-            # Draw internal node
-            svg_elements.append(f'''
-                <circle cx="{x}" cy="{y}" r="4" fill="{color}" class="internal-node" opacity="0.7">
-                    <title>{branch} ({analysis['sequence_count']} seqs, {coverage_pct:.1f}% coverage)</title>
-                </circle>
-            ''')
-            
-            # Process children
-            num_children = len(node.children)
-            child_y_spacing = dy / max(1, num_children)
-            
-            all_child_svg = []
-            child_positions = []
-            
-            for i, child in enumerate(node.children):
-                child_y = y + (i - (num_children - 1) / 2) * child_y_spacing
-                child_positions.append((child_y, child))
-            
-            for child_y, child in child_positions:
-                child_svg, child_x, child_y_ret = generate_tree_svg(
-                    child, x + dx, child_y, dx, dy * 0.7, depth + 1
-                )
-                all_child_svg.extend(child_svg)
-                
-                # Draw branch line
-                svg_elements.append(f'''
-                    <line x1="{x}" y1="{y}" x2="{x + dx}" y2="{child_y}" 
-                          stroke="{color}" stroke-width="2" opacity="0.8" class="branch-line"/>
-                ''')
-                
-                # Add coverage percentage label on the branch (midpoint)
-                mid_x = (x + x + dx) / 2
-                mid_y = (y + child_y) / 2
-                
-                # Get coverage for the child's dominant branch
-                child_analysis = analyze_branch_composition(child, sequence_coverage, branch_coverage_cache)
-                child_coverage = child_analysis['coverage_percent']
-                
-                if child_coverage > 0:
-                    svg_elements.append(f'''
-                        <text x="{mid_x}" y="{mid_y - 8}" 
-                              font-size="12" font-weight="bold" text-anchor="middle" 
-                              class="branch-coverage" fill="{color}">
-                            {child_coverage:.1f}%
-                        </text>
-                    ''')
-            
-            svg_elements.extend(all_child_svg)
-            
-            return svg_elements, x, y
+        # Internal node: position between children
+        child_positions = []
+        for child in node.children:
+            cx, cy = layout_tree(child, depth + child.distance)
+            child_positions.append((cx, cy))
+        
+        # Y position is average of children
+        y = sum(cy for cx, cy in child_positions) / len(child_positions)
+        node_positions[id(node)] = (x, y, node.name)
+        
+        return x, y
     
-    svg_lines, _, _ = generate_tree_svg(tree, 80, 500, 180, 900)
-    svg_content = '\n'.join(svg_lines)
+    layout_tree(tree)
     
-    # Create legend
-    legend_html = '''
-        <div class="legend">
-            <h3>Legend</h3>
-            <div class="legend-section">
-                <div class="legend-title">Branches</div>
-                <div class="legend-item">
-                    <span class="legend-color" style="background-color: #45B7D1;"></span>
-                    <span>SSL3</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color" style="background-color: #FFEAA7;"></span>
-                    <span>SSL7</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color" style="background-color: #DDA15E;"></span>
-                    <span>SSL11</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color" style="background-color: #96CEB4;"></span>
-                    <span>SSL5</span>
-                </div>
-            </div>
-            <div class="legend-section" style="margin-top: 16px; border-top: 1px solid #2a3a5e; padding-top: 12px;">
-                <div class="legend-title">Sequence Types</div>
-                <div class="legend-item">
-                    <span class="legend-marker reference"></span>
-                    <span>Always-Keep Reference</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-marker regular"></span>
-                    <span>Regular Sequence</span>
-                </div>
-            </div>
-        </div>
-    '''
+    # Generate SVG content
+    svg_lines = [
+        f'<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="{svg_width}" height="{svg_height}" viewBox="0 0 {svg_width} {svg_height}">',
+        '<defs>',
+        '<style>',
+        '.branch { stroke: #000; stroke-width: 1.5; fill: none; }',
+        '.leaf-circle { fill: #333; stroke: #000; stroke-width: 1; }',
+        '.reference-highlight { fill: #FFE5B4; opacity: 0.6; }',
+        '.leaf-label { font-family: Arial, sans-serif; font-size: 16px; fill: #000; }',
+        '.reference-label { font-family: Arial, sans-serif; font-size: 16px; fill: #000; font-weight: bold; }',
+        '.coverage-label { font-family: Arial, sans-serif; font-size: 12px; fill: #666; }',
+        '</style>',
+        '</defs>',
+        '<rect width="100%" height="100%" fill="white"/>',
+    ]
     
-    # Create coverage table from sequence-level data
+    # Draw tree edges
+    def draw_tree(node):
+        """Recursively draw tree branches"""
+        if node not in node_positions:
+            return
+        
+        x1, y1, _ = node_positions[id(node)]
+        
+        for child in node.children:
+            if child not in node_positions:
+                continue
+            
+            x2, y2, _ = node_positions[id(child)]
+            
+            # Get branch color from child
+            clean_name = clean_seq_name(child.name)
+            branch = extract_branch_from_seq(child.name)
+            color = branch_colors.get(branch, '#95a5a6')
+            
+            # Rectangular connection: horizontal then vertical
+            mid_x = x1 + (x2 - x1) * 0.7
+            
+            svg_lines.append(f'<line x1="{x1}" y1="{y1}" x2="{mid_x}" y2="{y1}" class="branch" stroke="{color}"/>')
+            svg_lines.append(f'<line x1="{mid_x}" y1="{y1}" x2="{x2}" y2="{y2}" class="branch" stroke="{color}"/>')
+            
+            draw_tree(child)
+    
+    draw_tree(tree)
+    
+    # Draw leaf nodes
+    for node_id, (x, y, name) in node_positions.items():
+        if not isinstance(name, str) or not name:
+            continue
+        
+        clean_name = clean_seq_name(name)
+        branch = extract_branch_from_seq(name)
+        color = branch_colors.get(branch, '#95a5a6')
+        is_reference = clean_name in always_keep_set
+        
+        # Check if leaf (no children in original tree)
+        for node in _get_all_nodes(tree):
+            if id(node) == node_id and not node.children:
+                # Draw highlight background for reference sequences
+                if is_reference:
+                    svg_lines.append(f'<rect x="{x-8}" y="{y-16}" width="24" height="24" class="reference-highlight" rx="4"/>')
+                
+                # Draw leaf circle
+                svg_lines.append(f'<circle cx="{x}" cy="{y}" r="5" class="leaf-circle" fill="{color}"/>')
+                
+                # Draw label
+                label = clean_name.split('|')[-1] if '|' in clean_name else clean_name
+                label_class = 'reference-label' if is_reference else 'leaf-label'
+                svg_lines.append(f'<text x="{x + 15}" y="{y + 6}" class="{label_class}">{label}</text>')
+                
+                # Add coverage info if available
+                if clean_name in sequence_coverage:
+                    cov = sequence_coverage[clean_name]['coverage_percent']
+                    svg_lines.append(f'<text x="{x + 15}" y="{y + 22}" class="coverage-label">({cov:.1f}%)</text>')
+                break
+    
+    svg_lines.append('</svg>')
+    
+    # Write SVG
+    with open(svg_output_path, 'w') as f:
+        f.write('\n'.join(svg_lines))
+    
+    return svg_output_path
+
+
+def _get_all_nodes(node):
+    """Helper to get all nodes in tree"""
+    yield node
+    for child in node.children:
+        yield from _get_all_nodes(child)
+
+
+def generate_html_visualization(coverage_json_path, svg_embed_path, html_output_path):
+    """Generate HTML report with embedded SVG and coverage table."""
+    
+    # Hardcoded always-keep sequences
+    always_keep_SSL3 = {
+        "SSL3|CC1", "SSL3|CC5", "SSL3|CC8", "SSL3|CC22", "SSL3|CC30", "SSL3|CC93"
+    }
+    always_keep_SSL7 = {
+        "SSL7|CC1", "SSL7|CC5", "SSL7|CC8", "SSL7|CC22", "SSL7|CC30", "SSL7|CC93"
+    }
+    always_keep_SSL11 = {
+        "SSL11|CC1", "SSL11|CC5", "SSL11|CC8", "SSL11|CC22", "SSL11|CC30", "SSL11|CC93"
+    }
+    always_keep_set = always_keep_SSL3 | always_keep_SSL7 | always_keep_SSL11
+    
+    # Load coverage data
+    with open(coverage_json_path, 'r') as f:
+        sequence_coverage = json.load(f)
+    
+    # Create coverage table rows
     coverage_rows = ''
     for seq_name in sorted(sequence_coverage.keys()):
         stats = sequence_coverage[seq_name]
         num = stats['num']
         cov_pct = stats['coverage_percent']
-        
-        # Highlight reference sequences
         is_ref = seq_name in always_keep_set
         ref_marker = '⭐ ' if is_ref else ''
         
@@ -347,17 +320,209 @@ def generate_html_visualization(tree_path, coverage_json_path, output_html):
         </tr>
         '''
     
-    coverage_table = f'''
+    # Read SVG
+    with open(svg_embed_path, 'r') as f:
+        svg_content = f.read()
+    
+    html = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phylogenetic Tree Visualization</title>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+        
+        body {{
+            font-family: 'Lato', sans-serif;
+            background: #ffffff;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
+        }}
+        
+        .container {{
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }}
+        
+        h1 {{
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 2.2em;
+            color: #2c3e50;
+        }}
+        
+        .subtitle {{
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }}
+        
+        .tree-section {{
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }}
+        
+        .tree-section svg {{
+            display: block;
+            margin: 0 auto;
+            background: white;
+            width: 100%;
+            height: auto;
+        }}
+        
+        .coverage-section {{
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 25px;
+        }}
+        
+        .coverage-section h2 {{
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }}
+        
+        .coverage-section > p {{
+            margin-bottom: 20px;
+            color: #555;
+            font-size: 0.95em;
+        }}
+        
+        .coverage-table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }}
+        
+        .coverage-table thead {{
+            background: #ecf0f1;
+            border-bottom: 2px solid #bdc3c7;
+        }}
+        
+        .coverage-table th {{
+            padding: 12px;
+            text-align: left;
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 0.9em;
+        }}
+        
+        .coverage-table td {{
+            padding: 11px 12px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 0.95em;
+        }}
+        
+        .coverage-table td.numeric {{
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }}
+        
+        .coverage-table tbody tr:hover {{
+            background: #f5f5f5;
+        }}
+        
+        .coverage-table tbody tr.reference-row {{
+            background: #FFF8DC;
+        }}
+        
+        .coverage-table tbody tr.reference-row:hover {{
+            background: #FFE5B4;
+        }}
+        
+        .coverage-explanation {{
+            background: #f9f9f9;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #555;
+        }}
+        
+        .coverage-explanation h3 {{
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }}
+        
+        .explanation-item {{
+            margin: 8px 0;
+            line-height: 1.5;
+        }}
+        
+        .legend {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+        }}
+        
+        .legend-item {{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95em;
+        }}
+        
+        .legend-color {{
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1px solid #333;
+        }}
+        
+        .legend-item.highlight {{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+        
+        .reference-box {{
+            width: 18px;
+            height: 18px;
+            background: #FFE5B4;
+            border-radius: 3px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧬 Phylogenetic Tree Analysis</h1>
+        <div class="subtitle">Rectangular tree layout with sequence coverage metrics</div>
+        
+        <div class="tree-section">
+            {svg_content}
+        </div>
+        
         <div class="coverage-section">
-            <h3>Sequence Coverage Report</h3>
-            <p style="font-size: 0.85em; color: #bdc3c7; margin-bottom: 12px;">
-                Coverage metric: Number of sequences this representative accounts for, 
-                divided by total sequences in the original alignment.
-            </p>
+            <h2>Sequence Coverage Report</h2>
+            <p>Coverage metric: Number of sequences this representative accounts for, divided by total sequences in the original alignment.</p>
+            
             <table class="coverage-table">
                 <thead>
                     <tr>
-                        <th>Sequence</th>
+                        <th>Sequence Name</th>
                         <th>Represents</th>
                         <th>Coverage %</th>
                     </tr>
@@ -368,443 +533,72 @@ def generate_html_visualization(tree_path, coverage_json_path, output_html):
             </table>
             
             <div class="coverage-explanation">
-                <h4>📊 Understanding Coverage</h4>
+                <h3>📊 Understanding the Metrics</h3>
                 <div class="explanation-item">
-                    <strong>Represents:</strong> The count of sequences this representative accounts for 
-                    (1 = itself, plus any sequences merged with it due to &gt;90% identity)
+                    <strong>Represents:</strong> The count of sequences this representative accounts for (1 = itself, plus any sequences merged with it due to >90% identity)
                 </div>
                 <div class="explanation-item">
                     <strong>Coverage %:</strong> (Sequences Represented / Total Original Sequences) × 100
                 </div>
-                <div class="explanation-item" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #2a3a5e;">
-                    <strong>Example:</strong> If a representative accounts for 25 sequences out of 1000 total, 
-                    its coverage is 2.5%
+                <div class="explanation-item" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e0e0e0;">
+                    <strong>Example:</strong> If a representative accounts for 25 sequences out of 1000 total, its coverage is 2.5%
                 </div>
-                <div class="explanation-item" style="color: #FFD700; margin-top: 8px;">
+                <div class="explanation-item" style="color: #d4af37; margin-top: 8px;">
                     <strong>⭐ = Always-Keep Reference Sequence</strong> — Retained regardless of redundancy
                 </div>
             </div>
-        </div>
-    '''
-    
-    # Full HTML
-    html_content = f'''
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Alifilter Tree Visualization</title>
-        <style>
-            * {{
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }}
             
-            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
-            
-            body {{
-                font-family: 'Inter', sans-serif;
-                background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
-                color: #ecf0f1;
-                padding: 20px;
-                min-height: 100vh;
-            }}
-            
-            .container {{
-                max-width: 1800px;
-                margin: 0 auto;
-                background: linear-gradient(135deg, #0f1629 0%, #1a2847 100%);
-                border-radius: 16px;
-                padding: 40px;
-                box-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
-                border: 1px solid rgba(0, 212, 255, 0.15);
-            }}
-            
-            h1 {{
-                text-align: center;
-                margin-bottom: 8px;
-                font-size: 2.8em;
-                font-family: 'Playfair Display', serif;
-                background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                letter-spacing: -1px;
-            }}
-            
-            .subtitle {{
-                text-align: center;
-                color: #a0aec0;
-                margin-bottom: 35px;
-                font-size: 0.95em;
-                font-weight: 500;
-            }}
-            
-            .layout {{
-                display: grid;
-                grid-template-columns: 1fr 320px;
-                gap: 30px;
-                margin-bottom: 35px;
-            }}
-            
-            .tree-container {{
-                background: linear-gradient(135deg, #0d1b2a 0%, #1a2c42 100%);
-                border-radius: 12px;
-                overflow: auto;
-                border: 2px solid rgba(0, 212, 255, 0.3);
-                padding: 25px;
-                max-height: 900px;
-                box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
-            }}
-            
-            .tree-container svg {{
-                display: block;
-                margin: 0 auto;
-                filter: drop-shadow(0 4px 12px rgba(0, 212, 255, 0.15));
-            }}
-            
-            .leaf-node {{
-                cursor: pointer;
-                transition: all 0.3s ease;
-                filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
-            }}
-            
-            .leaf-node:hover {{
-                r: 7;
-                filter: drop-shadow(0 0 10px currentColor);
-            }}
-            
-            .reference-seq {{
-                stroke: #FFD700;
-                stroke-width: 2.5;
-                filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
-            }}
-            
-            .reference-seq:hover {{
-                stroke-width: 3;
-                filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8));
-            }}
-            
-            .leaf-label {{
-                fill: #d1d5db;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                font-size: 11px;
-                font-weight: 500;
-            }}
-            
-            .leaf-label:hover {{
-                font-weight: 700;
-                fill: #00d4ff;
-                filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.5));
-            }}
-            
-            .branch-line {{
-                transition: all 0.3s ease;
-            }}
-            
-            .branch-line:hover {{
-                opacity: 1 !important;
-                stroke-width: 2.5 !important;
-                filter: drop-shadow(0 0 8px currentColor);
-            }}
-            
-            .branch-coverage {{
-                transition: all 0.3s ease;
-                background: rgba(15, 52, 96, 0.9);
-                padding: 2px 6px;
-                border-radius: 3px;
-                font-family: 'Inter', monospace;
-                letter-spacing: 0.5px;
-            }}
-            
-            .internal-node {{
-                cursor: pointer;
-                transition: all 0.2s ease;
-                filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
-            }}
-            
-            .internal-node:hover {{
-                r: 5;
-                filter: drop-shadow(0 0 10px currentColor);
-            }}
-            
-            .sidebar {{
-                display: flex;
-                flex-direction: column;
-                gap: 24px;
-            }}
-            
-            .legend {{
-                background: linear-gradient(135deg, #0d1b2a 0%, #1a2c42 100%);
-                border-radius: 12px;
-                padding: 20px;
-                border: 2px solid rgba(0, 212, 255, 0.3);
-                box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
-            }}
-            
-            .legend h3 {{
-                font-size: 1.25em;
-                margin-bottom: 16px;
-                color: #00d4ff;
-                font-family: 'Playfair Display', serif;
-                letter-spacing: -0.5px;
-            }}
-            
-            .legend-section {{
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }}
-            
-            .legend-title {{
-                font-size: 0.8em;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                color: #7dd3fc;
-                font-weight: 600;
-                margin-bottom: 4px;
-            }}
-            
-            .legend-item {{
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                font-size: 0.9em;
-                color: #cbd5e1;
-                transition: all 0.2s ease;
-                padding: 4px;
-                border-radius: 4px;
-            }}
-            
-            .legend-item:hover {{
-                color: #00d4ff;
-                background: rgba(0, 212, 255, 0.05);
-            }}
-            
-            .legend-color {{
-                width: 14px;
-                height: 14px;
-                border-radius: 3px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            }}
-            
-            .legend-marker {{
-                width: 12px;
-                height: 12px;
-                border: 2px solid currentColor;
-                border-radius: 50%;
-                background: transparent;
-            }}
-            
-            .legend-marker.reference {{
-                border-color: #FFD700;
-                box-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
-            }}
-            
-            .legend-marker.regular {{
-                border-color: #94a3b8;
-            }}
-            
-            .coverage-section {{
-                background: linear-gradient(135deg, #0d1b2a 0%, #1a2c42 100%);
-                border-radius: 12px;
-                padding: 28px;
-                border: 2px solid rgba(0, 212, 255, 0.3);
-                grid-column: 1 / -1;
-                box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
-            }}
-            
-            .coverage-section h3 {{
-                font-size: 1.4em;
-                margin-bottom: 12px;
-                color: #00d4ff;
-                font-family: 'Playfair Display', serif;
-                letter-spacing: -0.5px;
-            }}
-            
-            .coverage-section > p {{
-                margin-bottom: 18px;
-                line-height: 1.6;
-            }}
-            
-            .coverage-table {{
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20px;
-            }}
-            
-            .coverage-table thead {{
-                background: rgba(0, 212, 255, 0.05);
-                border-bottom: 2px solid rgba(0, 212, 255, 0.3);
-            }}
-            
-            .coverage-table th {{
-                padding: 12px 14px;
-                text-align: left;
-                font-weight: 600;
-                color: #7dd3fc;
-                font-size: 0.9em;
-                letter-spacing: 0.5px;
-                text-transform: uppercase;
-            }}
-            
-            .coverage-table td {{
-                padding: 11px 14px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-                color: #cbd5e1;
-            }}
-            
-            .coverage-table td.numeric {{
-                font-family: 'Inter', monospace;
-                text-align: right;
-            }}
-            
-            .coverage-table tr:hover {{
-                background: rgba(0, 212, 255, 0.08);
-            }}
-            
-            .coverage-table tbody tr.reference-row {{
-                background: rgba(255, 215, 0, 0.08);
-            }}
-            
-            .coverage-table tbody tr.reference-row:hover {{
-                background: rgba(255, 215, 0, 0.15);
-            }}
-            
-            .coverage-table tbody tr:last-child td {{
-                border-bottom: none;
-            }}
-            
-            .coverage-explanation {{
-                font-size: 0.85em;
-                color: #a0aec0;
-                margin-top: 16px;
-                padding: 16px;
-                background: rgba(0, 212, 255, 0.05);
-                border-left: 3px solid #00d4ff;
-                border-radius: 6px;
-            }}
-            
-            .coverage-explanation h4 {{
-                color: #00d4ff;
-                margin-bottom: 10px;
-                font-size: 0.95em;
-                font-weight: 600;
-            }}
-            
-            .explanation-item {{
-                padding: 6px 0;
-                line-height: 1.5;
-            }}
-            
-            @media (max-width: 1024px) {{
-                .layout {{
-                    grid-template-columns: 1fr;
-                }}
-                
-                .sidebar {{
-                    grid-column: 1 / -1;
-                    flex-direction: row;
-                    gap: 20px;
-                }}
-                
-                .legend {{
-                    flex: 1;
-                }}
-                
-                .tree-container {{
-                    max-height: 600px;
-                }}
-            }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>🧬 Phylogenetic Tree Analysis</h1>
-            <div class="subtitle">Interactive visualization of sequence filtering and coverage metrics</div>
-            
-            <div class="layout">
-                <div class="tree-container">
-                    <svg viewBox="0 0 2000 1000" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <style>
-                                .leaf-node, .internal-node, .leaf-label, .branch-coverage {{ 
-                                    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
-                                }}
-                            </style>
-                        </defs>
-                        {svg_content}
-                    </svg>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #2980b9;"></div>
+                    <span>SSL3</span>
                 </div>
-                
-                <div class="sidebar">
-                    {legend_html}
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f39c12;"></div>
+                    <span>SSL7</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #d35400;"></div>
+                    <span>SSL11</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #27ae60;"></div>
+                    <span>SSL5</span>
+                </div>
+                <div class="legend-item highlight">
+                    <div class="reference-box"></div>
+                    <span>Reference Highlight</span>
                 </div>
             </div>
-            
-            {coverage_table}
         </div>
-        
-        <script>
-            // Interactivity: highlight related sequences
-            document.querySelectorAll('.leaf-node, .leaf-label').forEach(el => {{
-                el.addEventListener('mouseenter', function() {{
-                    const seq = this.getAttribute('data-seq');
-                    if (seq) {{
-                        document.querySelectorAll(`[data-seq="${{seq}}"]`).forEach(related => {{
-                            related.style.opacity = '1';
-                            related.style.filter = 'drop-shadow(0 0 12px rgba(0, 212, 255, 0.8))';
-                        }});
-                        document.querySelectorAll('[data-seq]').forEach(other => {{
-                            if (other.getAttribute('data-seq') !== seq) {{
-                                other.style.opacity = '0.3';
-                            }}
-                        }});
-                    }}
-                }});
-                
-                el.addEventListener('mouseleave', function() {{
-                    document.querySelectorAll('[data-seq]').forEach(el => {{
-                        el.style.opacity = '1';
-                        el.style.filter = 'none';
-                    }});
-                }});
-            }});
-        </script>
-    </body>
-    </html>
-    '''
+    </div>
+</body>
+</html>
+'''
     
-    with open(output_html, 'w') as f:
-        f.write(html_content)
+    with open(html_output_path, 'w') as f:
+        f.write(html)
     
-    print(f"✅ Visualization saved to: {output_html}")
+    print(f"✅ HTML report saved to: {html_output_path}")
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Generate interactive tree visualization from alifilter output'
+        description='Generate rectangular tree visualization from alifilter output'
     )
-    parser.add_argument(
-        '--tree', required=True,
-        help='Path to Newick tree file (.tree)'
-    )
-    parser.add_argument(
-        '--coverage', required=True,
-        help='Path to sequence coverage JSON file (sequence_coverage.json)'
-    )
-    parser.add_argument(
-        '-o', '--output', required=True,
-        help='Output HTML file path'
-    )
+    parser.add_argument('--tree', required=True, help='Path to Newick tree file')
+    parser.add_argument('--coverage', required=True, help='Path to sequence coverage JSON file')
+    parser.add_argument('--svg-output', required=True, help='Output SVG file path')
+    parser.add_argument('--html-output', required=True, help='Output HTML file path')
     
     args = parser.parse_args()
     
-    # Generate visualization
-    generate_html_visualization(args.tree, args.coverage, args.output)
+    # Generate SVG
+    svg_path = generate_rectangular_tree_svg(args.tree, args.coverage, args.svg_output)
+    print(f"✅ SVG saved to: {svg_path}")
+    
+    # Generate HTML
+    generate_html_visualization(args.coverage, svg_path, args.html_output)
 
 
 if __name__ == '__main__':
