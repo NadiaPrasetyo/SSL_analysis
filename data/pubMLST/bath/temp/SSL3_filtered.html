@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phylogenetic Tree Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Lato', sans-serif;
+            background: #ffffff;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 2.2em;
+            color: #2c3e50;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+        
+        .tree-section {
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        
+        .tree-section svg {
+            display: block;
+            margin: 0 auto;
+            background: white;
+            width: 100%;
+            height: auto;
+        }
+        
+        .coverage-section {
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 25px;
+        }
+        
+        .coverage-section h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .coverage-section > p {
+            margin-bottom: 20px;
+            color: #555;
+            font-size: 0.95em;
+        }
+        
+        .coverage-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .coverage-table thead {
+            background: #ecf0f1;
+            border-bottom: 2px solid #bdc3c7;
+        }
+        
+        .coverage-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 0.9em;
+        }
+        
+        .coverage-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 0.95em;
+        }
+        
+        .coverage-table td.numeric {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .coverage-table tbody tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .coverage-table tbody tr.reference-row {
+            background: #FFF8DC;
+        }
+        
+        .coverage-table tbody tr.reference-row:hover {
+            background: #FFE5B4;
+        }
+        
+        .coverage-explanation {
+            background: #f9f9f9;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        
+        .coverage-explanation h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+        
+        .explanation-item {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+        
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95em;
+        }
+        
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1px solid #333;
+        }
+        
+        .legend-item.highlight {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .reference-box {
+            width: 18px;
+            height: 18px;
+            background: #FFE5B4;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧬 Phylogenetic Tree Analysis</h1>
+        <div class="subtitle">Rectangular tree layout with sequence coverage metrics</div>
+        
+        <div class="tree-section">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="600.0" height="1800" viewBox="0 0 600.0 1800">
+<defs>
+<style>
+.branch { stroke: #000; stroke-width: 1.5; fill: none; }
+.leaf-circle { fill: #333; stroke: #000; stroke-width: 1; }
+.reference-highlight { fill: #FFE5B4; opacity: 0.6; }
+.leaf-label { font-family: Arial, sans-serif; font-size: 16px; fill: #000; }
+.reference-label { font-family: Arial, sans-serif; font-size: 16px; fill: #000; font-weight: bold; }
+.coverage-label { font-family: Arial, sans-serif; font-size: 12px; fill: #666; }
+</style>
+</defs>
+<rect width="100%" height="100%" fill="white"/>
+<circle cx="160.98881745166798" cy="100" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="175.98881745166798" y="106" class="leaf-label">ERR212785_Unknown_2016_ST80_SSL3</text>
+<circle cx="160.98881745166798" cy="140" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="175.98881745166798" y="146" class="leaf-label">unknown_USA_2021_ST840_SSL3</text>
+<circle cx="196.89184683243184" cy="180" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="211.89184683243184" y="186" class="leaf-label">ERR737173_Unknown_2016_ST22_SSL3</text>
+<circle cx="242.4529099913395" cy="220" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="257.45290999133954" y="226" class="leaf-label">ERR736962_Unknown_2016_ST22_SSL3</text>
+<circle cx="303.2458706028998" cy="260" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="318.2458706028998" y="266" class="leaf-label">unknown_Sweden_2022_ST7975_SSL3</text>
+<circle cx="316.64908460648485" cy="300" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="331.64908460648485" y="306" class="leaf-label">unknown_Spain_2021_ST6984_SSL3</text>
+<circle cx="316.64908460648485" cy="340" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="331.64908460648485" y="346" class="leaf-label">SRR304677_Unknown_2016_ST30_SSL3</text>
+<circle cx="345.83846733966345" cy="380" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="360.83846733966345" y="386" class="leaf-label">unknown_Spain_2021_ST6979_SSL3</text>
+<circle cx="361.9510044600398" cy="420" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="376.9510044600398" y="426" class="leaf-label">ERR182438_Unknown_2016_ST93_SSL3</text>
+<circle cx="400.0443542341286" cy="460" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="415.0443542341286" y="466" class="leaf-label">ERR033684_Unknown_2016_ST377_SSL3</text>
+<circle cx="400.0443542341286" cy="500" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="415.0443542341286" y="506" class="leaf-label">ERR038143_Unknown_2016_ST36_SSL3</text>
+<circle cx="423.4556916418452" cy="540" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="438.4556916418452" y="546" class="leaf-label">ERR418515_Unknown_2016_ST580_SSL3</text>
+<circle cx="433.5334570119748" cy="580" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="448.5334570119748" y="586" class="leaf-label">ERR033729_Unknown_2016_ST20_SSL3</text>
+<circle cx="443.33981564572116" cy="620" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="458.33981564572116" y="626" class="leaf-label">ERR708316_Unknown_2016_ST8_SSL3</text>
+<rect x="463.113174908304" y="644" width="24" height="24" class="reference-highlight" rx="4"/>
+<circle cx="471.113174908304" cy="660" r="5" class="leaf-circle" fill="#2980b9"/>
+<text x="486.113174908304" y="666" class="reference-label">CC93</text>
+<circle cx="471.113174908304" cy="700" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="486.113174908304" y="706" class="leaf-label">SRR27673292_Mexico_2022_ST93_SSL3</text>
+<circle cx="479.16944346849215" cy="740" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="494.16944346849215" y="746" class="leaf-label">ERR109596_Unknown_2016_ST45_SSL3</text>
+<circle cx="486.57288573301975" cy="780" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="501.57288573301975" y="786" class="leaf-label">ERR033602_Unknown_2016_ST2233_SSL3</text>
+<rect x="487.52429524433995" y="804" width="24" height="24" class="reference-highlight" rx="4"/>
+<circle cx="495.52429524433995" cy="820" r="5" class="leaf-circle" fill="#2980b9"/>
+<text x="510.52429524433995" y="826" class="reference-label">CC22</text>
+<rect x="487.52429524433995" y="844" width="24" height="24" class="reference-highlight" rx="4"/>
+<circle cx="495.52429524433995" cy="860" r="5" class="leaf-circle" fill="#2980b9"/>
+<text x="510.52429524433995" y="866" class="reference-label">CC30</text>
+<circle cx="493.2864428665099" cy="900" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="508.2864428665099" y="906" class="leaf-label">unknown_Russia_2019_ST5814_SSL3</text>
+<circle cx="462.5234023412412" cy="940" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="477.5234023412412" y="946" class="leaf-label">ERR182540_Unknown_2016_ST2198_SSL3</text>
+<circle cx="471.78524673441393" cy="980" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="486.78524673441393" y="986" class="leaf-label">ERR418915_Unknown_2016_ST25_SSL3</text>
+<circle cx="471.78524673441393" cy="1020" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="486.78524673441393" y="1026" class="leaf-label">ERR715680_Unknown_2016_ST239_SSL3</text>
+<circle cx="470.32545087130785" cy="1060" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="485.32545087130785" y="1066" class="leaf-label">unknown_Japan_2021_ST8074_SSL3</text>
+<circle cx="475.2984959394169" cy="1100" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="490.2984959394169" y="1106" class="leaf-label">ERR237620_Unknown_2016_ST816_SSL3</text>
+<circle cx="478.46317725804903" cy="1140" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="493.46317725804903" y="1146" class="leaf-label">unknown_USA_2022_ST7870_SSL3</text>
+<rect x="473.1851218622513" y="1164" width="24" height="24" class="reference-highlight" rx="4"/>
+<circle cx="481.1851218622513" cy="1180" r="5" class="leaf-circle" fill="#2980b9"/>
+<text x="496.1851218622513" y="1186" class="reference-label">CC1</text>
+<rect x="473.1851218622513" y="1204" width="24" height="24" class="reference-highlight" rx="4"/>
+<circle cx="481.1851218622513" cy="1220" r="5" class="leaf-circle" fill="#2980b9"/>
+<text x="496.1851218622513" y="1226" class="reference-label">CC8</text>
+<rect x="472.72367670194274" y="1244" width="24" height="24" class="reference-highlight" rx="4"/>
+<circle cx="480.72367670194274" cy="1260" r="5" class="leaf-circle" fill="#2980b9"/>
+<text x="495.72367670194274" y="1266" class="reference-label">CC5</text>
+<circle cx="480.72367670194274" cy="1300" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="495.72367670194274" y="1306" class="leaf-label">ERR332249_Unknown_2016_ST225_SSL3</text>
+<circle cx="413.36011296678805" cy="1340" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="428.36011296678805" y="1346" class="leaf-label">SRR016396_Unknown_2016_ST30_SSL3</text>
+<circle cx="424.3061650595157" cy="1380" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="439.3061650595157" y="1386" class="leaf-label">ERR540016_Unknown_2016_ST30_SSL3</text>
+<circle cx="424.3061650595157" cy="1420" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="439.3061650595157" y="1426" class="leaf-label">unknown_Egypt_2021_ST291_SSL3</text>
+<circle cx="413.48122553747623" cy="1460" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="428.48122553747623" y="1466" class="leaf-label">ERR418433_Unknown_2016_ST291_SSL3</text>
+<circle cx="375.88315725164875" cy="1500" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="390.88315725164875" y="1506" class="leaf-label">ERR525018_Unknown_2016_ST133_SSL3</text>
+<circle cx="357.04249905450735" cy="1540" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="372.04249905450735" y="1546" class="leaf-label">ERR144790_Unknown_2016_ST130_SSL3</text>
+<circle cx="386.2211400962724" cy="1580" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="401.2211400962724" y="1586" class="leaf-label">ERR708393_Unknown_2016_ST199_SSL3</text>
+<circle cx="415.12676314794214" cy="1620" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="430.12676314794214" y="1626" class="leaf-label">unknown_USA_2021_ST7253_SSL3</text>
+<circle cx="415.12676314794214" cy="1660" r="5" class="leaf-circle" fill="#95a5a6"/>
+<text x="430.12676314794214" y="1666" class="leaf-label">unknown_Australia_2021_ST22_SSL3</text>
+</svg>
+        </div>
+        
+        <div class="coverage-section">
+            <h2>Sequence Coverage Report</h2>
+            <p>Coverage metric: Number of sequences this representative accounts for, divided by total sequences in the original alignment.</p>
+            
+            <table class="coverage-table">
+                <thead>
+                    <tr>
+                        <th>Sequence Name</th>
+                        <th>Represents</th>
+                        <th>Coverage %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr >
+            <td><strong>055|SSL3|CC1</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>073|SSL3|CC8</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>103|SSL3|CC5</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>111|ERR332249_Unknown_2016_ST225_SSL3</strong></td>
+            <td class="numeric">258</td>
+            <td class="numeric">29.49%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>221|ERR033729_Unknown_2016_ST20_SSL3</strong></td>
+            <td class="numeric">16</td>
+            <td class="numeric">1.83%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>408|unknown_USA_2022_ST7870_SSL3</strong></td>
+            <td class="numeric">2</td>
+            <td class="numeric">0.23%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>457|ERR418915_Unknown_2016_ST25_SSL3</strong></td>
+            <td class="numeric">6</td>
+            <td class="numeric">0.69%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>458|ERR715680_Unknown_2016_ST239_SSL3</strong></td>
+            <td class="numeric">2</td>
+            <td class="numeric">0.23%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>466|ERR708316_Unknown_2016_ST8_SSL3</strong></td>
+            <td class="numeric">18</td>
+            <td class="numeric">2.06%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>493|ERR525018_Unknown_2016_ST133_SSL3</strong></td>
+            <td class="numeric">13</td>
+            <td class="numeric">1.49%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>512|ERR182438_Unknown_2016_ST93_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>515|SSL3|CC22</strong></td>
+            <td class="numeric">2</td>
+            <td class="numeric">0.23%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>518|SSL3|CC30</strong></td>
+            <td class="numeric">2</td>
+            <td class="numeric">0.23%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>536|ERR038143_Unknown_2016_ST36_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>605|SRR016396_Unknown_2016_ST30_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>667|ERR109596_Unknown_2016_ST45_SSL3</strong></td>
+            <td class="numeric">21</td>
+            <td class="numeric">2.40%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>699|ERR033602_Unknown_2016_ST2233_SSL3</strong></td>
+            <td class="numeric">14</td>
+            <td class="numeric">1.60%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>705|SSL3|CC93</strong></td>
+            <td class="numeric">2</td>
+            <td class="numeric">0.23%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>708|SRR27673292_Mexico_2022_ST93_SSL3</strong></td>
+            <td class="numeric">9</td>
+            <td class="numeric">1.03%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>733|unknown_Japan_2021_ST8074_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>739|ERR237620_Unknown_2016_ST816_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>745|unknown_Russia_2019_ST5814_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>749|ERR418515_Unknown_2016_ST580_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>753|ERR540016_Unknown_2016_ST30_SSL3</strong></td>
+            <td class="numeric">47</td>
+            <td class="numeric">5.37%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>786|ERR418433_Unknown_2016_ST291_SSL3</strong></td>
+            <td class="numeric">3</td>
+            <td class="numeric">0.34%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>806|unknown_Egypt_2021_ST291_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>807|ERR033684_Unknown_2016_ST377_SSL3</strong></td>
+            <td class="numeric">2</td>
+            <td class="numeric">0.23%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>819|unknown_Spain_2021_ST6979_SSL3</strong></td>
+            <td class="numeric">3</td>
+            <td class="numeric">0.34%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>826|ERR182540_Unknown_2016_ST2198_SSL3</strong></td>
+            <td class="numeric">3</td>
+            <td class="numeric">0.34%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>843|unknown_Spain_2021_ST6984_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>844|SRR304677_Unknown_2016_ST30_SSL3</strong></td>
+            <td class="numeric">5</td>
+            <td class="numeric">0.57%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>849|unknown_Sweden_2022_ST7975_SSL3</strong></td>
+            <td class="numeric">2</td>
+            <td class="numeric">0.23%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>858|unknown_USA_2021_ST840_SSL3</strong></td>
+            <td class="numeric">2</td>
+            <td class="numeric">0.23%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>861|ERR212785_Unknown_2016_ST80_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>862|unknown_USA_2021_ST7253_SSL3</strong></td>
+            <td class="numeric">2</td>
+            <td class="numeric">0.23%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>864|unknown_Australia_2021_ST22_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>865|ERR708393_Unknown_2016_ST199_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>866|ERR144790_Unknown_2016_ST130_SSL3</strong></td>
+            <td class="numeric">1</td>
+            <td class="numeric">0.11%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>867|ERR736962_Unknown_2016_ST22_SSL3</strong></td>
+            <td class="numeric">2</td>
+            <td class="numeric">0.23%</td>
+        </tr>
+        
+        <tr >
+            <td><strong>872|ERR737173_Unknown_2016_ST22_SSL3</strong></td>
+            <td class="numeric">4</td>
+            <td class="numeric">0.46%</td>
+        </tr>
+        
+                </tbody>
+            </table>
+            
+            <div class="coverage-explanation">
+                <h3>📊 Understanding the Metrics</h3>
+                <div class="explanation-item">
+                    <strong>Represents:</strong> The count of sequences this representative accounts for (1 = itself, plus any sequences merged with it due to >90% identity)
+                </div>
+                <div class="explanation-item">
+                    <strong>Coverage %:</strong> (Sequences Represented / Total Original Sequences) × 100
+                </div>
+                <div class="explanation-item" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e0e0e0;">
+                    <strong>Example:</strong> If a representative accounts for 25 sequences out of 1000 total, its coverage is 2.5%
+                </div>
+                <div class="explanation-item" style="color: #d4af37; margin-top: 8px;">
+                    <strong>⭐ = Always-Keep Reference Sequence</strong> — Retained regardless of redundancy
+                </div>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #2980b9;"></div>
+                    <span>SSL3</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f39c12;"></div>
+                    <span>SSL7</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #d35400;"></div>
+                    <span>SSL11</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #27ae60;"></div>
+                    <span>SSL5</span>
+                </div>
+                <div class="legend-item highlight">
+                    <div class="reference-box"></div>
+                    <span>Reference Highlight</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
