@@ -23,36 +23,41 @@ def setup_logging(verbose, output_dir):
     if verbose:
         logging.info("Logging initialized. Log file: %s", log_file)
 
-
+def normalize(seq):
+    """Remove Stockholm numeric prefix like 657|"""
+    return seq.split("|", 1)[1] if "|" in seq and seq.split("|", 1)[0].isdigit() else seq
 
 def get_seqs_in_stockholm(stockholm_file):
-    """Extract all sequence names from a Stockholm format file.
-    Returns both full names (with prefix) and base names (without prefix)."""
+    """Extract sequence names and normalize ID space immediately."""
+
     full_names = set()
     base_names = defaultdict(list)
-    
+
     with open(stockholm_file, 'r') as f:
         for line in f:
             line = line.rstrip('\n')
-            # In Stockholm format, sequences are like: "NAME  SEQUENCE"
-            # Skip comments and blank lines
+
             if not line or line.startswith('#') or line.startswith('//'):
                 continue
-            # Split on whitespace
-            parts = line.split()
-            if len(parts) >= 1 and not line.startswith(' '):
-                # This is a sequence line
-                full_name = parts[0]
-                full_names.add(full_name)
-                
-                # Extract base name (remove numeric prefix like "000|")
-                # Format: "000|original_name"
-                if '|' in full_name:
-                    base_name = '|'.join(full_name.split('|')[1:])
-                else:
-                    base_name = full_name
 
-                base_names[base_name].append(full_name)
+            parts = line.split()
+            if len(parts) < 1 or line.startswith(' '):
+                continue
+
+            full_name_raw = parts[0]
+            full_name = normalize(full_name_raw)
+
+            full_names.add(full_name)
+
+            # base name extraction + normalization
+            if '|' in full_name:
+                base_name = '|'.join(full_name.split('|')[1:])
+            else:
+                base_name = full_name
+
+            base_name = normalize(base_name)
+
+            base_names[base_name].append(full_name)
 
     return full_names, base_names
 
@@ -79,8 +84,8 @@ def cluster_sequences_by_pid(pairs, full_names, base_names_map, maxid, always_ke
     # Step 1: compute best edges
     # -----------------------------
     for seq1, seq2, pid in pairs:
-        full_seqs1 = base_names_map.get(seq1, [])
-        full_seqs2 = base_names_map.get(seq2, [])
+        full_seqs1 = base_names_map.get(normalize(seq1), [])
+        full_seqs2 = base_names_map.get(normalize(seq2), [])
 
         if not full_seqs1 or not full_seqs2:
             continue
@@ -106,7 +111,7 @@ def cluster_sequences_by_pid(pairs, full_names, base_names_map, maxid, always_ke
     representative = {}
     clusters = defaultdict(set)
 
-    for seq in full_names:
+    for seq in map(normalize, full_names):
         rep = find_root(seq)
         representative[seq] = rep
         clusters[rep].add(seq)
@@ -117,7 +122,8 @@ def cluster_sequences_by_pid(pairs, full_names, base_names_map, maxid, always_ke
     keep = set(clusters.keys())
 
     for base in always_keep_sequences:
-        full_list = base_names_map.get(base, [])
+        full_list = base_names_map.get(normalize(base), [])
+        base = normalize(base)
 
         for seq in full_list:
             if seq not in representative:
@@ -138,10 +144,12 @@ def cluster_sequences_by_pid(pairs, full_names, base_names_map, maxid, always_ke
     # -----------------------------
     # Step 4: coverage report
     # -----------------------------
-    total_original_sequences = len(full_names)
+    total_original_sequences = len(set(map(normalize, full_names)))
 
     coverage_report = {}
-    for rep, cluster in clusters.items():
+    for rep_raw, cluster_raw in clusters.items():
+        rep = normalize(rep_raw)
+        cluster = {normalize(x) for x in cluster_raw}
         num = len(cluster)
         coverage_percent = (num / total_original_sequences) * 100.0
 
