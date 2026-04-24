@@ -29,7 +29,7 @@ def get_seqs_in_stockholm(stockholm_file):
     """Extract all sequence names from a Stockholm format file.
     Returns both full names (with prefix) and base names (without prefix)."""
     full_names = set()
-    base_names = {}  # maps base name -> full name (with prefix)
+    base_names = defaultdict(list)
     
     with open(stockholm_file, 'r') as f:
         for line in f:
@@ -52,15 +52,15 @@ def get_seqs_in_stockholm(stockholm_file):
                 else:
                     base_name = full_name
 
-                base_names[base_name] = full_name
+                base_names[base_name].append(full_name)
 
     return full_names, base_names
-
 
 def cluster_sequences_by_pid(pairs, full_names, base_names_map, maxid, always_keep_sequences, verbose=False):
     representative = {}
     represented = defaultdict(set)
 
+    # Initialize each sequence as its own cluster
     for seq in full_names:
         representative[seq] = seq
         represented[seq].add(seq)
@@ -70,53 +70,66 @@ def cluster_sequences_by_pid(pairs, full_names, base_names_map, maxid, always_ke
             return (2, 0)
         return (1, -seq.count("unknown"))
 
+    # --- CLUSTERING ---
     for seq1, seq2, pid in pairs:
         if pid < maxid * 100.0:
             break
 
-        full_seq1 = base_names_map.get(seq1, seq1)
-        full_seq2 = base_names_map.get(seq2, seq2)
+        full_seqs1 = base_names_map.get(seq1, [])
+        full_seqs2 = base_names_map.get(seq2, [])
 
-        if full_seq1 not in full_names or full_seq2 not in full_names:
+        if not full_seqs1 or not full_seqs2:
             continue
 
-        rep1 = representative[full_seq1]
-        rep2 = representative[full_seq2]
+        # 🔥 THIS is where your snippet goes
+        for f1 in full_seqs1:
+            for f2 in full_seqs2:
 
-        if rep1 == rep2:
-            continue
+                rep1 = representative[f1]
+                rep2 = representative[f2]
 
-        if score(rep1) >= score(rep2):
-            keep_rep, remove_rep = rep1, rep2
-        else:
-            keep_rep, remove_rep = rep2, rep1
+                if rep1 == rep2:
+                    continue
 
-        for s in represented[remove_rep]:
-            representative[s] = keep_rep
-            represented[keep_rep].add(s)
+                if score(rep1) >= score(rep2):
+                    keep_rep, remove_rep = rep1, rep2
+                else:
+                    keep_rep, remove_rep = rep2, rep1
 
-        del represented[remove_rep]
+                # Merge clusters safely
+                if remove_rep not in represented:
+                    continue
 
+                for s in represented[remove_rep]:
+                    representative[s] = keep_rep
+                    represented[keep_rep].add(s)
+
+                del represented[remove_rep]
+
+    # --- Representatives ---
     keep = sorted(represented.keys())
 
-    # enforce always-keep sequences
-    for s in always_keep_sequences:
-        if s in base_names_map:
-            full_s = base_names_map[s]
+    # --- Enforce always-keep sequences ---
+    for base in always_keep_sequences:
+        full_list = base_names_map.get(base, [])
 
+        for full_s in full_list:
             if full_s not in representative:
                 continue
 
             rep = representative[full_s]
 
             if rep != full_s:
-                represented[rep].remove(full_s)
+                if rep in represented and full_s in represented[rep]:
+                    represented[rep].remove(full_s)
+
                 represented[full_s] = {full_s}
                 representative[full_s] = full_s
                 keep.append(full_s)
 
     keep = sorted(set(keep))
 
+    # --- Coverage ---
     total_original_sequences = len(full_names)
 
     coverage_report = {}
@@ -175,7 +188,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
 
     # --- Parse + clean PID pairs ---
     pairs = []
-    seen_pairs = set()
+    pair_best_pid = {}
 
     for line in result.stdout.splitlines():
         if line.startswith("#"):
@@ -191,12 +204,9 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
             continue
 
         key = tuple(sorted((seq1, seq2)))
-        if key in seen_pairs:
-            continue
-        seen_pairs.add(key)
+        pair_best_pid[key] = max(pid, pair_best_pid.get(key, 0.0))
 
-        pairs.append((seq1, seq2, pid))
-
+    pairs = [(k[0], k[1], v) for k, v in pair_best_pid.items()]
     pairs.sort(key=lambda x: x[2], reverse=True)
 
     if verbose:
