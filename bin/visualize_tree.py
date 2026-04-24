@@ -151,7 +151,7 @@ def generate_rectangular_tree_svg(tree_path, coverage_json_path, svg_output_path
         'SSL3': '#4A90E2',
         'SSL7': '#7ED321',
         'SSL11': '#F5D547',
-        'Unknown': '#999999'
+        'Unknown': '#000000'
     }
 
     # Layout
