@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Tree visualization tool for alifilter output
-Generates a rectangular phylogenetic tree with proper Newick parsing and layout.
+Generates a rectangular phylogenetic tree with proper spacing and reference highlighting.
 """
 
 import json
@@ -34,9 +34,7 @@ def parse_newick(newick_str):
                 else:
                     child = parse_node()
                     node.children.append(child)
-            
             pos += 1
-            
             label_start = pos
             while pos < len(newick_str) and newick_str[pos] not in '(),;:':
                 pos += 1
@@ -64,7 +62,7 @@ def parse_newick(newick_str):
 
 
 def clean_seq_name(seq_name):
-    """Remove leading sequence number (e.g., '861|ERR212785_...' -> 'ERR212785_...')"""
+    """Remove leading sequence number."""
     if '|' in seq_name:
         parts = seq_name.split('|', 1)
         if parts[0].isdigit():
@@ -74,7 +72,7 @@ def clean_seq_name(seq_name):
 
 
 def extract_branch_from_seq(seq_name):
-    """Extract branch (SSL3, SSL7, etc.) from sequence name"""
+    """Extract branch type from sequence name."""
     clean_name = clean_seq_name(seq_name)
     if '|' in clean_name:
         return clean_name.split('|')[0]
@@ -85,23 +83,30 @@ def extract_branch_from_seq(seq_name):
 
 
 def collect_leaf_count(node):
-    """Count number of leaves below this node"""
+    """Count number of leaves below this node."""
     if not node.children:
         return 1
     return sum(collect_leaf_count(child) for child in node.children)
 
 
+def get_max_distance(node):
+    """Get maximum branch distance in tree."""
+    if not node.children:
+        return 0
+    return max(node.distance + get_max_distance(child) for child in node.children)
+
+
 def generate_rectangular_tree_svg(tree_path, coverage_json_path, svg_output_path):
-    """Generate rectangular phylogenetic tree SVG."""
+    """Generate rectangular phylogenetic tree SVG with proper spacing."""
     
-    # Hardcoded always-keep sequences
+    # Always-keep sequences
     always_keep_set = {
         "SSL3|CC1", "SSL3|CC5", "SSL3|CC8", "SSL3|CC22", "SSL3|CC30", "SSL3|CC93",
         "SSL7|CC1", "SSL7|CC5", "SSL7|CC8", "SSL7|CC22", "SSL7|CC30", "SSL7|CC93",
         "SSL11|CC1", "SSL11|CC5", "SSL11|CC8", "SSL11|CC22", "SSL11|CC30", "SSL11|CC93"
     }
     
-    # Read tree and coverage
+    # Read input files
     with open(tree_path, 'r') as f:
         tree = parse_newick(f.read().strip())
     
@@ -119,79 +124,74 @@ def generate_rectangular_tree_svg(tree_path, coverage_json_path, svg_output_path
         'Unknown': '#95a5a6'
     }
     
-    # Highlight colors by branch
     highlight_colors = {
-        'SSL3': '#4A90E2',      # Blue
-        'SSL7': '#7ED321',      # Green
-        'SSL11': '#F5D547',     # Yellow
+        'SSL3': '#4A90E2',
+        'SSL7': '#7ED321',
+        'SSL11': '#F5D547',
         'SSL1': '#FF6B6B',
         'SSL2': '#4ECDC4',
         'SSL5': '#95E1D3',
         'Unknown': '#CCCCCC'
     }
     
-    # Layout parameters
-    margin_left = 50
-    margin_top = 30
-    leaf_height = 25
-    x_scale = 4  # pixels per unit distance
+    # Layout parameters - make SVG VERY WIDE to show branch distances
+    margin_left = 80
+    margin_top = 40
+    leaf_height = 30
+    x_scale = 50  # Much larger for branch distance visibility
+    label_right_margin = 300
     
-    # Count total leaves to determine SVG height
+    # Calculate dimensions
     total_leaves = collect_leaf_count(tree)
-    svg_height = margin_top * 2 + total_leaves * leaf_height
+    max_distance = get_max_distance(tree)
     
-    # Track layout
+    svg_height = margin_top * 2 + total_leaves * leaf_height
+    svg_width = margin_left + (max_distance * x_scale) + label_right_margin
+    
+    # Layout tree
     leaf_y = [margin_top]
-    svg_elements = []
-    node_positions = {}  # Store (x, y) for each node
+    node_positions = {}
     
     def layout_tree(node, depth=0):
-        """Layout tree and record positions"""
+        """Calculate node positions."""
         x = margin_left + depth * x_scale
         
         if not node.children:
-            # Leaf node
             y = leaf_y[0]
             leaf_y[0] += leaf_height
             node_positions[id(node)] = (x, y)
             return x, y
         
-        # Internal node: position at midpoint of children
+        # Internal node at midpoint of children
         child_positions = []
         for child in node.children:
             cx, cy = layout_tree(child, depth + node.distance)
             child_positions.append((cx, cy))
         
-        # Y position is midpoint of children
         avg_y = sum(cy for cx, cy in child_positions) / len(child_positions)
         x_internal = margin_left + (depth + node.distance) * x_scale
         node_positions[id(node)] = (x_internal, avg_y)
         
         return x_internal, avg_y
     
-    # Layout the tree
     layout_tree(tree)
     
-    # Calculate max X for SVG width
-    max_x = max(x for x, y in node_positions.values()) + 200
-    svg_width = max_x + 50
-    
     # Build SVG
-    svg_elements = [
-        f'<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="{svg_width}" height="{svg_height}" viewBox="0 0 {svg_width} {svg_height}">',
+    svg = [
+        f'<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="{svg_width:.0f}" height="{svg_height:.0f}" viewBox="0 0 {svg_width:.0f} {svg_height:.0f}">',
         '<defs><style>',
-        '.branch { stroke: #333; stroke-width: 1.5; fill: none; }',
-        '.leaf-circle { stroke: #000; stroke-width: 1; }',
-        '.leaf-label { font-family: Arial, sans-serif; font-size: 14px; fill: #000; }',
-        '.reference-label { font-family: Arial, sans-serif; font-size: 14px; fill: #000; font-weight: bold; }',
-        '.coverage-label { font-family: Arial, sans-serif; font-size: 11px; fill: #666; }',
+        '.branch { stroke: #333; stroke-width: 2; fill: none; }',
+        '.leaf-circle { stroke: #000; stroke-width: 1.5; }',
+        '.leaf-label { font-family: Arial, sans-serif; font-size: 16px; fill: #000; }',
+        '.reference-label { font-family: Arial, sans-serif; font-size: 16px; fill: #fff; font-weight: bold; }',
+        '.coverage-label { font-family: Arial, sans-serif; font-size: 12px; fill: #666; }',
         '</style></defs>',
         '<rect width="100%" height="100%" fill="white"/>',
     ]
     
-    # Draw branches recursively
+    # Draw branches
     def draw_branches(node):
-        """Draw branches for rectangular tree"""
+        """Draw rectangular tree branches."""
         if id(node) not in node_positions:
             return
         
@@ -203,25 +203,23 @@ def generate_rectangular_tree_svg(tree_path, coverage_json_path, svg_output_path
             
             x2, y2 = node_positions[id(child)]
             
-            # Rectangular path: horizontal then vertical
-            # Horizontal line from parent
-            svg_elements.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y1}" class="branch"/>')
-            # Vertical line to child
-            svg_elements.append(f'<line x1="{x2}" y1="{y1}" x2="{x2}" y2="{y2}" class="branch"/>')
+            # Horizontal line from parent to child x-position
+            svg.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y1:.1f}" class="branch"/>')
+            # Vertical line from parent y to child y
+            svg.append(f'<line x1="{x2:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" class="branch"/>')
             
             draw_branches(child)
     
     draw_branches(tree)
     
-    # Draw leaf nodes and labels
+    # Draw leaf nodes
     def draw_leaves(node):
-        """Draw leaf nodes"""
+        """Draw leaf nodes and labels with highlighting."""
         if node.children:
             for child in node.children:
                 draw_leaves(child)
             return
         
-        # This is a leaf
         if id(node) not in node_positions:
             return
         
@@ -230,38 +228,40 @@ def generate_rectangular_tree_svg(tree_path, coverage_json_path, svg_output_path
         branch = extract_branch_from_seq(node.name)
         is_reference = clean_name in always_keep_set
         
-        # Draw highlight box for reference sequences
-        if is_reference:
-            highlight_color = highlight_colors.get(branch, '#CCCCCC')
-            svg_elements.append(f'<rect x="{x-10}" y="{y-10}" width="20" height="20" fill="{highlight_color}" opacity="0.4" rx="2"/>')
-        
-        # Draw leaf circle
+        # Draw circle
         color = branch_colors.get(branch, '#95a5a6')
-        svg_elements.append(f'<circle cx="{x}" cy="{y}" r="4" class="leaf-circle" fill="{color}"/>')
+        svg.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="5" class="leaf-circle" fill="{color}"/>')
         
-        # Draw label
+        # Draw label (clean version)
         label = clean_name.split('|')[-1] if '|' in clean_name else clean_name
-        label_class = 'reference-label' if is_reference else 'leaf-label'
-        svg_elements.append(f'<text x="{x + 12}" y="{y + 5}" class="{label_class}">{label}</text>')
+        
+        if is_reference:
+            # Highlighted background for reference sequences
+            highlight_color = highlight_colors.get(branch, '#CCCCCC')
+            label_width = len(label) * 9  # Approximate width
+            svg.append(f'<rect x="{x + 12}" y="{y - 18}" width="{label_width + 8}" height="22" fill="{highlight_color}" rx="3"/>')
+            svg.append(f'<text x="{x + 16}" y="{y + 3}" class="reference-label">{label}</text>')
+        else:
+            svg.append(f'<text x="{x + 12}" y="{y + 5}" class="leaf-label">{label}</text>')
         
         # Add coverage info
         if clean_name in sequence_coverage:
             cov = sequence_coverage[clean_name]['coverage_percent']
-            svg_elements.append(f'<text x="{x + 12}" y="{y + 18}" class="coverage-label">({cov:.1f}%)</text>')
+            svg.append(f'<text x="{x + 12}" y="{y + 20}" class="coverage-label">({cov:.1f}%)</text>')
     
     draw_leaves(tree)
     
-    svg_elements.append('</svg>')
+    svg.append('</svg>')
     
-    # Write SVG
+    # Write file
     with open(svg_output_path, 'w') as f:
-        f.write('\n'.join(svg_elements))
+        f.write('\n'.join(svg))
     
     print(f"✅ SVG saved to: {svg_output_path}")
 
 
 def generate_html_visualization(coverage_json_path, svg_output_path, html_output_path):
-    """Generate HTML report with embedded SVG and coverage table."""
+    """Generate HTML report."""
     
     always_keep_set = {
         "SSL3|CC1", "SSL3|CC5", "SSL3|CC8", "SSL3|CC22", "SSL3|CC30", "SSL3|CC93",
@@ -269,7 +269,6 @@ def generate_html_visualization(coverage_json_path, svg_output_path, html_output
         "SSL11|CC1", "SSL11|CC5", "SSL11|CC8", "SSL11|CC22", "SSL11|CC30", "SSL11|CC93"
     }
     
-    # Load coverage
     with open(coverage_json_path, 'r') as f:
         sequence_coverage = json.load(f)
     
@@ -318,7 +317,7 @@ def generate_html_visualization(coverage_json_path, svg_output_path, html_output
         }}
         
         .container {{
-            max-width: 1600px;
+            max-width: 100%;
             margin: 0 auto;
             background: white;
             border-radius: 8px;
@@ -347,7 +346,7 @@ def generate_html_visualization(coverage_json_path, svg_output_path, html_output
             padding: 20px;
             margin-bottom: 30px;
             overflow-x: auto;
-            max-height: 1000px;
+            max-height: 1200px;
             overflow-y: auto;
         }}
         
@@ -461,12 +460,6 @@ def generate_html_visualization(coverage_json_path, svg_output_path, html_output
             flex-shrink: 0;
         }}
         
-        .legend-item.highlight {{
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }}
-        
         .reference-box {{
             width: 18px;
             height: 18px;
@@ -535,17 +528,17 @@ def generate_html_visualization(coverage_json_path, svg_output_path, html_output
                     <div class="legend-color" style="background: #27ae60;"></div>
                     <span>SSL5</span>
                 </div>
-                <div class="legend-item highlight">
-                    <div class="reference-box" style="background: #4A90E2; opacity: 0.4;"></div>
-                    <span>SSL3 Reference</span>
+                <div class="legend-item">
+                    <div class="reference-box" style="background: #4A90E2; border: none;"></div>
+                    <span>SSL3 Reference (Highlighted)</span>
                 </div>
-                <div class="legend-item highlight">
-                    <div class="reference-box" style="background: #7ED321; opacity: 0.4;"></div>
-                    <span>SSL7 Reference</span>
+                <div class="legend-item">
+                    <div class="reference-box" style="background: #7ED321; border: none;"></div>
+                    <span>SSL7 Reference (Highlighted)</span>
                 </div>
-                <div class="legend-item highlight">
-                    <div class="reference-box" style="background: #F5D547; opacity: 0.4;"></div>
-                    <span>SSL11 Reference</span>
+                <div class="legend-item">
+                    <div class="reference-box" style="background: #F5D547; border: none;"></div>
+                    <span>SSL11 Reference (Highlighted)</span>
                 </div>
             </div>
         </div>
