@@ -251,7 +251,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
 
     # --- Coverage output ---
     if verbose:
-        cov_file = os.path.join(output_dir, "temp", "sequence_coverage.json")
+        cov_file = output_file.replace(".fasta", "_coverage.json")
         with open(cov_file, "w") as f:
             json.dump(coverage_report, f, indent=2)
 
