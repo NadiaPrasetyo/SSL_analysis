@@ -23,68 +23,65 @@ def setup_logging(verbose, output_dir):
     if verbose:
         logging.info("Logging initialized. Log file: %s", log_file)
 
-def normalize(seq):
-    """Remove Stockholm numeric prefix like 657|"""
-    return seq.split("|", 1)[1] if "|" in seq and seq.split("|", 1)[0].isdigit() else seq
 
 def get_seqs_in_stockholm(stockholm_file):
+    """Extract all sequence names from a Stockholm format file.
+    Returns both full names (with prefix) and base names (without prefix)."""
     full_names = set()
     base_names = defaultdict(list)
-    norm_to_raw = defaultdict(list)
-
+    
     with open(stockholm_file, 'r') as f:
         for line in f:
             line = line.rstrip('\n')
-
+            # In Stockholm format, sequences are like: "NAME  SEQUENCE"
+            # Skip comments and blank lines
             if not line or line.startswith('#') or line.startswith('//'):
                 continue
-
+            # Split on whitespace
             parts = line.split()
-            if len(parts) < 1 or line.startswith(' '):
-                continue
+            if len(parts) >= 1 and not line.startswith(' '):
+                # This is a sequence line
+                full_name = parts[0]
+                full_names.add(full_name)
+                
+                # Extract base name (remove numeric prefix like "000|")
+                # Format: "000|original_name"
+                if '|' in full_name:
+                    base_name = '|'.join(full_name.split('|')[1:])
+                else:
+                    base_name = full_name
 
-            full_name_raw = parts[0]
-            full_name = normalize(full_name_raw)
-
-            full_names.add(full_name_raw)  # IMPORTANT: keep RAW too
-
-            norm_to_raw[full_name].append(full_name_raw)
-
-            if '|' in full_name:
-                base_name = '|'.join(full_name.split('|')[1:])
-            else:
-                base_name = full_name
-
-            base_name = normalize(base_name)
-            base_names[base_name].append(full_name_raw)
-
-    return full_names, base_names, norm_to_raw
+                base_names[base_name].append(full_name)
+                
+    logging.info(f"full_names sample: {list(full_names)[:5]}, base_names sample: {list(base_names.keys())[:5]}")
+    return full_names, base_names
 
 def cluster_sequences_by_pid(pairs, full_names, base_names_map, maxid, always_keep_sequences, verbose=False):
     from collections import defaultdict
 
+    threshold = maxid * 100.0
+
     # -----------------------------
-    # Step 0: initialize
+    # Step 0: best direct match
     # -----------------------------
-    best_match = {}  # seq -> (best_pid, partner_seq)
+    best_match = {}  # seq -> partner
 
     def update_best(a, b, pid):
-        # only keep PID > threshold
-        if pid < maxid * 100.0:
+        if pid < threshold:
             return
 
-        # prefer higher PID
+        # keep only best partner (no PID stored anymore)
         if a not in best_match or pid > best_match[a][0]:
             best_match[a] = (pid, b)
         if b not in best_match or pid > best_match[b][0]:
             best_match[b] = (pid, a)
 
     # -----------------------------
-    # Step 1: compute best edges
+    # Step 1: build best edges
     # -----------------------------
     for seq1, seq2, pid in pairs:
-        full_seqs1 = base_names_map.get(normalize(seq1), [])
-        full_seqs2 = base_names_map.get(normalize(seq2), [])
+        full_seqs1 = base_names_map.get(seq1, [])
+        full_seqs2 = base_names_map.get(seq2, [])
 
         if not full_seqs1 or not full_seqs2:
             continue
@@ -96,71 +93,67 @@ def cluster_sequences_by_pid(pairs, full_names, base_names_map, maxid, always_ke
                 update_best(f1, f2, pid)
 
     # -----------------------------
-    # Step 2: resolve representatives (inheritance)
+    # Step 2: initial representative mapping
     # -----------------------------
-    def find_root(seq):
-        visited = set()
-        while seq in best_match:
-            if seq in visited:
-                break
-            visited.add(seq)
-            seq = best_match[seq][1]
-        return seq
-
-    representative = {}
-    clusters = defaultdict(set)
-
-    for seq in map(normalize, full_names):
-        rep = find_root(seq)
-        representative[seq] = rep
-        clusters[rep].add(seq)
+    rep = {}
+    for seq in full_names:
+        if seq in best_match:
+            rep[seq] = best_match[seq][1]
+        else:
+            rep[seq] = seq
 
     # -----------------------------
-    # Step 3: enforce always-keep
+    # Step 3: enforce always-keep (force roots)
     # -----------------------------
-    keep = set(clusters.keys())
+    keep = set()
 
     for base in always_keep_sequences:
-        full_list = base_names_map.get(normalize(base), [])
-        base = normalize(base)
-
-        for seq in full_list:
-            if seq not in representative:
-                continue
-
-            rep = representative[seq]
-
-            # break it out into its own cluster
-            if seq != rep:
-                clusters[rep].discard(seq)
-
-            clusters[seq].add(seq)
-            representative[seq] = seq
+        for seq in base_names_map.get(base, []):
+            rep[seq] = seq
             keep.add(seq)
 
-    keep = sorted(set(keep))
+    # -----------------------------
+    # Step 4: transitive collapse (KEY FIX)
+    # -----------------------------
+    def resolve(x):
+        seen = set()
+        while rep.get(x, x) != x and x not in seen:
+            seen.add(x)
+            x = rep[x]
+        return x
+
+    changed = True
+    while changed:
+        changed = False
+        for seq in full_names:
+            new_rep = resolve(seq)
+            if rep[seq] != new_rep:
+                rep[seq] = new_rep
+                changed = True
 
     # -----------------------------
-    # Step 4: coverage report
+    # Step 5: build clusters
     # -----------------------------
-    total_original_sequences = len(set(map(normalize, full_names)))
+    clusters = defaultdict(set)
+
+    for seq, r in rep.items():
+        clusters[r].add(seq)
+
+    keep.update(clusters.keys())
+    keep = sorted(keep)
+
+    # -----------------------------
+    # Step 6: coverage report
+    # -----------------------------
+    total = len(full_names)
 
     coverage_report = {}
-    for rep_raw, cluster_raw in clusters.items():
-        rep = normalize(rep_raw)
-        cluster = {normalize(x) for x in cluster_raw}
-        num = len(cluster)
-        coverage_percent = (num / total_original_sequences) * 100.0
-
-        coverage_report[rep] = {
-            "num": num,
-            "coverage_percent": round(coverage_percent, 2),
-            "removed_sequences": sorted([s for s in cluster if s != rep])
+    for r, cluster in clusters.items():
+        coverage_report[r] = {
+            "num": len(cluster),
+            "coverage_percent": round(len(cluster) / total * 100.0, 2),
+            "removed_sequences": sorted([s for s in cluster if s != r])
         }
-
-    # sanity check
-    total_coverage = sum(v["num"] for v in coverage_report.values())
-    assert total_coverage == total_original_sequences
 
     if verbose:
         logging.info(f"Clusters formed: {len(keep)}")
@@ -189,7 +182,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         )
 
     # Get all sequences actually in the Stockholm file
-    full_names, base_names_map, norm_to_raw = get_seqs_in_stockholm(tmp_sto)
+    full_names, base_names_map = get_seqs_in_stockholm(tmp_sto)
 
     if verbose:
         logging.info(f"Sequences in alignment: {len(full_names)}")
@@ -250,21 +243,11 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     if verbose:
         logging.info(f"Final keep count: {len(keep)}")
 
-    to_keep_raw = set()
-
-    for seq in keep:
-        # map normalized cluster rep back to raw Stockholm IDs
-        if seq in norm_to_raw:
-            to_keep_raw.update(norm_to_raw[seq])
-        else:
-            # fallback safety
-            to_keep_raw.add(seq)
-
     # --- Write keep list ---
     to_keep_file = os.path.join(output_dir, "temp", "to_keep.txt")
     with open(to_keep_file, "w") as f:
-    for seq in sorted(to_keep_raw):
-        f.write(seq + "\n")
+        for seq in keep:
+            f.write(seq + "\n")
 
     # --- Coverage output ---
     if verbose:
