@@ -286,23 +286,55 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     # Calculate total number of sequences in the original unfiltered alignment
     total_original_sequences = len(full_names)
     
-    # Build coverage report for each non-removed sequence
+    # Build direct removal mapping: removed -> keeper
+    direct_parent = {}
+
+    for keeper, removed_set in coverage_map.items():
+        for r in removed_set:
+            direct_parent[r] = keeper
+
+
+    def find_root(seq):
+        """Find final representative (with path compression)."""
+        path = []
+        while seq in direct_parent:
+            path.append(seq)
+            seq = direct_parent[seq]
+        # path compression
+        for p in path:
+            direct_parent[p] = seq
+        return seq
+
+
+    # Assign every sequence to a final representative
+    final_clusters = defaultdict(set)
+
+    for seq in full_names:
+        if seq in removed:
+            root = find_root(seq)
+        else:
+            root = seq
+        final_clusters[root].add(seq)
+
+
+    # Only keep clusters whose root is actually in `keep`
     coverage_report = {}
-    
+
     for kept_seq in keep:
-        # Count how many sequences this one represents:
-        # 1. Itself (1)
-        # 2. All sequences marked as removed because they matched above PID threshold
-        num_represented = 1 + len(coverage_map.get(kept_seq, set()))
-        
-        # Calculate coverage percentage
+        cluster = final_clusters.get(kept_seq, {kept_seq})
+
+        num_represented = len(cluster)
         coverage_percent = (num_represented / total_original_sequences) * 100.0
-        
+
         coverage_report[kept_seq] = {
             "num": num_represented,
             "coverage_percent": round(coverage_percent, 2),
-            "removed_sequences": sorted(list(coverage_map.get(kept_seq, set())))
+            "removed_sequences": sorted([s for s in cluster if s != kept_seq])
         }
+
+
+    # Sanity check
+    total_coverage = sum(v["num"] for v in coverage_report.values())
     
     # Output coverage report as JSON if verbose
     if verbose:
