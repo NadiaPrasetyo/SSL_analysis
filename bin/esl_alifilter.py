@@ -28,10 +28,9 @@ def normalize(seq):
     return seq.split("|", 1)[1] if "|" in seq and seq.split("|", 1)[0].isdigit() else seq
 
 def get_seqs_in_stockholm(stockholm_file):
-    """Extract sequence names and normalize ID space immediately."""
-
     full_names = set()
     base_names = defaultdict(list)
+    norm_to_raw = defaultdict(list)
 
     with open(stockholm_file, 'r') as f:
         for line in f:
@@ -47,19 +46,19 @@ def get_seqs_in_stockholm(stockholm_file):
             full_name_raw = parts[0]
             full_name = normalize(full_name_raw)
 
-            full_names.add(full_name)
+            full_names.add(full_name_raw)  # IMPORTANT: keep RAW too
 
-            # base name extraction + normalization
+            norm_to_raw[full_name].append(full_name_raw)
+
             if '|' in full_name:
                 base_name = '|'.join(full_name.split('|')[1:])
             else:
                 base_name = full_name
 
             base_name = normalize(base_name)
+            base_names[base_name].append(full_name_raw)
 
-            base_names[base_name].append(full_name)
-
-    return full_names, base_names
+    return full_names, base_names, norm_to_raw
 
 def cluster_sequences_by_pid(pairs, full_names, base_names_map, maxid, always_keep_sequences, verbose=False):
     from collections import defaultdict
@@ -190,7 +189,7 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
         )
 
     # Get all sequences actually in the Stockholm file
-    full_names, base_names_map = get_seqs_in_stockholm(tmp_sto)
+    full_names, base_names_map, norm_to_raw = get_seqs_in_stockholm(tmp_sto)
 
     if verbose:
         logging.info(f"Sequences in alignment: {len(full_names)}")
@@ -251,11 +250,21 @@ def main(tool_root, maxid, msafile, output_file, verbose=False):
     if verbose:
         logging.info(f"Final keep count: {len(keep)}")
 
+    to_keep_raw = set()
+
+    for seq in keep:
+        # map normalized cluster rep back to raw Stockholm IDs
+        if seq in norm_to_raw:
+            to_keep_raw.update(norm_to_raw[seq])
+        else:
+            # fallback safety
+            to_keep_raw.add(seq)
+
     # --- Write keep list ---
     to_keep_file = os.path.join(output_dir, "temp", "to_keep.txt")
     with open(to_keep_file, "w") as f:
-        for seq in keep:
-            f.write(seq + "\n")
+    for seq in sorted(to_keep_raw):
+        f.write(seq + "\n")
 
     # --- Coverage output ---
     if verbose:
