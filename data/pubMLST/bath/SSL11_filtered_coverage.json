@@ -1,0 +1,754 @@
+{
+  "000|ERR527294_Unknown_2016_ST22_SSL11": {
+    "num": 352,
+    "coverage_percent": 69.7,
+    "removed_sequences": [
+      "001|ERR737351_Unknown_2016_ST22_SSL11",
+      "002|ERR266701_Unknown_2016_ST22_SSL11",
+      "003|ERR278951_Unknown_2016_ST22_SSL11",
+      "004|ERR714756_Unknown_2016_ST22_SSL11",
+      "005|ERR419180_Unknown_2016_ST22_SSL11",
+      "006|ERR310929_Unknown_2016_ST22_SSL11",
+      "007|ERR266644_Unknown_2016_ST22_SSL11",
+      "008|ERR540792_Unknown_2016_ST22_SSL11",
+      "009|ERR715281_Unknown_2016_ST22_SSL11",
+      "010|ERR377067_Unknown_2016_ST22_SSL11",
+      "011|ERR737616_Unknown_2016_ST22_SSL11",
+      "012|ERR038078_UK_2016_ST22_SSL11",
+      "013|ERR715199_Unknown_2016_ST22_SSL11",
+      "014|ERR038152_UK_2016_ST22_SSL11",
+      "015|ERR038144_UK_2016_ST22_SSL11",
+      "016|unknown_Pakistan_2019_ST5426_SSL11",
+      "017|ERR038148_UK_2016_ST22_SSL11",
+      "018|ERR038147_UK_2016_STunknown_SSL11",
+      "019|ERR038151_UK_2016_ST22_SSL11",
+      "020|ERR418629_Unknown_2016_ST22_SSL11",
+      "021|ERR038149_UK_2016_ST22_SSL11",
+      "022|ERR038096_UK_2016_ST22_SSL11",
+      "023|ERR038079_UK_2016_ST22_SSL11",
+      "024|ERR377173_Unknown_2016_ST22_SSL11",
+      "025|ERR033430_Unknown_2016_ST89_SSL11",
+      "026|unknown_Romania_2023_ST8050_SSL11",
+      "027|unknown_USA_2022_ST1290_SSL11",
+      "028|unknown_Spain_2017_ST8338_SSL11",
+      "029|ERR038058_UK_2016_ST22_SSL11",
+      "030|unknown_Egypt_2021_STunknown_SSL11",
+      "031|ERR045886_UK_2016_ST22_SSL11",
+      "032|ERR266675_Unknown_2016_ST22_SSL11",
+      "033|unknown_Australia_2021_ST22_SSL11",
+      "034|unknown_Australia_2021_ST22_SSL11",
+      "035|ERR038100_UK_2016_ST22_SSL11",
+      "036|unknown_China_2019_ST22_SSL11",
+      "037|unknown_USA_2022_STunknown_SSL11",
+      "038|ERR279059_Unknown_2016_ST22_SSL11",
+      "039|unknown_Nepal_2016_ST22_SSL11",
+      "040|ERR701916_Unknown_2016_ST22_SSL11",
+      "042|unknown_Unknown_2022_ST22_SSL11",
+      "043|unknown_Ghana_2022_ST152_SSL11",
+      "044|unknown_Ghana_2022_ST152_SSL11",
+      "045|unknown_Egypt_2021_STunknown_SSL11",
+      "046|unknown_Egypt_2021_ST152_SSL11",
+      "047|unknown_Egypt_2021_STunknown_SSL11",
+      "048|unknown_Japan_2021_ST8073_SSL11",
+      "049|unknown_Australia_2022_ST152_SSL11",
+      "050|unknown_Egypt_2021_STunknown_SSL11",
+      "051|unknown_Egypt_2021_STunknown_SSL11",
+      "060|ERR418602_Unknown_2016_ST121_SSL11",
+      "062|unknown_Egypt_2021_STunknown_SSL11",
+      "063|unknown_Ghana_2022_ST121_SSL11",
+      "065|unknown_Egypt_2021_STunknown_SSL11",
+      "066|unknown_Australia_2022_ST121_SSL11",
+      "067|ERR311156_Unknown_2016_ST121_SSL11",
+      "068|ERR554328_Unknown_2016_ST121_SSL11",
+      "069|unknown_Egypt_2021_STunknown_SSL11",
+      "070|unknown_Australia_2022_ST121_SSL11",
+      "071|unknown_Egypt_2021_STunknown_SSL11",
+      "072|unknown_USA_2021_STunknown_SSL11",
+      "073|ERR410067_Unknown_2016_ST942_SSL11",
+      "076|unknown_Ghana_2022_ST7865_SSL11",
+      "077|unknown_Egypt_2021_ST121_SSL11",
+      "078|ERR033543_Unknown_2016_ST10_SSL11",
+      "079|unknown_Egypt_2021_STunknown_SSL11",
+      "080|ERR845378_Unknown_2016_ST6_SSL11",
+      "083|unknown_USA_2022_ST5_SSL11",
+      "085|SRR9647375_USA_2018_ST8870_SSL11",
+      "087|ERR540038_Unknown_2016_ST105_SSL11",
+      "088|unknown_Australia_2022_ST5_SSL11",
+      "089|ERR212871_Unknown_2016_ST5_SSL11",
+      "090|unknown_Australia_2021_ST5_SSL11",
+      "091|ERR109592_Unknown_2016_ST5_SSL11",
+      "092|ERR425674_Unknown_2016_ST5_SSL11",
+      "093|ERR555080_Unknown_2016_ST5_SSL11",
+      "094|unknown_USA_2022_ST5_SSL11",
+      "097|unknown_Australia_2022_ST6_SSL11",
+      "098|unknown_USA_2022_STunknown_SSL11",
+      "099|unknown_USA_2022_ST5_SSL11",
+      "100|unknown_Egypt_2021_STunknown_SSL11",
+      "101|unknown_Egypt_2021_STunknown_SSL11",
+      "102|ERR038367_Unknown_2016_ST249_SSL11",
+      "103|unknown_Australia_2022_ST5_SSL11",
+      "104|unknown_Egypt_2021_STunknown_SSL11",
+      "105|unknown_USA_2017_ST6956_SSL11",
+      "106|unknown_USA_2023_ST1631_SSL11",
+      "107|unknown_Australia_2022_ST5_SSL11",
+      "108|unknown_Egypt_2021_STunknown_SSL11",
+      "109|unknown_Australia_2022_ST5_SSL11",
+      "110|unknown_USA_2017_ST7550_SSL11",
+      "111|unknown_Chile_2023_ST105_SSL11",
+      "115|unknown_Egypt_2021_STunknown_SSL11",
+      "116|unknown_Australia_2022_ST5_SSL11",
+      "117|unknown_Egypt_2021_STunknown_SSL11",
+      "133|ERR554466_Unknown_2016_ST8_SSL11",
+      "134|SRR1048363_USA_2016_ST8_SSL11",
+      "135|ERR033837_Unknown_2016_ST239_SSL11",
+      "136|ERR554191_Unknown_2016_ST848_SSL11",
+      "137|ERR540166_Unknown_2016_ST8_SSL11",
+      "139|ERR554246_Unknown_2016_ST12_SSL11",
+      "141|unknown_USA_2022_STunknown_SSL11",
+      "142|unknown_USA_2022_ST8_SSL11",
+      "150|ERR086053_Unknown_2016_ST8_SSL11",
+      "151|unknown_Egypt_2021_ST239_SSL11",
+      "153|ERR190141_Unknown_2016_ST239_SSL11",
+      "154|ERR294127_Unknown_2016_ST8_SSL11",
+      "155|SRR2121457_USA_2016_ST8_SSL11",
+      "156|ERR418644_Unknown_2016_ST12_SSL11",
+      "157|unknown_USA_2022_STunknown_SSL11",
+      "158|ERR109217_Unknown_2016_ST239_SSL11",
+      "159|SRR513970_Unknown_2016_ST8_SSL11",
+      "160|ERR418583_Unknown_2016_ST12_SSL11",
+      "161|ERR006562_Unknown_2016_ST239_SSL11",
+      "162|SRR277418_Unknown_2016_ST8_SSL11",
+      "163|unknown_Unknown_2022_ST8_SSL11",
+      "164|unknown_Australia_2022_ST8_SSL11",
+      "165|SRR022842_Unknown_2016_ST8_SSL11",
+      "166|ERR171823_Unknown_2016_ST239_SSL11",
+      "167|ERR380533_Canada_2016_ST8_SSL11",
+      "168|ERR380531_Canada_2016_ST8_SSL11",
+      "169|ERR044246_Unknown_2016_ST239_SSL11",
+      "170|unknown_Unknown_2022_ST8_SSL11",
+      "182|unknown_USA_2021_ST7312_SSL11",
+      "183|ERR418479_Unknown_2016_ST1_SSL11",
+      "184|unknown_UK_2022_ST1_SSL11",
+      "185|ERR084635_Unknown_2016_ST81_SSL11",
+      "186|unknown_Egypt_2021_ST1_SSL11",
+      "187|unknown_Algeria_2020_ST1_SSL11",
+      "188|unknown_Egypt_2021_STunknown_SSL11",
+      "189|ERR731094_Unknown_2016_ST1_SSL11",
+      "190|unknown_Ghana_2022_ST1_SSL11",
+      "191|unknown_UK_2022_STunknown_SSL11",
+      "192|ERR332193_Unknown_2016_ST188_SSL11",
+      "193|ERR211907_Unknown_2016_ST1_SSL11",
+      "195|ERR708399_Unknown_2016_ST1_SSL11",
+      "196|unknown_Sweden_2020_ST6121_SSL11",
+      "197|unknown_Egypt_2021_STunknown_SSL11",
+      "199|unknown_Egypt_2021_ST1_SSL11",
+      "200|unknown_UK_2022_STunknown_SSL11",
+      "201|unknown_Poland_2021_ST1_SSL11",
+      "202|ERR573185_Unknown_2016_ST188_SSL11",
+      "203|ERR418502_Unknown_2016_ST1_SSL11",
+      "204|unknown_UK_2022_ST3926_SSL11",
+      "205|unknown_Australia_2022_ST188_SSL11",
+      "206|unknown_USA_2022_STunknown_SSL11",
+      "207|unknown_USA_2022_STunknown_SSL11",
+      "208|unknown_USA_2023_ST188_SSL11",
+      "209|unknown_USA_2023_ST1_SSL11",
+      "210|unknown_USA_2022_STunknown_SSL11",
+      "211|unknown_USA_2022_ST188_SSL11",
+      "212|unknown_USA_2022_ST188_SSL11",
+      "213|unknown_UK_2022_STunknown_SSL11",
+      "214|unknown_USA_2022_ST188_SSL11",
+      "215|unknown_USA_2022_ST188_SSL11",
+      "216|unknown_USA_2022_ST188_SSL11",
+      "217|unknown_Poland_2016_ST1_SSL11",
+      "218|unknown_Australia_2022_ST188_SSL11",
+      "219|unknown_UK_2022_STunknown_SSL11",
+      "220|unknown_UK_2022_STunknown_SSL11",
+      "221|unknown_USA_2021_ST7317_SSL11",
+      "233|ERR144763_Unknown_2016_ST39_SSL11",
+      "234|ERR573268_Unknown_2016_ST30_SSL11",
+      "235|ERR172083_Unknown_2016_ST30_SSL11",
+      "236|ERR540175_Unknown_2016_ST30_SSL11",
+      "237|ERR419001_Unknown_2016_ST30_SSL11",
+      "238|ERR418881_Unknown_2016_ST30_SSL11",
+      "239|ERR418949_Unknown_2016_ST30_SSL11",
+      "240|ERR410089_Unknown_2016_ST39_SSL11",
+      "241|ERR109532_Unknown_2016_ST30_SSL11",
+      "242|ERR714917_Unknown_2016_ST30_SSL11",
+      "243|ERR418876_Unknown_2016_ST30_SSL11",
+      "244|ERR418545_Unknown_2016_ST30_SSL11",
+      "245|ERR410094_Unknown_2016_ST30_SSL11",
+      "246|ERR158684_Unknown_2016_ST30_SSL11",
+      "247|ERR083714_UK_2016_ST30_SSL11",
+      "248|ERR109593_Unknown_2016_ST30_SSL11",
+      "249|ERR425751_Unknown_2016_ST30_SSL11",
+      "250|ERR109507_Unknown_2016_ST30_SSL11",
+      "251|ERR109563_Unknown_2016_ST30_SSL11",
+      "252|ERR540081_Unknown_2016_ST30_SSL11",
+      "254|ERR109577_Unknown_2016_ST30_SSL11",
+      "255|unknown_Australia_2022_ST30_SSL11",
+      "256|unknown_Australia_2022_ST39_SSL11",
+      "257|ERR083718_UK_2016_ST30_SSL11",
+      "258|ERR083710_UK_2016_ST30_SSL11",
+      "259|unknown_Australia_2022_ST30_SSL11",
+      "260|unknown_USA_2022_STunknown_SSL11",
+      "261|unknown_USA_2022_ST30_SSL11",
+      "262|SRR016396_Unknown_2016_ST30_SSL11",
+      "263|unknown_USA_2022_ST30_SSL11",
+      "264|unknown_USA_2022_ST30_SSL11",
+      "265|ERR357853_Unknown_2016_ST36_SSL11",
+      "266|unknown_USA_2022_ST30_SSL11",
+      "267|unknown_USA_2022_STunknown_SSL11",
+      "268|ERR419027_Unknown_2016_ST30_SSL11",
+      "269|ERR418888_Unknown_2016_ST30_SSL11",
+      "270|ERR109503_Unknown_2016_ST30_SSL11",
+      "271|SRR304676_Unknown_2016_ST30_SSL11",
+      "272|ERR109526_Unknown_2016_ST39_SSL11",
+      "273|unknown_USA_2022_ST39_SSL11",
+      "274|unknown_USA_2022_ST30_SSL11",
+      "275|unknown_USA_2022_ST30_SSL11",
+      "277|unknown_USA_2022_ST30_SSL11",
+      "278|unknown_USA_2017_ST7565_SSL11",
+      "279|ERR425647_Unknown_2016_ST15_SSL11",
+      "280|ERR554515_Unknown_2016_ST15_SSL11",
+      "281|unknown_Sweden_2022_ST691_SSL11",
+      "282|ERR539975_Unknown_2016_ST15_SSL11",
+      "283|ERR554083_Unknown_2016_ST15_SSL11",
+      "284|ERR418743_Unknown_2016_ST15_SSL11",
+      "285|ERR033282_Unknown_2016_ST15_SSL11",
+      "286|unknown_Egypt_2021_STunknown_SSL11",
+      "287|unknown_Australia_2022_ST15_SSL11",
+      "288|unknown_Australia_2022_ST15_SSL11",
+      "289|unknown_Egypt_2021_STunknown_SSL11",
+      "290|ERR573133_Unknown_2016_ST15_SSL11",
+      "291|unknown_Egypt_2021_STunknown_SSL11",
+      "292|unknown_Egypt_2021_STunknown_SSL11",
+      "293|unknown_USA_2022_ST7873_SSL11",
+      "294|unknown_USA_2022_ST15_SSL11",
+      "295|unknown_USA_2022_ST15_SSL11",
+      "296|unknown_USA_2022_STunknown_SSL11",
+      "297|unknown_USA_2022_STunknown_SSL11",
+      "298|unknown_USA_2022_STunknown_SSL11",
+      "299|unknown_USA_2022_STunknown_SSL11",
+      "300|unknown_USA_2022_STunknown_SSL11",
+      "301|unknown_USA_2022_STunknown_SSL11",
+      "302|unknown_USA_2022_ST582_SSL11",
+      "303|unknown_USA_2022_ST15_SSL11",
+      "304|unknown_USA_2022_ST15_SSL11",
+      "306|unknown_USA_2022_STunknown_SSL11",
+      "307|unknown_China_2018_ST9393_SSL11",
+      "317|unknown_Australia_2021_ST88_SSL11",
+      "318|unknown_UK_2022_STunknown_SSL11",
+      "319|unknown_Japan_2022_ST8083_SSL11",
+      "320|unknown_Unknown_2022_ST59_SSL11",
+      "321|unknown_China_2020_ST6632_SSL11",
+      "322|ERR033626_Unknown_2016_ST59_SSL11",
+      "323|ERR554154_Unknown_2016_ST59_SSL11",
+      "324|unknown_Egypt_2021_STunknown_SSL11",
+      "325|ERR211691_Unknown_2016_ST97_SSL11",
+      "326|ERR490495_Unknown_2016_ST97_SSL11",
+      "327|unknown_Australia_2022_ST97_SSL11",
+      "328|unknown_Thailand_2023_ST8463_SSL11",
+      "329|unknown_Tanzania_2017_ST7841_SSL11",
+      "330|unknown_Australia_2022_ST97_SSL11",
+      "331|unknown_Russia_2018_ST97_SSL11",
+      "332|unknown_USA_2022_ST87_SSL11",
+      "333|unknown_USA_2022_ST97_SSL11",
+      "334|unknown_USA_2022_ST8124_SSL11",
+      "335|unknown_USA_2022_STunknown_SSL11",
+      "336|unknown_USA_2023_ST97_SSL11",
+      "337|unknown_USA_2022_ST87_SSL11",
+      "338|unknown_USA_2022_ST97_SSL11",
+      "339|unknown_USA_2022_STunknown_SSL11",
+      "340|unknown_USA_2022_STunknown_SSL11",
+      "341|unknown_USA_2022_STunknown_SSL11",
+      "342|unknown_USA_2022_STunknown_SSL11",
+      "343|unknown_USA_2022_STunknown_SSL11",
+      "344|unknown_USA_2022_STunknown_SSL11",
+      "345|unknown_USA_2022_ST97_SSL11",
+      "346|unknown_USA_2022_ST8129_SSL11",
+      "349|unknown_USA_2022_ST87_SSL11",
+      "350|ERR109596_Unknown_2016_ST45_SSL11",
+      "351|ERR109575_Unknown_2016_ST45_SSL11",
+      "352|ERR419155_Unknown_2016_ST45_SSL11",
+      "353|ERR109644_Unknown_2016_ST45_SSL11",
+      "354|ERR554080_Unknown_2016_ST45_SSL11",
+      "355|ERR554285_Unknown_2016_ST45_SSL11",
+      "356|ERR554360_Unknown_2016_ST45_SSL11",
+      "357|ERR731085_Unknown_2016_ST45_SSL11",
+      "358|ERR033724_Unknown_2016_ST656_SSL11",
+      "359|ERR418613_Unknown_2016_ST45_SSL11",
+      "360|unknown_USA_2023_ST45_SSL11",
+      "361|ERR114888_Unknown_2016_ST45_SSL11",
+      "362|ERR554463_Unknown_2016_ST45_SSL11",
+      "363|ERR419122_Unknown_2016_ST45_SSL11",
+      "364|unknown_USA_2023_ST9031_SSL11",
+      "365|ERR419197_Unknown_2016_ST45_SSL11",
+      "366|unknown_USA_2022_ST45_SSL11",
+      "367|unknown_USA_2022_ST256_SSL11",
+      "368|unknown_USA_2022_STunknown_SSL11",
+      "369|unknown_USA_2022_STunknown_SSL11",
+      "370|unknown_USA_2022_ST45_SSL11",
+      "371|ERR425719_Unknown_2016_ST45_SSL11",
+      "372|ERR540145_Unknown_2016_ST45_SSL11",
+      "373|ERR033452_Unknown_2016_ST45_SSL11",
+      "374|unknown_Egypt_2021_STunknown_SSL11",
+      "406|ERR264116_Unknown_2016_ST772_SSL11",
+      "407|ERR716969_Unknown_2016_ST772_SSL11",
+      "408|ERR717024_Unknown_2016_ST772_SSL11",
+      "409|ERR266708_Unknown_2016_ST772_SSL11",
+      "410|unknown_Egypt_2021_STunknown_SSL11",
+      "411|unknown_Nigeria_2017_ST7670_SSL11",
+      "412|ERR279026_Unknown_2016_ST573_SSL11",
+      "427|unknown_Egypt_2021_STunknown_SSL11",
+      "428|unknown_USA_2022_ST8131_SSL11",
+      "429|unknown_USA_2022_ST8131_SSL11",
+      "430|SRR1025376_USA_2016_ST840_SSL11",
+      "431|unknown_Egypt_2021_ST5_SSL11",
+      "432|SRR1025377_USA_2016_ST840_SSL11",
+      "433|unknown_USA_2022_STunknown_SSL11",
+      "434|unknown_Egypt_2021_STunknown_SSL11",
+      "435|ERR038387_Unknown_2016_ST188_SSL11",
+      "436|ERR494738_Unknown_2016_ST133_SSL11",
+      "437|ERR573130_Unknown_2016_ST45_SSL11",
+      "438|unknown_Egypt_2021_STunknown_SSL11",
+      "439|SRR304678_Unknown_2016_ST30_SSL11",
+      "440|unknown_UK_2022_STunknown_SSL11",
+      "441|unknown_Japan_2021_ST8074_SSL11",
+      "442|unknown_Egypt_2021_ST121_SSL11",
+      "443|ERR163361_Unknown_2016_ST3123_SSL11",
+      "444|unknown_Egypt_2021_STunknown_SSL11",
+      "445|unknown_Egypt_2021_STunknown_SSL11",
+      "446|unknown_Egypt_2021_STunknown_SSL11",
+      "447|unknown_Egypt_2021_STunknown_SSL11",
+      "450|unknown_Australia_2022_ST121_SSL11",
+      "451|unknown_Egypt_2021_STunknown_SSL11",
+      "452|unknown_Egypt_2021_ST121_SSL11",
+      "460|unknown_Egypt_2021_STunknown_SSL11",
+      "461|unknown_Egypt_2021_STunknown_SSL11",
+      "464|unknown_Egypt_2021_STunknown_SSL11",
+      "465|ERR171888_Unknown_2016_ST5_SSL11",
+      "466|unknown_Egypt_2021_STunknown_SSL11",
+      "467|unknown_Egypt_2021_STunknown_SSL11",
+      "468|unknown_Egypt_2021_STunknown_SSL11",
+      "469|unknown_Egypt_2021_STunknown_SSL11",
+      "470|unknown_Egypt_2021_ST1_SSL11",
+      "471|unknown_Egypt_2021_STunknown_SSL11",
+      "472|ERR418713_Unknown_2016_ST59_SSL11",
+      "475|unknown_Australia_2021_ST22_SSL11",
+      "476|unknown_UK_2022_STunknown_SSL11",
+      "477|unknown_USA_2022_STunknown_SSL11",
+      "478|unknown_USA_2022_STunknown_SSL11",
+      "481|unknown_USA_2022_STunknown_SSL11",
+      "482|unknown_USA_2022_STunknown_SSL11",
+      "483|unknown_Australia_2022_ST45_SSL11",
+      "485|unknown_Egypt_2021_STunknown_SSL11",
+      "486|unknown_Egypt_2021_STunknown_SSL11",
+      "487|unknown_Egypt_2021_STunknown_SSL11",
+      "488|unknown_Egypt_2021_STunknown_SSL11",
+      "489|unknown_Egypt_2021_STunknown_SSL11",
+      "491|unknown_Egypt_2021_STunknown_SSL11",
+      "493|unknown_UK_2022_STunknown_SSL11",
+      "494|unknown_UK_2022_STunknown_SSL11",
+      "495|unknown_UK_2022_STunknown_SSL11",
+      "496|unknown_Egypt_2021_STunknown_SSL11",
+      "497|unknown_Egypt_2021_STunknown_SSL11",
+      "499|unknown_Australia_2022_ST15_SSL11",
+      "500|unknown_Egypt_2021_STunknown_SSL11"
+    ]
+  },
+  "308|ERR599998_Unknown_2016_ST398_SSL11": {
+    "num": 9,
+    "coverage_percent": 1.78,
+    "removed_sequences": [
+      "309|ERR162421_Unknown_2016_ST398_SSL11",
+      "310|unknown_Thailand_2022_ST398_SSL11",
+      "311|unknown_Poland_2021_ST398_SSL11",
+      "312|ERR237562_Unknown_2016_ST398_SSL11",
+      "313|ERR162427_Unknown_2016_ST398_SSL11",
+      "314|ERR160827_Unknown_2016_ST398_SSL11",
+      "315|ERR211617_Unknown_2016_ST398_SSL11",
+      "316|unknown_Germany_2018_ST398_SSL11"
+    ]
+  },
+  "392|ERR524971_Unknown_2016_ST522_SSL11": {
+    "num": 6,
+    "coverage_percent": 1.19,
+    "removed_sequences": [
+      "390|ERR038397_Unknown_2016_ST50_SSL11",
+      "391|ERR599977_Unknown_2016_ST522_SSL11",
+      "393|ERR525069_Unknown_2016_ST522_SSL11",
+      "394|unknown_USA_2022_ST50_SSL11",
+      "395|unknown_Romania_2023_ST8053_SSL11"
+    ]
+  },
+  "173|SSL11|CC93": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  },
+  "224|ERR554368_Unknown_2016_ST291_SSL11": {
+    "num": 4,
+    "coverage_percent": 0.79,
+    "removed_sequences": [
+      "225|unknown_USA_2022_ST8113_SSL11",
+      "226|unknown_USA_2022_ST8113_SSL11",
+      "227|unknown_USA_2022_ST8113_SSL11"
+    ]
+  },
+  "121|unknown_Nepal_2019_ST7753_SSL11": {
+    "num": 5,
+    "coverage_percent": 0.99,
+    "removed_sequences": [
+      "122|ERR144793_Unknown_2016_ST3091_SSL11",
+      "123|ERR211638_Unknown_2016_ST2361_SSL11",
+      "128|ERR084755_Unknown_2016_ST1946_SSL11",
+      "129|unknown_Japan_2022_ST8080_SSL11"
+    ]
+  },
+  "132|ERR540140_Unknown_2016_ST8_SSL11": {
+    "num": 10,
+    "coverage_percent": 1.98,
+    "removed_sequences": [
+      "138|Q2G0X4|SSL11",
+      "140|SRR279127_Unknown_2016_ST8_SSL11",
+      "143|unknown_Chile_2021_ST9025_SSL11",
+      "144|unknown_Nepal_2019_ST7687_SSL11",
+      "146|ERR006496_Unknown_2016_ST239_SSL11",
+      "147|ERR425596_Unknown_2016_ST8_SSL11",
+      "148|ERR332258_Unknown_2016_ST8_SSL11",
+      "149|ERR418656_Unknown_2016_ST8_SSL11",
+      "152|unknown_Unknown_2022_ST239_SSL11"
+    ]
+  },
+  "400|ERR294338_Unknown_2016_ST446_SSL11": {
+    "num": 6,
+    "coverage_percent": 1.19,
+    "removed_sequences": [
+      "401|ERR039399_Unknown_2016_ST1021_SSL11",
+      "402|ERR715719_Unknown_2016_ST580_SSL11",
+      "403|ERR731098_Unknown_2016_ST580_SSL11",
+      "404|unknown_Israel_2019_ST913_SSL11",
+      "405|unknown_Japan_2020_ST7499_SSL11"
+    ]
+  },
+  "053|ERR524918_Unknown_2016_ST133_SSL11": {
+    "num": 10,
+    "coverage_percent": 1.98,
+    "removed_sequences": [
+      "052|ERR211688_Unknown_2016_ST133_SSL11",
+      "054|ERR632863_Unknown_2016_ST133_SSL11",
+      "055|ERR524902_Unknown_2016_ST133_SSL11",
+      "056|unknown_USA_2022_ST133_SSL11",
+      "057|ERR524905_Unknown_2016_ST133_SSL11",
+      "058|ERR525018_Unknown_2016_ST133_SSL11",
+      "059|ERR525014_Unknown_2016_ST133_SSL11",
+      "061|ERR163406_Unknown_2016_ST49_SSL11",
+      "064|ERR211693_Unknown_2016_ST3093_SSL11"
+    ]
+  },
+  "474|ERR737143_Unknown_2016_ST22_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "473|ERR573223_Unknown_2016_ST22_SSL11"
+    ]
+  },
+  "479|unknown_Australia_2022_ST398_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "480|ERR418435_Unknown_2016_ST580_SSL11"
+    ]
+  },
+  "175|unknown_China_2020_ST20_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "178|unknown_USA_2022_ST109_SSL11"
+    ]
+  },
+  "222|ERR033321_Unknown_2016_ST101_SSL11": {
+    "num": 4,
+    "coverage_percent": 0.79,
+    "removed_sequences": [
+      "223|unknown_USA_2022_ST101_SSL11",
+      "228|unknown_China_2016_ST3689_SSL11",
+      "229|unknown_China_2017_ST4981_SSL11"
+    ]
+  },
+  "419|unknown_Sweden_2020_ST7535_SSL11": {
+    "num": 4,
+    "coverage_percent": 0.79,
+    "removed_sequences": [
+      "420|unknown_UK_2024_ST9401_SSL11",
+      "421|unknown_Nepal_2019_ST7747_SSL11",
+      "424|unknown_Spain_2021_ST6984_SSL11"
+    ]
+  },
+  "380|ERR524943_Unknown_2016_ST130_SSL11": {
+    "num": 5,
+    "coverage_percent": 0.99,
+    "removed_sequences": [
+      "381|ERR524961_Unknown_2016_ST130_SSL11",
+      "382|ERR156395_Unknown_2016_ST1245_SSL11",
+      "383|ERR084733_Unknown_2016_ST130_SSL11",
+      "385|ERR310879_Unknown_2016_ST130_SSL11"
+    ]
+  },
+  "145|SSL11|CC8": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  },
+  "379|unknown_Poland_2016_ST425_SSL11": {
+    "num": 7,
+    "coverage_percent": 1.39,
+    "removed_sequences": [
+      "375|ERR211673_Unknown_2016_ST425_SSL11",
+      "376|ERR211620_Unknown_2016_ST425_SSL11",
+      "377|ERR490449_Unknown_2016_ST425_SSL11",
+      "378|ERR490445_Unknown_2016_ST425_SSL11",
+      "388|unknown_Nepal_2019_ST7692_SSL11",
+      "389|ERR182550_Unknown_2016_ST1223_SSL11"
+    ]
+  },
+  "124|ERR554088_Unknown_2016_ST72_SSL11": {
+    "num": 4,
+    "coverage_percent": 0.79,
+    "removed_sequences": [
+      "125|unknown_Australia_2022_ST72_SSL11",
+      "126|ERR554695_Unknown_2016_ST72_SSL11",
+      "127|unknown_China_2022_STunknown_SSL11"
+    ]
+  },
+  "348|ERR033703_Unknown_2016_ST97_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "347|unknown_USA_2022_ST2187_SSL11"
+    ]
+  },
+  "118|unknown_USA_2021_ST6873_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "086|ERR539863_Unknown_2016_ST225_SSL11"
+    ]
+  },
+  "198|SSL11|CC1": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "194|ERR708439_Unknown_2016_ST1_SSL11"
+    ]
+  },
+  "112|ERR540916_Unknown_2016_ST105_SSL11": {
+    "num": 4,
+    "coverage_percent": 0.79,
+    "removed_sequences": [
+      "082|unknown_Sudan_2021_ST5_SSL11",
+      "084|ERR204225_Unknown_2016_ST146_SSL11",
+      "113|unknown_China_2018_ST7576_SSL11"
+    ]
+  },
+  "305|SSL11|CC30": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  },
+  "501|unknown_Romania_2023_ST8046_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "502|unknown_Australia_2021_ST188_SSL11"
+    ]
+  },
+  "172|ERR278864_Unknown_2016_ST93_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "171|ERR182384_Unknown_2016_ST93_SSL11"
+    ]
+  },
+  "413|unknown_India_2017_ST789_SSL11": {
+    "num": 6,
+    "coverage_percent": 1.19,
+    "removed_sequences": [
+      "414|ERR573229_Unknown_2016_ST7_SSL11",
+      "415|unknown_Australia_2022_ST7_SSL11",
+      "416|unknown_Tanzania_2017_ST7845_SSL11",
+      "417|unknown_USA_2022_ST7_SSL11",
+      "418|unknown_USA_2023_ST7_SSL11"
+    ]
+  },
+  "181|ERR540049_Unknown_2016_ST718_SSL11": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  },
+  "384|ERR156397_Unknown_2016_ST130_SSL11": {
+    "num": 3,
+    "coverage_percent": 0.59,
+    "removed_sequences": [
+      "386|ERR084591_Unknown_2016_ST130_SSL11",
+      "387|unknown_Israel_2019_ST130_SSL11"
+    ]
+  },
+  "095|ERR540271_Unknown_2016_ST5_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "096|unknown_Sweden_2024_ST8925_SSL11"
+    ]
+  },
+  "396|unknown_Nepal_2019_ST7690_SSL11": {
+    "num": 4,
+    "coverage_percent": 0.79,
+    "removed_sequences": [
+      "397|unknown_Tanzania_2017_ST7847_SSL11",
+      "398|unknown_Spain_2021_ST6979_SSL11",
+      "399|unknown_Nepal_2019_ST7750_SSL11"
+    ]
+  },
+  "253|ERR708378_Unknown_2016_ST30_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "276|unknown_USA_2022_ST1482_SSL11"
+    ]
+  },
+  "453|ERR211631_Unknown_2016_ST130_SSL11": {
+    "num": 3,
+    "coverage_percent": 0.59,
+    "removed_sequences": [
+      "454|unknown_Poland_2016_ST133_SSL11",
+      "455|unknown_Poland_2016_ST133_SSL11"
+    ]
+  },
+  "230|ERR156415_Unknown_2016_ST599_SSL11": {
+    "num": 3,
+    "coverage_percent": 0.59,
+    "removed_sequences": [
+      "231|ERR175867_Unknown_2016_ST2179_SSL11",
+      "232|unknown_Russia_2018_ST479_SSL11"
+    ]
+  },
+  "120|unknown_Nepal_2019_ST7688_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "119|unknown_Malaysia_2016_ST5032_SSL11"
+    ]
+  },
+  "449|unknown_Russia_2019_ST5814_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "448|unknown_Ireland_2022_ST699_SSL11"
+    ]
+  },
+  "490|ERR410115_Unknown_2016_ST30_SSL11": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  },
+  "425|ERR182540_Unknown_2016_ST2198_SSL11": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  },
+  "504|unknown_Japan_2019_ST7474_SSL11": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  },
+  "075|unknown_USA_2024_ST9194_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "074|ERR599933_Unknown_2016_ST779_SSL11"
+    ]
+  },
+  "179|ERR175899_Unknown_2016_ST9_SSL11": {
+    "num": 5,
+    "coverage_percent": 0.99,
+    "removed_sequences": [
+      "174|ERR387247_Unknown_2016_ST20_SSL11",
+      "176|unknown_Russia_2018_ST20_SSL11",
+      "177|ERR237575_Unknown_2016_ST9_SSL11",
+      "180|ERR573237_Unknown_2016_ST9_SSL11"
+    ]
+  },
+  "459|unknown_Australia_2022_ST109_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "458|unknown_Thailand_2022_ST9_SSL11"
+    ]
+  },
+  "462|unknown_Australia_2021_ST239_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "463|ERR109654_Unknown_2016_ST8_SSL11"
+    ]
+  },
+  "130|ERR171896_Unknown_2016_ST25_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "131|ERR033713_Unknown_2016_ST25_SSL11"
+    ]
+  },
+  "456|ERR083722_UK_2016_ST20_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "457|ERR083731_UK_2016_STunknown_SSL11"
+    ]
+  },
+  "492|ERR038081_UK_2016_ST22_SSL11": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  },
+  "041|SSL11|CC22": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  },
+  "422|unknown_Japan_2021_ST8075_SSL11": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "423|unknown_Japan_2022_ST8081_SSL11"
+    ]
+  },
+  "114|SSL11|CC5": {
+    "num": 2,
+    "coverage_percent": 0.4,
+    "removed_sequences": [
+      "081|SRR1049510_USA_2016_ST5_SSL11"
+    ]
+  },
+  "498|ERR038136_Unknown_2016_ST36_SSL11": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  },
+  "503|ERR737173_Unknown_2016_ST22_SSL11": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  },
+  "484|unknown_Japan_2022_ST8078_SSL11": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  },
+  "426|SRR16104201_Rwanda_2016_ST97_SSL11": {
+    "num": 1,
+    "coverage_percent": 0.2,
+    "removed_sequences": []
+  }
+}
