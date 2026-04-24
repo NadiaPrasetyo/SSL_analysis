@@ -57,83 +57,91 @@ def get_seqs_in_stockholm(stockholm_file):
     return full_names, base_names
 
 def cluster_sequences_by_pid(pairs, full_names, base_names_map, maxid, always_keep_sequences, verbose=False):
-    representative = {}
-    represented = defaultdict(set)
+    from collections import defaultdict
 
-    # Initialize each sequence as its own cluster
-    for seq in full_names:
-        representative[seq] = seq
-        represented[seq].add(seq)
+    # -----------------------------
+    # Step 0: initialize
+    # -----------------------------
+    best_match = {}  # seq -> (best_pid, partner_seq)
 
-    def score(seq):
-        if seq in always_keep_sequences:
-            return (2, 0)
-        return (1, -seq.count("unknown"))
-
-    # --- CLUSTERING ---
-    for seq1, seq2, pid in pairs:
+    def update_best(a, b, pid):
+        # only keep PID > threshold
         if pid < maxid * 100.0:
-            break
+            return
 
+        # prefer higher PID
+        if a not in best_match or pid > best_match[a][0]:
+            best_match[a] = (pid, b)
+        if b not in best_match or pid > best_match[b][0]:
+            best_match[b] = (pid, a)
+
+    # -----------------------------
+    # Step 1: compute best edges
+    # -----------------------------
+    for seq1, seq2, pid in pairs:
         full_seqs1 = base_names_map.get(seq1, [])
         full_seqs2 = base_names_map.get(seq2, [])
 
         if not full_seqs1 or not full_seqs2:
             continue
 
-        # 🔥 THIS is where your snippet goes
         for f1 in full_seqs1:
             for f2 in full_seqs2:
-
-                rep1 = representative[f1]
-                rep2 = representative[f2]
-
-                if rep1 == rep2:
+                if f1 == f2:
                     continue
+                update_best(f1, f2, pid)
 
-                if score(rep1) >= score(rep2):
-                    keep_rep, remove_rep = rep1, rep2
-                else:
-                    keep_rep, remove_rep = rep2, rep1
+    # -----------------------------
+    # Step 2: resolve representatives (inheritance)
+    # -----------------------------
+    def find_root(seq):
+        visited = set()
+        while seq in best_match:
+            if seq in visited:
+                break
+            visited.add(seq)
+            seq = best_match[seq][1]
+        return seq
 
-                # Merge clusters safely
-                if remove_rep not in represented:
-                    continue
+    representative = {}
+    clusters = defaultdict(set)
 
-                for s in represented[remove_rep]:
-                    representative[s] = keep_rep
-                    represented[keep_rep].add(s)
+    for seq in full_names:
+        rep = find_root(seq)
+        representative[seq] = rep
+        clusters[rep].add(seq)
 
-                del represented[remove_rep]
+    # -----------------------------
+    # Step 3: enforce always-keep
+    # -----------------------------
+    keep = set(clusters.keys())
 
-    # --- Representatives ---
-    keep = sorted(represented.keys())
-
-    # --- Enforce always-keep sequences ---
     for base in always_keep_sequences:
         full_list = base_names_map.get(base, [])
 
-        for full_s in full_list:
-            if full_s not in representative:
+        for seq in full_list:
+            if seq not in representative:
                 continue
 
-            rep = representative[full_s]
+            rep = representative[seq]
 
-            if rep != full_s:
-                if rep in represented and full_s in represented[rep]:
-                    represented[rep].remove(full_s)
+            # break it out into its own cluster
+            if seq != rep:
+                clusters[rep].discard(seq)
 
-                represented[full_s] = {full_s}
-                representative[full_s] = full_s
-                keep.append(full_s)
+            clusters[seq].add(seq)
+            representative[seq] = seq
+            keep.add(seq)
 
     keep = sorted(set(keep))
 
-    # --- Coverage ---
+    # -----------------------------
+    # Step 4: coverage report
+    # -----------------------------
     total_original_sequences = len(full_names)
 
     coverage_report = {}
-    for rep, cluster in represented.items():
+    for rep, cluster in clusters.items():
         num = len(cluster)
         coverage_percent = (num / total_original_sequences) * 100.0
 
@@ -143,6 +151,7 @@ def cluster_sequences_by_pid(pairs, full_names, base_names_map, maxid, always_ke
             "removed_sequences": sorted([s for s in cluster if s != rep])
         }
 
+    # sanity check
     total_coverage = sum(v["num"] for v in coverage_report.values())
     assert total_coverage == total_original_sequences
 
