@@ -208,10 +208,44 @@ def generate_rectangular_tree_svg(tree_path, coverage_json_path, svg_output_path
 
     draw_labels(root)
 
-    ax.set_ylim(-1, max(y_pos.values()) + 1)
+    ax.set_ylim(-2, max(y_pos.values()) + 1)
     ax.set_xlim(0, max(x_pos.values()) * 1.1)
 
     ax.axis("off")
+
+    # --- Tree scale bar ---
+    max_x = max(x_pos.values())
+    # Choose a round scale length: 1 if tree is small, 10 if large
+    scale_length = 10 if max_x > 50 else 1
+
+    # Position in the bottom-left
+    bar_x = max_x * 0.02
+    bar_y = -1.5  # just inside the bottom y-limit
+
+    ax.plot(
+        [bar_x, bar_x + scale_length],
+        [bar_y, bar_y],
+        color="black",
+        linewidth=1.5,
+        solid_capstyle="butt"
+    )
+    # Tick marks at each end
+    tick_height = 0.2
+    ax.plot([bar_x, bar_x], [bar_y - tick_height, bar_y + tick_height],
+            color="black", linewidth=1.5)
+    ax.plot([bar_x + scale_length, bar_x + scale_length],
+            [bar_y - tick_height, bar_y + tick_height],
+            color="black", linewidth=1.5)
+    # Label centred above the bar
+    # Label with legend text to the left of the bar
+    ax.text(
+        bar_x,
+        bar_y + 0.35,
+        f"Tree scale: {scale_length}",
+        ha="left",
+        va="bottom",
+        fontsize=8
+    )
 
     os.makedirs(os.path.dirname(svg_output_path), exist_ok=True)
     plt.savefig(svg_output_path, format="svg", bbox_inches="tight")
