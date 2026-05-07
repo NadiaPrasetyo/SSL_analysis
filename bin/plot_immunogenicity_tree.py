@@ -127,19 +127,22 @@ def main(input_csv, newick_tree_file, output_file):
     # ── 5.  FIGURE LAYOUT  ───────────────────────────────────────────────────────
     cell_h   = 0.45
     cell_w   = 0.70
-    tree_w   = 3.0
+    tree_w   = 7.0
     cbar_w   = 0.4
     pad      = 0.3
 
-    label_w  = max(len(a) for a in accessions) * 0.07
+    label_w  = max(len(a) for a in accessions) * 0.07 
     fig_h = max(6, n_acc * cell_h + 2.0)
-    fig_w = tree_w + n_feat * cell_w + label_w + cbar_w + pad * 3
+    #fig_w = tree_w + n_feat * cell_w + label_w + cbar_w + pad * 3 #extra label
+    fig_w = tree_w + n_feat * cell_w + cbar_w + pad * 3
 
     fig = plt.figure(figsize=(fig_w, fig_h), facecolor="white")
 
     gs = fig.add_gridspec(
-        1, 4,
-        width_ratios=[tree_w, n_feat * cell_w, label_w, cbar_w],
+        1, 3,
+        #1, 4, #extra labels
+        # width_ratios=[tree_w, n_feat * cell_w, label_w, cbar_w], #extra label
+        width_ratios=[tree_w, n_feat * cell_w, cbar_w],
         left=0.08, right=0.97,
         top=0.95, bottom=0.22,
         wspace=0.03,
@@ -147,8 +150,9 @@ def main(input_csv, newick_tree_file, output_file):
 
     ax_tree  = fig.add_subplot(gs[0])
     ax_heat  = fig.add_subplot(gs[1])
-    ax_label = fig.add_subplot(gs[2])
-    ax_cbar  = fig.add_subplot(gs[3])
+    ax_cbar  = fig.add_subplot(gs[2])
+    #ax_cbar  = fig.add_subplot(gs[3]) = fig.add_subplot(gs[2]) extra labels
+    #ax_cbar  = fig.add_subplot(gs[3]) extra labels
 
     # ── 6.  DRAW TREE  ────────────────────────────────────────────────────────────
     tree_color = "black"
@@ -188,7 +192,7 @@ def main(input_csv, newick_tree_file, output_file):
         grp = leaf_name.split("|")[0]
         col = group_colors.get(grp, "black")
         ax_tree.text(max_x * 1.03, idx, leaf_name,
-                    va="center", ha="left", fontsize=7.5,
+                    va="center", ha="left", fontsize=12,
                     color=col, fontfamily="monospace")
 
     # ── 7.  DRAW HEATMAP  ─────────────────────────────────────────────────────────
@@ -213,26 +217,26 @@ def main(input_csv, newick_tree_file, output_file):
 
     ax_heat.set_facecolor("white")
     ax_heat.set_xticks(range(n_feat))
-    ax_heat.set_xticklabels(features, rotation=45, ha="right", fontsize=7.5,
+    ax_heat.set_xticklabels(features, rotation=45, ha="right", fontsize=12,
                             color="black")
     ax_heat.xaxis.set_label_position("bottom")
     ax_heat.xaxis.tick_bottom()
     ax_heat.set_yticks([])
     ax_heat.tick_params(axis="x", length=0, pad=3)
 
-    # dedicated label panel — mirrors the heatmap y-axis
-    ax_label.set_xlim(0, 1)
-    ax_label.set_ylim(n_acc - 0.5, -0.5)   # invert so row 0 is at the top
-    ax_label.axis("off")
-    for i, name in enumerate(reversed(accessions)):
-        grp = name.split("|")[0]
-        col = group_colors.get(grp, "black")
-        ax_label.text(0.05, i, name, va="center", ha="left",
-                      fontsize=7.5, fontfamily="monospace", color=col)
+    # dedicated label panel — mirrors the heatmap y-axis extra labels
+    #ax_label.set_xlim(0, 1)
+    #ax_label.set_ylim(n_acc - 0.5, -0.5)   # invert so row 0 is at the top
+    #ax_label.axis("off")
+    #for i, name in enumerate(reversed(accessions)):
+    #    grp = name.split("|")[0]
+    #    col = group_colors.get(grp, "black")
+    #    ax_label.text(0.05, i, name, va="center", ha="left",
+    #                  fontsize=12, fontfamily="monospace", color=col)
 
     # ── 8.  COLORBAR  ────────────────────────────────────────────────────────────
     cb = fig.colorbar(im, cax=ax_cbar)
-    cb.set_label("Z-score", color="black", fontsize=8, labelpad=6)
+    cb.set_label("Z-score", color="black", fontsize=13, labelpad=6)
     cb.ax.yaxis.set_tick_params(color="black", labelsize=7)
     plt.setp(plt.getp(cb.ax.axes, "yticklabels"), color="black")
     cb.ax.set_facecolor("white")
@@ -243,12 +247,12 @@ def main(input_csv, newick_tree_file, output_file):
         mpatches.Patch(color=v, label=k) for k, v in group_colors.items()
     ]
     fig.legend(handles=legend_handles, loc="lower left", framealpha=0.8,
-            labelcolor="black", fontsize=8,
+            labelcolor="black", fontsize=12,
             bbox_to_anchor=(0.01, 0.01), ncol=3,
             facecolor="white", edgecolor="#aaa")
 
     fig.suptitle("Accession Feature Heatmap  (Z-score per feature)",
-                color="black", fontsize=13, fontweight="bold", y=1)
+                color="black", fontsize=17, fontweight="bold", y=1)
 
     fig.patch.set_facecolor("white")
 
