@@ -26,8 +26,11 @@ The analysis was performed using representative SSL sequences from major clonal 
 ### Repository Structure
 
 SSL_analysis/
+
 ├── bin/
+
 ├── data/
+
 └── README.md
 
 bin/ — Analysis Scripts
