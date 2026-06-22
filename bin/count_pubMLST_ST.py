@@ -17,6 +17,7 @@ def main(input_file, output_csv):
 
     with open(output_csv, "w") as f:
         writer = csv.writer(f)
+        writer.writerow(["ST", "Count"])
         for st, count in st_counts.items():
             writer.writerow([st, count])
 
