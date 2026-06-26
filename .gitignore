@@ -4,6 +4,7 @@ data/ssl/genomes_6frame_proteins.fasta
 data/6_strains/*/bcell/*
 data/6_strains/*/mhci/*
 bin/test.py
+pubMLST.fas
 data/pubMLST/contigs/*
 data/pubMLST/bath/bath_results/
 data/pubMLST/bath/best_hits/
