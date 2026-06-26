@@ -4,6 +4,7 @@ from collections import defaultdict
 from Bio import SeqIO
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import numpy as np
 
 
 def main(input_file, output_csv, output_plot=None, year_column=-2, st_column=-1, plot_year=None, last_n_years=10):
@@ -40,7 +41,7 @@ def main(input_file, output_csv, output_plot=None, year_column=-2, st_column=-1,
     print(f"Wrote {output_csv}")
 
     # --- Plot ---
-    all_years = sorted(year_st_counts.keys())  # now sorted numerically
+    all_years = sorted(year_st_counts.keys())
 
     if plot_year:
         years = [y for y in all_years if y in plot_year]
@@ -49,7 +50,7 @@ def main(input_file, output_csv, output_plot=None, year_column=-2, st_column=-1,
     else:
         years = all_years
 
-    # Find top 5 STs per year
+    # Find top 5 STs per year; everything else goes into "Other"
     top_sts_per_year = {}
     all_top_sts = set()
     for year in years:
@@ -57,34 +58,54 @@ def main(input_file, output_csv, output_plot=None, year_column=-2, st_column=-1,
         top_sts_per_year[year] = top5
         all_top_sts.update(top5)
 
-    # Sort STs and assign consistent colors
+    # Sort STs for consistent ordering in the stack
     all_top_sts = sorted(all_top_sts, key=lambda s: int(s) if s.isdigit() else float("inf"))
     cmap = cm.get_cmap("tab20", max(len(all_top_sts), 1))
     st_colors = {st: cmap(i) for i, st in enumerate(all_top_sts)}
 
-    fig, ax = plt.subplots(figsize=(14, 6))
+    # Build stacked data: for each year, value for each ST (0 if not in top 5 that year)
+    # Plus an "Other" bar for the remaining counts
+    st_data = {st: [] for st in all_top_sts}
+    other_data = []
 
+    for year in years:
+        top5 = top_sts_per_year[year]
+        top5_total = 0
+        for st in all_top_sts:
+            val = year_st_counts[year][st] if st in top5 else 0
+            st_data[st].append(val)
+            top5_total += val
+        year_total = sum(year_st_counts[year].values())
+        other_data.append(year_total - top5_total)
+
+    fig, ax = plt.subplots(figsize=(14, 6))
+    x = np.arange(len(years))
+    bar_width = 0.6
+
+    bottoms = np.zeros(len(years))
+
+    # Plot "Other" at the bottom
+    ax.bar(x, other_data, bar_width, label="Other", color="lightgrey",
+           bottom=bottoms, edgecolor="white", linewidth=0.5)
+    bottoms += np.array(other_data)
+
+    # Stack each top ST on top
     for st in all_top_sts:
-        x_vals, y_vals = [], []
-        for year in years:
-            if st in top_sts_per_year[year]:
-                x_vals.append(year)
-                y_vals.append(year_st_counts[year][st])
-        if x_vals:
-            ax.plot(x_vals, y_vals, marker="o", label=f"ST {st}",
-                    color=st_colors[st], linewidth=2, markersize=6)
+        vals = np.array(st_data[st])
+        ax.bar(x, vals, bar_width, label=f"ST {st}",
+               color=st_colors[st], bottom=bottoms,
+               edgecolor="white", linewidth=0.5)
+        bottoms += vals
 
     ax.set_xlabel("Year", fontsize=12)
     ax.set_ylabel("ST Count", fontsize=12)
-    ax.set_title("Top 5 ST Counts per Year", fontsize=14)
-    ax.grid(axis="y", linestyle="--", alpha=0.5)
-
-    # Set x-axis to only show the plotted years, as integers
-    ax.set_xticks(years)
+    ax.set_title("Top 5 ST Counts per Year (Stacked)", fontsize=14)
+    ax.set_xticks(x)
     ax.set_xticklabels([str(y) for y in years], rotation=45, ha="right")
-    ax.set_xlim(years[0] - 0.5, years[-1] + 0.5)
+    ax.grid(axis="y", linestyle="--", alpha=0.4)
+    ax.set_axisbelow(True)
 
-    # Legend outside plot, but constrained so it doesn't overflow
+    # Legend: put it outside, 2 columns if many STs
     ax.legend(
         bbox_to_anchor=(1.01, 1),
         loc="upper left",
@@ -93,7 +114,7 @@ def main(input_file, output_csv, output_plot=None, year_column=-2, st_column=-1,
         title_fontsize=9,
         frameon=True,
         borderpad=0.5,
-        ncol=max(1, len(all_top_sts) // 20),  # use 2 columns if many STs
+        ncol=max(1, len(all_top_sts) // 20),
     )
 
     plt.tight_layout()
