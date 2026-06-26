@@ -8,7 +8,7 @@ import matplotlib.cm as cm
 import numpy as np
 
 
-def main(input_file, output_csv, output_plot=None, year_column=-2, st_column=-1):
+def main(input_file, output_csv, output_plot=None, year_column=-2, st_column=-1, plot_year=None):
     # >3532|Saitama9|Staphylococcus_aureus|Japan|2012|1558
     records = SeqIO.parse(input_file, "fasta")
 
@@ -35,6 +35,8 @@ def main(input_file, output_csv, output_plot=None, year_column=-2, st_column=-1)
     # --- Plot ---
     # Find top 5 STs per year (by count in that year)
     years = sorted(year_st_counts.keys())
+    if plot_year:
+        years = [y for y in years if y in plot_year]
 
     # Collect all top-5 STs across all years so we can assign consistent colors
     top_sts_per_year = {}
@@ -89,5 +91,7 @@ if __name__ == "__main__":
                         help="Column number for year (default: -2 (last column - 1))")
     parser.add_argument("--st-column", type=int, default=-1,
                         help="Column number for ST (default: -1 (last column))")
+    parser.add_argument("--plot-year", type=int, default=None, nargs="+",
+                        help="Years to plot (default: None)")
     args = parser.parse_args()
-    main(args.input_file, args.output_csv, args.output_plot, args.year_column, args.st_column)
+    main(args.input_file, args.output_csv, args.output_plot, args.year_column, args.st_column, args.plot_year)
